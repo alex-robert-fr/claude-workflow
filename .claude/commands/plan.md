@@ -1,6 +1,6 @@
 Commence par lire ce fichier :
 
-1. `.claude/skills/shared.md`
+1. `.claude/skills/shared/SKILL.md`
 
 ---
 

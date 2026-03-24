@@ -40,6 +40,7 @@ while IFS= read -r -d '' file; do
 done < <(find "$SCRIPT_DIR/.claude/skills" -name '*.md' -print0)
 
 # Créer les fichiers projet-specific s'ils n'existent pas encore
+# Templates fichiers plats (ex: templates/foo.md → skills/foo.md)
 for file in "$SCRIPT_DIR/templates/"*.md; do
   [ -f "$file" ] || continue
   filename="$(basename "$file")"
@@ -48,6 +49,17 @@ for file in "$SCRIPT_DIR/templates/"*.md; do
   if [ ! -f "$TARGET_CLAUDE/skills/$filename" ]; then
     cp "$file" "$TARGET_CLAUDE/skills/$filename"
     echo "  ↳ skills/$filename (template, à personnaliser)"
+    changed=$((changed + 1))
+  fi
+done
+# Templates répertoires (ex: templates/foo/SKILL.md → skills/foo/SKILL.md)
+for dir in "$SCRIPT_DIR/templates/"*/; do
+  [ -d "$dir" ] || continue
+  dirname="$(basename "$dir")"
+  target_dir="$TARGET_CLAUDE/skills/$dirname"
+  if [ ! -d "$target_dir" ]; then
+    cp -r "$dir" "$target_dir"
+    echo "  ↳ skills/$dirname/ (template, à personnaliser)"
     changed=$((changed + 1))
   fi
 done

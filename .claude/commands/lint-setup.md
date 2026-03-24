@@ -1,4 +1,4 @@
-Commence par lire `.claude/skills/shared.md`.
+Commence par lire `.claude/skills/shared/SKILL.md`.
 
 ---
 
@@ -19,7 +19,7 @@ Focus sur un aspect spécifique. Arguments possibles :
 
 ## Étape 1 — Explorer les configs existantes
 
-Lis `.claude/skills/code-conventions.md` pour comprendre la stack du projet, puis scanne pour identifier toutes les configurations lint/format en place :
+Lis `.claude/skills/code-conventions/SKILL.md` pour comprendre la stack du projet, puis scanne pour identifier toutes les configurations lint/format en place :
 
 - `biome.json` / `biome.jsonc` (racine et workspaces)
 - `eslint.config.mjs` / `.eslintrc.*` (racine et workspaces)
@@ -34,7 +34,7 @@ Lis chaque fichier trouvé pour comprendre la configuration actuelle.
 
 ## Étape 2 — Analyser
 
-Lis `.claude/skills/lint-expertise.md` puis évalue chaque axe :
+Lis `.claude/skills/lint-expertise/SKILL.md` puis évalue chaque axe :
 
 1. Choix des outils — sont-ils optimaux ?
 2. Performance — temps de lint, cache activé ?

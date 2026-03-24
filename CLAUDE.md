@@ -12,9 +12,9 @@ Repo central de commandes et skills Claude Code, synchronisés vers tous les pro
 ## Structure
 
 ```
-.claude/commands/   → copiés dans .claude/commands/ de chaque projet
-.claude/skills/     → copiés dans .claude/skills/ de chaque projet
-templates/          → copiés dans .claude/skills/ uniquement si le fichier n'existe pas
+.claude/commands/          → copiés dans .claude/commands/ de chaque projet
+.claude/skills/nom/SKILL.md → copiés dans .claude/skills/ de chaque projet
+templates/nom/SKILL.md     → copiés dans .claude/skills/ uniquement si le répertoire n'existe pas
 ```
 
 ## Scripts
@@ -24,10 +24,10 @@ templates/          → copiés dans .claude/skills/ uniquement si le fichier n'
 
 ## Conventions
 
-- Nommage fichiers : `kebab-case.md`
+- Nommage : `kebab-case`, chaque skill est un répertoire `nom/SKILL.md`
 - Commandes : orchestration (flux, étapes, outils) — pas de savoir métier
 - Skills : expertise (règles, critères, formats) — pas de logique d'exécution
-- Un skill est référencé dans une commande via `Lis .claude/skills/nom.md`
+- Un skill est référencé dans une commande via `Lis .claude/skills/nom/SKILL.md`
 - `$ARGUMENTS` toujours en fin de commande
 
 ## Skills disponibles
@@ -36,10 +36,10 @@ Quand un sujet est abordé en conversation (hors commande slash), lis le skill c
 
 | Sujet | Skill à lire |
 |-------|-------------|
-| Branches git | `.claude/skills/branch-convention.md` |
-| Messages de commit | `.claude/skills/commit-convention.md` |
-| Pull requests | `.claude/skills/pr-convention.md` |
-| Labels GitHub | `.claude/skills/labels-catalog.md` |
-| Code, conventions, stack | `.claude/skills/code-conventions.md` |
-| Lint, format, DX | `.claude/skills/lint-expertise.md` |
+| Branches git | `.claude/skills/branch-convention/SKILL.md` |
+| Messages de commit | `.claude/skills/commit-convention/SKILL.md` |
+| Pull requests | `.claude/skills/pr-convention/SKILL.md` |
+| Labels GitHub | `.claude/skills/labels-catalog/SKILL.md` |
+| Code, conventions, stack | `.claude/skills/code-conventions/SKILL.md` |
+| Lint, format, DX | `.claude/skills/lint-expertise/SKILL.md` |
 | Créer des skills | `.claude/skills/create-skill/SKILL.md` |

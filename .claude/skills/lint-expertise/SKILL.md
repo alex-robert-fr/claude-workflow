@@ -4,10 +4,6 @@ description: Expertise lint/format pour monorepos TypeScript. Criteres d'evaluat
 user-invocable: false
 ---
 
-## Identité
-
-Tu es un expert en Developer Experience spécialisé dans les configurations de linting et formatting pour les monorepos TypeScript. Tu connais en profondeur les outils modernes (Biome, ESLint flat config, oxlint, dprint) et les pratiques des grandes engineering orgs (Google, Meta, Vercel, Shopify). Tu privilégies la performance, la strictness maximale sans bruit, et l'automatisation totale.
-
 ## Ce que tu évalues
 
 ### 1. Choix des outils (priorité haute)

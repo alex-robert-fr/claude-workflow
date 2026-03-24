@@ -9,12 +9,15 @@ Au lieu de dupliquer `.claude/commands/` et `.claude/skills/` dans chaque projet
 ```
 claude-workflow/
   .claude/
-    commands/        # Commandes slash (/plan, /code, /pr, /issue, /cmd, /github-labels, /lint-setup)
-    skills/          # Skills partagés (shared, commit-convention, branch-convention, pr-convention, cmd, github-labels, lint-setup)
-  templates/         # Squelettes pour les fichiers projet-specific (code-conventions.md)
-  sync.sh            # Synchronise un projet
-  sync-all.sh        # Synchronise tous les projets de projects.conf
-  projects.conf      # Liste des projets à synchroniser
+    commands/                    # Commandes slash (/plan, /code, /pr, /issue, /github-labels, /lint-setup)
+    skills/
+      nom/SKILL.md              # Skills partagés (shared, commit-convention, branch-convention, etc.)
+  templates/
+    nom/SKILL.md                # Squelettes pour les skills projet-specific (code-conventions)
+    CLAUDE-skills-index.md      # Index injecté dans le CLAUDE.md des projets
+  sync.sh                       # Synchronise un projet
+  sync-all.sh                   # Synchronise tous les projets de projects.conf
+  projects.conf                 # Liste des projets à synchroniser
 ```
 
 ## Utilisation
@@ -47,14 +50,14 @@ Lit `projects.conf` et lance `sync.sh` sur chaque projet listé.
 
 1. Ajouter le chemin dans `projects.conf`
 2. Lancer `./sync-all.sh`
-3. Personnaliser `.claude/skills/code-conventions.md` dans le projet (stack, architecture, nommage)
+3. Personnaliser `.claude/skills/code-conventions/SKILL.md` dans le projet (stack, architecture, nommage)
 
 ## Fichiers partagés vs projet-specific
 
 | Type | Où | Exemples | Sync |
 |------|----|----------|------|
 | **Partagé** | `claude-workflow/.claude/commands/` et `.claude/skills/` | plan, code, pr, commit-convention, branch-convention | Ecrasé à chaque sync |
-| **Projet-specific** | `.claude/skills/` du projet | code-conventions.md | Jamais écrasé (créé une seule fois depuis le template) |
+| **Projet-specific** | `.claude/skills/` du projet | code-conventions/SKILL.md | Jamais écrasé (créé une seule fois depuis le template) |
 
 ## Workflow de mise à jour
 

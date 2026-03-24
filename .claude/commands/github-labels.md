@@ -1,6 +1,6 @@
 Commence par lire ce fichier :
 
-1. `.claude/skills/labels-catalog.md`
+1. `.claude/skills/labels-catalog/SKILL.md`
 
 ---
 

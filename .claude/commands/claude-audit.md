@@ -6,8 +6,8 @@ user-invocable: true
 
 Commence par lire ces fichiers dans l'ordre :
 
-1. `.claude/skills/shared.md`
-2. `.claude/skills/audit.md`
+1. `.claude/skills/shared/SKILL.md`
+2. `.claude/skills/audit/SKILL.md`
 
 # Commande /audit
 

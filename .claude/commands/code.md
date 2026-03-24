@@ -1,4 +1,4 @@
-Commence par lire `.claude/skills/shared.md`.
+Commence par lire `.claude/skills/shared/SKILL.md`.
 
 ---
 
@@ -14,7 +14,7 @@ Récupère l'issue via MCP GitHub (ID, URL ou titre) et lance `/plan` avant de c
 
 ## Étape 0 — Vérifications
 
-Lis `.claude/skills/code-conventions.md` puis vérifie :
+Lis `.claude/skills/code-conventions/SKILL.md` puis vérifie :
 
 - [ ] Le repo a un remote `origin` configuré
 - [ ] Le working tree est propre (pas de changements non commités qui bloqueraient un checkout)
@@ -24,13 +24,13 @@ Si une vérification échoue, signale-le clairement et arrête-toi. Ne tente pas
 
 ## Étape 1 — Créer la branche
 
-Lis `.claude/skills/branch-convention.md` puis crée une branche depuis la **branche par défaut** définie dans `code-conventions` (section Git) en suivant la convention.
+Lis `.claude/skills/branch-convention/SKILL.md` puis crée une branche depuis la **branche par défaut** définie dans `code-conventions` (section Git) en suivant la convention.
 
 Annonce la branche créée avant de commencer.
 
 ## Étape 2 — Implémenter
 
-Lis `.claude/skills/commit-convention.md` puis suis les étapes du plan dans l'ordre. Pour chaque étape :
+Lis `.claude/skills/commit-convention/SKILL.md` puis suis les étapes du plan dans l'ordre. Pour chaque étape :
 
 ### Règles de code
 

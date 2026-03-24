@@ -1,6 +1,6 @@
 Commence par lire ce fichier :
 
-1. `.claude/skills/shared.md`
+1. `.claude/skills/shared/SKILL.md`
 
 ---
 
@@ -85,7 +85,7 @@ Puis demande confirmation : **"Je crée ces N issues sur GitHub ?"**
 
 ## Étape 5 — Créer les issues via MCP GitHub
 
-Commence par lire `.claude/skills/labels-catalog.md` pour connaître les labels disponibles.
+Commence par lire `.claude/skills/labels-catalog/SKILL.md` pour connaître les labels disponibles.
 
 Une fois confirmation reçue, crée chaque issue via le MCP GitHub dans l'ordre logique (dépendances d'abord).
 
