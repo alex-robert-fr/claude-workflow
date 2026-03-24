@@ -1,3 +1,9 @@
+---
+name: cmd-philosophy
+description: Philosophie de decouplage commandes vs skills, structures, conventions de nommage et anti-patterns. Reference pour creer ou modifier des commandes et skills Claude Code.
+user-invocable: false
+---
+
 ## Philosophie de découpage
 
 ### Ce qui va dans une commande
@@ -50,6 +56,11 @@ Sinon, intègre directement dans la commande.
 # Commande /nom
 
 [Description courte du rôle de la commande]
+
+## Étape 0 — Vérifications
+
+Avant de commencer, vérifie les préconditions nécessaires.
+Si une vérification échoue, signale-le et arrête-toi.
 
 ## Étape 1 — [Action concrète]
 
@@ -112,6 +123,7 @@ $ARGUMENTS
 - Commandes : verbe court ou nom d'action (`review`, `plan`, `cmd`, `issue`)
 - Skills : domaine ou persona (`security`, `archi`, `shared`)
 - Pas de préfixe inutile (`expert-security.md` → `security.md`)
+- **Ne pas donner le même nom** à une commande et à son skill associé — le skill doit refléter son domaine d'expertise (ex: commande `cmd` → skill `cmd-philosophy`, commande `lint-setup` → skill `lint-expertise`)
 
 ### Référence aux skills dans une commande
 
@@ -144,10 +156,12 @@ La plupart des commandes gagnent à supporter deux modes :
 
 ## Anti-patterns à éviter
 
-- ❌ Commande trop longue qui mélange flux + règles métier
-- ❌ Skill sans persona claire → réponses génériques
-- ❌ Confirmation absente avant une action irréversible
-- ❌ `$ARGUMENTS` absent ou mal placé (doit toujours être à la fin)
-- ❌ Skill qui duplique le contenu de `shared.md`
-- ❌ Commande qui hardcode des valeurs qui appartiennent au skill
-- ❌ Trop de commandes pour la même chose → préférer les modes
+- Commande trop longue qui mélange flux + règles métier
+- Skill sans persona claire → réponses génériques
+- Confirmation absente avant une action irréversible
+- `$ARGUMENTS` absent ou mal placé (doit toujours être à la fin)
+- Skill qui duplique le contenu de `shared.md`
+- Commande qui hardcode des valeurs qui appartiennent au skill ou au template projet
+- Trop de commandes pour la même chose → préférer les modes
+- Commande sans Étape 0 de vérifications
+- Même nom pour une commande et son skill associé

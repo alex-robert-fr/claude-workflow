@@ -1,7 +1,7 @@
 Commence par lire ces fichiers dans l'ordre :
 
 1. `.claude/skills/shared.md`
-2. `.claude/skills/lint-setup.md`
+2. `.claude/skills/lint-expertise.md`
 3. `.claude/skills/code-conventions.md`
 
 ---
@@ -38,7 +38,7 @@ Lis chaque fichier trouvé pour comprendre la configuration actuelle.
 
 ## Étape 2 — Analyser
 
-Évalue chaque axe défini dans le skill `lint-setup` :
+Évalue chaque axe défini dans le skill `lint-expertise` :
 
 1. Choix des outils — sont-ils optimaux ?
 2. Performance — temps de lint, cache activé ?
@@ -50,7 +50,7 @@ Lis chaque fichier trouvé pour comprendre la configuration actuelle.
 
 ## Étape 3 — Produire le rapport
 
-Affiche le rapport au format défini dans le skill `lint-setup`.
+Affiche le rapport au format défini dans le skill `lint-expertise`.
 
 Pour chaque amélioration recommandée, montre le diff concret (avant/après) de la config concernée.
 

@@ -1,6 +1,6 @@
 ---
-name: lint-setup
-description: Expertise lint/format pour monorepos TypeScript. Critères d'évaluation, best practices GAFAM, outils modernes, patterns et anti-patterns.
+name: lint-expertise
+description: Expertise lint/format pour monorepos TypeScript. Criteres d'evaluation, best practices GAFAM, outils modernes, patterns et anti-patterns.
 user-invocable: false
 ---
 
@@ -84,36 +84,36 @@ Tous les fichiers du projet doivent être couverts :
 
 ## Anti-patterns à détecter
 
-- ❌ Prettier ET Biome actifs en même temps (conflits de formatting)
-- ❌ `.eslintrc.json` (legacy) au lieu de `eslint.config.mjs` (flat config)
-- ❌ `any` autorisé sans override explicite
-- ❌ Pre-commit hook qui lint tout le projet au lieu des fichiers stagés
-- ❌ Règles de style dans ESLint (Biome s'en charge)
-- ❌ Config ESLint qui extends 10+ configs (lent, conflits)
-- ❌ Pas de cache activé
-- ❌ Formatter configuré différemment entre Biome et l'IDE
+- Prettier ET Biome actifs en même temps (conflits de formatting)
+- `.eslintrc.json` (legacy) au lieu de `eslint.config.mjs` (flat config)
+- `any` autorisé sans override explicite
+- Pre-commit hook qui lint tout le projet au lieu des fichiers stagés
+- Règles de style dans ESLint (Biome s'en charge)
+- Config ESLint qui extends 10+ configs (lent, conflits)
+- Pas de cache activé
+- Formatter configuré différemment entre Biome et l'IDE
 
 ## Format de rapport
 
 ```
-## 🔍 Audit lint/format
+## Audit lint/format
 
 ### Score global : [X/10]
 
-### ✅ Points conformes
+### Points conformes
 - [ce qui est déjà bien configuré]
 
-### ⚠️ Améliorations recommandées
+### Améliorations recommandées
 Pour chaque amélioration :
 - **Quoi** : description précise
 - **Pourquoi** : quel problème ça résout
 - **Comment** : changement concret à appliquer
 - **Impact** : performance, strictness, DX
 
-### ❌ Problèmes critiques
+### Problèmes critiques
 [Configurations dangereuses ou anti-patterns majeurs]
 
-### 📊 Comparaison avant/après
+### Comparaison avant/après
 | Métrique | Avant | Après |
 |----------|-------|-------|
 | Temps de lint | Xs | Ys |

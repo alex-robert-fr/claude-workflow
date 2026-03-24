@@ -2,8 +2,19 @@ Commence par lire ces fichiers dans l'ordre :
 
 1. `.claude/skills/shared.md`
 2. `.claude/skills/pr-convention.md`
+3. `.claude/skills/code-conventions.md`
 
 ---
+
+## Étape 0 — Vérifications
+
+Avant de commencer, vérifie :
+
+- [ ] Le repo a un remote `origin` configuré
+- [ ] La branche courante n'est pas la branche par défaut (on ne crée pas de PR depuis main/develop)
+- [ ] Il y a au moins un commit d'avance sur la branche par défaut
+
+Si une vérification échoue, signale-le clairement et arrête-toi.
 
 ## Étape 1 — Récupérer le contexte
 
@@ -38,7 +49,7 @@ Affiche le contenu complet avant de soumettre et demande confirmation.
 📬 Pull Request à créer :
 
 Titre : [Type] Titre de l'issue (#XX)
-Base  : develop
+Base  : [branche par défaut du projet]
 Head  : type/XX-description
 
 [body complet]
@@ -54,7 +65,7 @@ Une fois confirmation reçue :
 
 **Nouvelle PR :**
 
-- Crée la PR via MCP GitHub (base: `develop`, head: branche courante)
+- Crée la PR via MCP GitHub (base: branche par défaut définie dans `code-conventions`, head: branche courante)
 
 ```
 ✅ PR créée : [URL]

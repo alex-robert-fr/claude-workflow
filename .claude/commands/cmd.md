@@ -1,8 +1,8 @@
 Commence par lire ce fichier :
 
-1. `.claude/skills/cmd.md`
+1. `.claude/skills/cmd-philosophy.md`
 
-Il contient les règles et conventions pour créer des commandes et skills de qualité. Applique-les à la lettre.
+Il contient la philosophie de découpage commandes/skills, les structures et les conventions. Applique-les à la lettre.
 
 ---
 
@@ -24,7 +24,7 @@ Analyse-la selon deux axes :
 - Si création : vérifie qu'une commande similaire n'existe pas déjà pour éviter les doublons
 
 **Complexité :** est-ce que ça nécessite un skill séparé ?
-Applique la règle du skill définie dans `.claude/skills/cmd.md`.
+Applique la règle du skill définie dans `.claude/skills/cmd-philosophy.md`.
 
 ---
 

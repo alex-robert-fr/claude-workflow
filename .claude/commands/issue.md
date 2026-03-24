@@ -4,6 +4,15 @@ Commence par lire ce fichier :
 
 ---
 
+## Étape 0 — Vérifications
+
+Avant de commencer, vérifie :
+
+- [ ] Le repo a un remote `origin` configuré
+- [ ] L'utilisateur a fourni une description de ce qu'il veut créer
+
+Si une vérification échoue, signale-le clairement et arrête-toi.
+
 ## Étape 1 — Détecter le repo courant
 
 Utilise le MCP GitHub pour identifier le repo actif à partir du remote Git (`origin`). Toutes les issues seront créées dans ce repo.
@@ -76,7 +85,7 @@ Puis demande confirmation : **"Je crée ces N issues sur GitHub ?"**
 
 ## Étape 5 — Créer les issues via MCP GitHub
 
-Commence par lire `.claude/skills/github-labels.md` pour connaître les labels disponibles.
+Commence par lire `.claude/skills/labels-catalog.md` pour connaître les labels disponibles.
 
 Une fois confirmation reçue, crée chaque issue via le MCP GitHub dans l'ordre logique (dépendances d'abord).
 

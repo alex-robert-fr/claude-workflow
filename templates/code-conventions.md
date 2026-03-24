@@ -17,6 +17,10 @@ user-invocable: false
 - **CSS** : <!-- ex: Tailwind, CSS Modules -->
 - **Composants UI** : <!-- ex: shadcn, Radix -->
 
+## Git
+
+- **Branche par defaut** : <!-- ex: main, develop -->
+
 ## Architecture
 
 - **Pattern** : <!-- ex: DDD, Clean Architecture, MVC -->

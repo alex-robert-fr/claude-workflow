@@ -4,6 +4,15 @@ Commence par lire ce fichier :
 
 ---
 
+## Étape 0 — Vérifications
+
+Avant de commencer, vérifie :
+
+- [ ] Le repo a un remote `origin` configuré (nécessaire pour récupérer l'issue)
+- [ ] L'argument fourni permet d'identifier une issue (numéro, URL ou texte)
+
+Si une vérification échoue, signale-le clairement et arrête-toi.
+
 ## Étape 1 — Identifier et récupérer l'issue
 
 L'argument peut prendre plusieurs formes. Adapte-toi :

@@ -17,9 +17,19 @@ Récupère l'issue via MCP GitHub (ID, URL ou titre) et lance `/plan` avant de c
 
 ---
 
+## Étape 0 — Vérifications
+
+Avant de commencer, vérifie :
+
+- [ ] Le repo a un remote `origin` configuré
+- [ ] Le working tree est propre (pas de changements non commités qui bloqueraient un checkout)
+- [ ] La branche par défaut définie dans `code-conventions` (section Git) existe localement ou sur le remote
+
+Si une vérification échoue, signale-le clairement et arrête-toi. Ne tente pas de contourner.
+
 ## Étape 1 — Créer la branche
 
-Avant tout code, crée une branche depuis `develop` en suivant la convention définie dans le skill `branch-convention`.
+Avant tout code, crée une branche depuis la **branche par défaut** définie dans `code-conventions` (section Git) en suivant la convention définie dans le skill `branch-convention`.
 
 Annonce la branche créée avant de commencer.
 

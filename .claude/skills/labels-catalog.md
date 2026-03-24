@@ -1,6 +1,6 @@
 ---
-name: github-labels
-description: Labels GitHub standard du projet. Utiliser lors de la création d'issues pour assigner le bon label.
+name: labels-catalog
+description: Labels GitHub standard du projet. Catalogue des labels, couleurs et correspondances type d'issue vers label.
 user-invocable: false
 ---
 

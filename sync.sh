@@ -13,29 +13,35 @@ TARGET_CLAUDE="$TARGET/.claude"
 # Créer les dossiers si nécessaire
 mkdir -p "$TARGET_CLAUDE/commands" "$TARGET_CLAUDE/skills"
 
-# Sync des commandes partagées
 changed=0
-for file in "$SCRIPT_DIR/.claude/commands/"*.md; do
-  filename="$(basename "$file")"
-  if ! cmp -s "$file" "$TARGET_CLAUDE/commands/$filename" 2>/dev/null; then
-    cp "$file" "$TARGET_CLAUDE/commands/$filename"
-    echo "  ↳ commands/$filename"
-    changed=$((changed + 1))
-  fi
-done
 
-# Sync des skills partagés
-for file in "$SCRIPT_DIR/.claude/skills/"*.md; do
-  filename="$(basename "$file")"
-  if ! cmp -s "$file" "$TARGET_CLAUDE/skills/$filename" 2>/dev/null; then
-    cp "$file" "$TARGET_CLAUDE/skills/$filename"
-    echo "  ↳ skills/$filename"
+# Sync des commandes partagées (récursif)
+while IFS= read -r -d '' file; do
+  rel="${file#"$SCRIPT_DIR/.claude/commands/"}"
+  target_file="$TARGET_CLAUDE/commands/$rel"
+  mkdir -p "$(dirname "$target_file")"
+  if ! cmp -s "$file" "$target_file" 2>/dev/null; then
+    cp "$file" "$target_file"
+    echo "  ↳ commands/$rel"
     changed=$((changed + 1))
   fi
-done
+done < <(find "$SCRIPT_DIR/.claude/commands" -name '*.md' -print0)
+
+# Sync des skills partagés (récursif)
+while IFS= read -r -d '' file; do
+  rel="${file#"$SCRIPT_DIR/.claude/skills/"}"
+  target_file="$TARGET_CLAUDE/skills/$rel"
+  mkdir -p "$(dirname "$target_file")"
+  if ! cmp -s "$file" "$target_file" 2>/dev/null; then
+    cp "$file" "$target_file"
+    echo "  ↳ skills/$rel"
+    changed=$((changed + 1))
+  fi
+done < <(find "$SCRIPT_DIR/.claude/skills" -name '*.md' -print0)
 
 # Créer les fichiers projet-specific s'ils n'existent pas encore
 for file in "$SCRIPT_DIR/templates/"*.md; do
+  [ -f "$file" ] || continue
   filename="$(basename "$file")"
   if [ ! -f "$TARGET_CLAUDE/skills/$filename" ]; then
     cp "$file" "$TARGET_CLAUDE/skills/$filename"

@@ -1,6 +1,6 @@
 Commence par lire ce fichier :
 
-1. `.claude/skills/github-labels.md`
+1. `.claude/skills/labels-catalog.md`
 
 ---
 
@@ -14,7 +14,7 @@ Récupère l'URL du remote `origin` via `git remote get-url origin` pour identif
 
 ## Étape 2 — Vérifier les labels existants
 
-Pour chaque label défini dans le skill `github-labels`, vérifie s'il existe déjà sur le repo via MCP GitHub (`get_label`).
+Pour chaque label défini dans le skill `labels-catalog`, vérifie s'il existe déjà sur le repo via MCP GitHub (`get_label`).
 
 ## Étape 3 — Récapituler et confirmer
 
