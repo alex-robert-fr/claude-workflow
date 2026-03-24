@@ -1,5 +1,5 @@
 ---
-name: audit
+name: claude-audit
 description: Audite un projet pour evaluer la qualite des process AI-Driven Development, commandes, skills et workflow Claude Code.
 user-invocable: true
 ---
