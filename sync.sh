@@ -15,7 +15,7 @@ mkdir -p "$TARGET_CLAUDE/commands" "$TARGET_CLAUDE/skills"
 
 # Sync des commandes partagées
 changed=0
-for file in "$SCRIPT_DIR/commands/"*.md; do
+for file in "$SCRIPT_DIR/.claude/commands/"*.md; do
   filename="$(basename "$file")"
   if ! cmp -s "$file" "$TARGET_CLAUDE/commands/$filename" 2>/dev/null; then
     cp "$file" "$TARGET_CLAUDE/commands/$filename"
@@ -25,7 +25,7 @@ for file in "$SCRIPT_DIR/commands/"*.md; do
 done
 
 # Sync des skills partagés
-for file in "$SCRIPT_DIR/skills/"*.md; do
+for file in "$SCRIPT_DIR/.claude/skills/"*.md; do
   filename="$(basename "$file")"
   if ! cmp -s "$file" "$TARGET_CLAUDE/skills/$filename" 2>/dev/null; then
     cp "$file" "$TARGET_CLAUDE/skills/$filename"

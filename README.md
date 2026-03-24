@@ -8,8 +8,9 @@ Au lieu de dupliquer `.claude/commands/` et `.claude/skills/` dans chaque projet
 
 ```
 claude-workflow/
-  commands/          # Commandes slash (/plan, /code, /pr, /issue, /cmd, /github-labels, /lint-setup)
-  skills/            # Skills partagés (shared, commit-convention, branch-convention, pr-convention, cmd, github-labels, lint-setup)
+  .claude/
+    commands/        # Commandes slash (/plan, /code, /pr, /issue, /cmd, /github-labels, /lint-setup)
+    skills/          # Skills partagés (shared, commit-convention, branch-convention, pr-convention, cmd, github-labels, lint-setup)
   templates/         # Squelettes pour les fichiers projet-specific (code-conventions.md)
   sync.sh            # Synchronise un projet
   sync-all.sh        # Synchronise tous les projets de projects.conf
@@ -52,12 +53,12 @@ Lit `projects.conf` et lance `sync.sh` sur chaque projet listé.
 
 | Type | Où | Exemples | Sync |
 |------|----|----------|------|
-| **Partagé** | `claude-workflow/commands/` et `skills/` | plan, code, pr, commit-convention, branch-convention | Ecrasé à chaque sync |
+| **Partagé** | `claude-workflow/.claude/commands/` et `.claude/skills/` | plan, code, pr, commit-convention, branch-convention | Ecrasé à chaque sync |
 | **Projet-specific** | `.claude/skills/` du projet | code-conventions.md | Jamais écrasé (créé une seule fois depuis le template) |
 
 ## Workflow de mise à jour
 
-1. Modifier le fichier dans `claude-workflow/`
+1. Modifier le fichier dans `claude-workflow/.claude/`
 2. Commit + push
 3. `./sync-all.sh` pour propager à tous les projets
 4. Commit les fichiers mis à jour dans chaque projet
