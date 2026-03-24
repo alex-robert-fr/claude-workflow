@@ -20,17 +20,17 @@ Recupere l'issue via MCP GitHub (ID, URL ou titre) et lance `/prepare-plan` avan
 
 ## Etape 0 — Verifications
 
-Lis `.claude/skills/code-conventions/SKILL.md` puis verifie :
+Lis `.claude/skills/tech-stack/SKILL.md` puis verifie :
 
 - [ ] Le repo a un remote `origin` configure
 - [ ] Le working tree est propre (pas de changements non commites qui bloqueraient un checkout)
-- [ ] La branche par defaut definie dans `code-conventions` (section Git) existe localement ou sur le remote
+- [ ] La branche par defaut definie dans `tech-stack` (section Git) existe localement ou sur le remote
 
 Si une verification echoue, signale-le clairement et arrete-toi. Ne tente pas de contourner.
 
 ## Etape 1 — Creer la branche
 
-Lis `.claude/skills/git-conventions/SKILL.md` (section Branches) puis cree une branche depuis la **branche par defaut** definie dans `code-conventions` (section Git) en suivant la convention.
+Lis `.claude/skills/git-conventions/SKILL.md` (section Branches) puis cree une branche depuis la **branche par defaut** definie dans `tech-stack` (section Git) en suivant la convention.
 
 Annonce la branche creee avant de commencer.
 
@@ -40,7 +40,7 @@ Suis les etapes du plan dans l'ordre. Pour chaque etape :
 
 ### Regles de code
 
-Respecte les conventions definies dans le skill `code-conventions` (deja lu).
+Respecte les conventions definies dans le skill `tech-stack` (deja lu).
 
 ### Commits atomiques
 

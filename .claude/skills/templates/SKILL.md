@@ -14,7 +14,7 @@ Initialise ou met a jour les fichiers templates projet-specific dans `.claude/sk
 
 ### Si un argument est fourni — Mode cible
 
-Filtre sur le template dont le nom correspond a `$ARGUMENTS` (ex: `code-conventions`).
+Filtre sur le template dont le nom correspond a `$ARGUMENTS` (ex: `tech-stack`).
 Si le fichier n'existe pas ou n'a aucun placeholder → signale-le et arrete-toi.
 
 ### Si aucun argument — Mode global

@@ -2,7 +2,8 @@
 name: create-skill
 description: Expert en conception de skills Claude Code et audit AI-Driven Development. Creer, modifier ou auditer des skills, CLAUDE.md et workflow Claude Code. Utiliser aussi avec "audit" pour evaluer un projet.
 user-invocable: true
-argument-hint: [description du skill a creer | audit | audit commandes | audit workflow]
+argument-hint:
+  [description du skill a creer | audit | audit commandes | audit workflow]
 ---
 
 # Skill — Conception et audit de skills Claude Code
@@ -58,11 +59,11 @@ effort: high                          # Override effort (low/medium/high/max).
 
 ### Controle d'invocation
 
-| Config | `/skill` par l'user | Charge auto par Claude |
-|---|---|---|
-| *(defaut)* | oui | oui |
-| `user-invocable: false` | non | oui |
-| `disable-model-invocation: true` | oui | non |
+| Config                           | `/skill` par l'user | Charge auto par Claude |
+| -------------------------------- | ------------------- | ---------------------- |
+| _(defaut)_                       | oui                 | oui                    |
+| `user-invocable: false`          | non                 | oui                    |
+| `disable-model-invocation: true` | oui                 | non                    |
 
 ---
 
@@ -74,6 +75,7 @@ Claude lit les descriptions pour decider quel skill charger. Budget : 2% du cont
 **Bon** : `description: Convention de messages de commit. Utiliser lors de la creation de commits pour formater avec le bon emoji, type et scope.`
 
 Regles :
+
 - Decrire le **domaine** ET le **declencheur**
 - Etre specifique — vague = jamais charge
 - 20-50 mots max
@@ -82,27 +84,20 @@ Regles :
 
 ## Contexte dynamique
 
-Syntaxe `` !`command` `` — execute **avant** que Claude voie le skill :
+Syntaxe : point d'exclamation suivi de la commande entre backticks — execute **avant** que Claude voie le skill.
 
-```markdown
-## Contexte
-- Branche : !`git branch --show-current`
-- Diff : !`git diff main...HEAD --stat`
-- Status : !`git status --short 2>/dev/null || echo "Pas un repo git"`
-```
-
-Le `2>/dev/null || echo "fallback"` gere les erreurs gracieusement.
+Voir [reference.md](reference.md) (section "Error handling") pour la syntaxe complete et les patterns de fallback.
 
 ---
 
 ## Arguments et variables
 
-| Syntaxe | Description | Exemple |
-|---------|-------------|---------|
-| `$ARGUMENTS` | Tous les arguments | `/skill Fix auth bug` -> `Fix auth bug` |
-| `$0`, `$1`, `$2` | Arguments positionnels | `/skill Button React Vue` -> `$0`=Button, `$1`=React |
-| `${CLAUDE_SKILL_DIR}` | Chemin absolu du repertoire du skill | Pour referencer les fichiers supports |
-| `${CLAUDE_SESSION_ID}` | UUID de la session courante | Pour logs/fichiers temporaires |
+| Syntaxe                | Description                          | Exemple                                              |
+| ---------------------- | ------------------------------------ | ---------------------------------------------------- |
+| `$ARGUMENTS`           | Tous les arguments                   | `/skill Fix auth bug` -> `Fix auth bug`              |
+| `$0`, `$1`, `$2`       | Arguments positionnels               | `/skill Button React Vue` -> `$0`=Button, `$1`=React |
+| `${CLAUDE_SKILL_DIR}`  | Chemin absolu du repertoire du skill | Pour referencer les fichiers supports                |
+| `${CLAUDE_SESSION_ID}` | UUID de la session courante          | Pour logs/fichiers temporaires                       |
 
 Si `$ARGUMENTS` n'est pas dans le contenu, Claude Code l'ajoute automatiquement a la fin.
 
@@ -117,12 +112,12 @@ Si `$ARGUMENTS` n'est pas dans le contenu, Claude Code l'ajoute automatiquement 
 
 ### Categories
 
-| Type | Exemples | Frontmatter |
-|------|----------|-------------|
-| Expertise / convention | `branch-convention`, `lint-expertise` | `user-invocable: false` |
-| Action / workflow | `pr`, `code`, `plan`, `deploy` | defaut (invocable) |
-| Side effects | `deploy`, `send-email` | `disable-model-invocation: true` |
-| Contexte partage | `shared` | `user-invocable: false` |
+| Type                   | Exemples                              | Frontmatter                      |
+| ---------------------- | ------------------------------------- | -------------------------------- |
+| Expertise / convention | `branch-convention`, `lint-expertise` | `user-invocable: false`          |
+| Action / workflow      | `pr`, `code`, `plan`, `deploy`        | defaut (invocable)               |
+| Side effects           | `deploy`, `send-email`                | `disable-model-invocation: true` |
+| Contexte partage       | `shared`                              | `user-invocable: false`          |
 
 ---
 
@@ -139,8 +134,9 @@ mon-skill/
 ```
 
 Referencement depuis SKILL.md :
+
 - Lien markdown : `[reference.md](reference.md)`
-- Script dynamique : `` !`${CLAUDE_SKILL_DIR}/scripts/validate.sh` ``
+- Script dynamique : syntaxe point d'exclamation + backticks (voir reference.md)
 - Claude peut lire : `Read("${CLAUDE_SKILL_DIR}/reference.md")`
 
 ---
@@ -154,6 +150,7 @@ Consulte [templates.md](templates.md) pour les squelettes complets (expertise, a
 ## Quand creer un skill separe
 
 Oui si :
+
 - Expertise specifique (persona, domaine)
 - Plus de 20 lignes de regles/criteres
 - Reutilise par plusieurs skills
@@ -182,10 +179,12 @@ Non sinon — integrer dans le skill appelant.
 ### Etape 1 — Comprendre la demande
 
 **Nature :** creation ou modification ?
+
 - Modification : identifier les fichiers existants dans `.claude/skills/`
 - Creation : verifier qu'un skill similaire n'existe pas
 
 **Type :** expertise, action, ou sous-agent ?
+
 - Expertise (`user-invocable: false`) : conventions, regles, persona
 - Action (defaut) : workflow, etapes, outils
 - Sous-agent (`context: fork`) : recherche, analyse isolee
@@ -193,6 +192,7 @@ Non sinon — integrer dans le skill appelant.
 ### Etape 2 — Questions de clarification
 
 Poser uniquement les questions manquantes :
+
 - Declencheur ? Quand a-t-on besoin de ce skill ?
 - Resultat attendu ?
 - Modes avec/sans argument ?

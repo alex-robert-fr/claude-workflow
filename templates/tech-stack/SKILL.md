@@ -1,6 +1,6 @@
 ---
-name: code-conventions
-description: Conventions de code et stack technique du projet. Utiliser lors de l'écriture ou la revue de code pour respecter les standards du projet.
+name: tech-stack
+description: Stack technique et conventions de code du projet. Utiliser lors de l'ecriture ou la revue de code pour respecter les standards et la stack du projet.
 user-invocable: false
 ---
 

@@ -10,7 +10,7 @@ Lis `.claude/skills/workflow-persona/SKILL.md` avant de commencer.
 
 ## Etape 0 — Verifications
 
-Lis `.claude/skills/code-conventions/SKILL.md` puis verifie :
+Lis `.claude/skills/tech-stack/SKILL.md` puis verifie :
 
 - [ ] Le repo a un remote `origin` configure
 - [ ] La branche courante n'est pas la branche par defaut (on ne cree pas de PR depuis main/develop)
@@ -69,7 +69,7 @@ Une fois confirmation recue :
 
 **Nouvelle PR :**
 
-- Cree la PR via MCP GitHub (base: branche par defaut definie dans `code-conventions`, head: branche courante)
+- Cree la PR via MCP GitHub (base: branche par defaut definie dans `tech-stack`, head: branche courante)
 
 ```
 PR creee : [URL]

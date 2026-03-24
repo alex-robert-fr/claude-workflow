@@ -25,7 +25,7 @@ Focus sur un aspect specifique. Arguments possibles :
 
 ## Etape 1 — Explorer les configs existantes
 
-Lis `.claude/skills/code-conventions/SKILL.md` pour comprendre la stack du projet, puis scanne pour identifier toutes les configurations lint/format en place :
+Lis `.claude/skills/tech-stack/SKILL.md` pour comprendre la stack du projet, puis scanne pour identifier toutes les configurations lint/format en place :
 
 - `biome.json` / `biome.jsonc` (racine et workspaces)
 - `eslint.config.mjs` / `.eslintrc.*` (racine et workspaces)

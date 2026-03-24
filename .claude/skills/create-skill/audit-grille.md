@@ -30,7 +30,7 @@ Criteres de scoring, bonnes pratiques et anti-patterns pour auditer skills, CLAU
 - Instructions claires sur la stack, l'architecture, les conventions
 - Pas de documentation — uniquement des directives
 - Separation global CLAUDE.md (preferences utilisateur) vs projet CLAUDE.md (regles du repo)
-- Utilisation de `code-conventions.md` pour les regles specifiques au projet
+- Utilisation de `tech-stack/SKILL.md` pour les regles specifiques au projet
 
 **Anti-patterns :**
 - CLAUDE.md qui fait 500 lignes (trop long = ignore)

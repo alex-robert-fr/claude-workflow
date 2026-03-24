@@ -15,14 +15,17 @@ claude-workflow/
       create-issue/SKILL.md       # /create-issue — issues GitHub
       create-pr/SKILL.md          # /create-pr — Pull Requests
       create-skill/SKILL.md       # /create-skill — creation + audit skills
+      frontend-code-conventions/SKILL.md  # conventions architecture frontend
       git-conventions/SKILL.md    # conventions branches/commits/PRs
       init/SKILL.md               # /init — generer CLAUDE.md
       lint-audit/SKILL.md         # /lint-audit — audit lint/format
       prepare-plan/SKILL.md       # /prepare-plan — planification
+      setup-mcp/SKILL.md          # /setup-mcp — configurer les MCP
+      setup-ui-ux/SKILL.md        # /setup-ui-ux — generer conventions UI/UX
       templates/SKILL.md          # /templates — remplir les templates
       workflow-persona/SKILL.md   # persona commune aux skills workflow
   templates/
-    code-conventions/SKILL.md     # squelette conventions projet-specific
+    tech-stack/SKILL.md            # squelette stack + conventions projet-specific
     CLAUDE-skills-index.md        # index injecte dans le CLAUDE.md des projets
   sync.sh                         # synchronise un projet
   sync-all.sh                     # synchronise tous les projets de projects.conf
@@ -59,14 +62,14 @@ Lit `projects.conf` et lance `sync.sh` sur chaque projet liste.
 
 1. Ajouter le chemin dans `projects.conf`
 2. Lancer `./sync-all.sh`
-3. Personnaliser `.claude/skills/code-conventions/SKILL.md` dans le projet (stack, architecture, nommage)
+3. Personnaliser `.claude/skills/tech-stack/SKILL.md` dans le projet (stack, architecture, nommage)
 
 ## Fichiers partages vs projet-specific
 
 | Type | Ou | Exemples | Sync |
 |------|----|----------|------|
 | **Partage** | `claude-workflow/.claude/skills/` | code, commit, create-pr, git-conventions | Ecrase a chaque sync |
-| **Projet-specific** | `.claude/skills/` du projet | code-conventions/SKILL.md | Jamais ecrase (cree une seule fois depuis le template) |
+| **Projet-specific** | `.claude/skills/` du projet | tech-stack/SKILL.md | Jamais ecrase (cree une seule fois depuis le template) |
 
 ## Workflow de mise a jour
 
