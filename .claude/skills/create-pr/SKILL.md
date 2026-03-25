@@ -18,6 +18,16 @@ Lis `.claude/skills/tech-stack/SKILL.md` puis verifie :
 
 Si une verification echoue, signale-le clairement et arrete-toi.
 
+### Push
+
+Si la branche n'est pas encore poussee sur le remote, pousse-la :
+
+```
+Push vers origin/[branche-courante]...
+```
+
+Confirme avant de push si c'est le premier push de cette branche.
+
 ## Etape 1 — Recuperer le contexte
 
 Rassemble les informations necessaires :
@@ -81,6 +91,13 @@ PR creee : [URL]
 
 ```
 PR mise a jour : [URL]
+```
+
+Propose la suite :
+
+```
+---
+PR soumise. Prochaine etape : `/notifier` pour envoyer la notification de review.
 ```
 
 ---

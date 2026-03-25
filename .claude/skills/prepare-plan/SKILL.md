@@ -88,13 +88,24 @@ Quoi tester, ou, et comment. Unitaires / integration / e2e selon ce qui est pert
 - Pas d'etape floue. Si tu ne sais pas comment implementer quelque chose, dis-le explicitement plutot que de rester vague
 - Ordre des etapes = ordre logique d'implementation (les dependances d'abord)
 
-## Etape 5 — Confirmer et proposer /code
+## Etape 5 — Persister le plan dans un fichier
+
+Ecris le plan dans `.claude/plans/plan-<numero-issue>.md` (ou `plan-<slug>.md` si pas de numero d'issue).
+
+Cree le repertoire `.claude/plans/` s'il n'existe pas.
+
+Le fichier de plan permet de :
+- Reprendre le travail dans une session fraiche sans perdre le contexte
+- Lancer `/code` depuis un terminal different avec un contexte propre
+
+## Etape 6 — Confirmer et proposer /code
 
 Demande a l'utilisateur de valider le plan. Une fois confirme, propose de lancer `/code` pour implementer.
 
 ```
 ---
-Plan pret. Ce plan te convient ? Tu veux que je lance `/code` pour implementer ca ?
+Plan ecrit dans `.claude/plans/plan-XX.md`.
+Ce plan te convient ? Tu veux que je lance `/code` pour implementer ca ?
 ```
 
 ---
