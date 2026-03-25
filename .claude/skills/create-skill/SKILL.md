@@ -63,6 +63,12 @@ Fragmenter les skills >150 lignes :
 
 Referencement : lien markdown `[reference.md](reference.md)` ou `Read("${CLAUDE_SKILL_DIR}/reference.md")`.
 
+## Regle de chargement de fichiers
+
+Toute instruction demandant a Claude de charger un fichier (skill, reference, config) doit utiliser la formulation **`utilise Read pour charger`**.
+
+Ne jamais utiliser : `Lis`, `Consulte`, `Charge`, `Regarde`, ou tout autre verbe implicite. Ces formulations ne garantissent pas l'utilisation explicite de l'outil Read et cassent le progressive disclosure.
+
 ## Quand creer un skill separe
 
 Oui si : expertise specifique, plus de 20 lignes de regles, reutilise par plusieurs skills, format de reponse structure.
