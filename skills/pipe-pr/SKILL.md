@@ -1,6 +1,6 @@
 ---
-name: create-pr
-description: Creer ou mettre a jour une Pull Request GitHub. Genere titre, description et commentaire d'iteration selon les conventions. Utiliser apres /code ou pour soumettre une branche.
+name: pipe-pr
+description: Creer ou mettre a jour une Pull Request GitHub. Genere titre, description et commentaire d'iteration selon les conventions. Utiliser apres /pipe-code ou pour soumettre une branche.
 argument-hint: [rien — detecte automatiquement la branche courante]
 ---
 
@@ -97,7 +97,7 @@ Propose la suite :
 
 ```
 ---
-PR soumise. Prochaine etape : `/notifier` pour envoyer la notification de review.
+PR soumise. Prochaine etape : `/pipe-notifier` pour envoyer la notification de review.
 ```
 
 ---

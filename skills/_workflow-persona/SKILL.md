@@ -1,6 +1,6 @@
 ---
 name: _workflow-persona
-description: Persona et posture commune a tous les skills du workflow (prepare-plan, code, review, test, commit, create-issue, create-pr, notifier, hello, setup). Charge automatiquement quand un skill workflow est actif.
+description: Persona et posture commune a tous les skills du workflow (pipe-plan, pipe-code, pipe-review, pipe-test, pipe-commit, create-issue, pipe-pr, pipe-notifier, pipe-hello, setup). Charge automatiquement quand un skill workflow est actif.
 user-invocable: false
 ---
 

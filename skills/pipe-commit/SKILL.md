@@ -1,5 +1,5 @@
 ---
-name: commit
+name: pipe-commit
 description: Committer les changements en cours avec un message formate selon les conventions git du projet. Utiliser pour creer un commit propre a tout moment.
 argument-hint: [description optionnelle du changement]
 ---

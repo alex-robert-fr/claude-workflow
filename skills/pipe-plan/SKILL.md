@@ -1,6 +1,6 @@
 ---
-name: prepare-plan
-description: Planifier l'implementation d'une issue GitHub. Analyse le code, produit un plan technique detaille avec etapes, fichiers et approche. Utiliser avant /code.
+name: pipe-plan
+description: Planifier l'implementation d'une issue GitHub. Analyse le code, produit un plan technique detaille avec etapes, fichiers et approche. Utiliser avant /pipe-code.
 argument-hint: [numero issue, URL ou texte]
 ---
 
@@ -59,16 +59,16 @@ Cree le repertoire `.claude/plans/` s'il n'existe pas.
 
 Le fichier de plan permet de :
 - Reprendre le travail dans une session fraiche sans perdre le contexte
-- Lancer `/code` depuis un terminal different avec un contexte propre
+- Lancer `/pipe-code` depuis un terminal different avec un contexte propre
 
 ## Etape 6 — Confirmer et proposer /code
 
-Demande a l'utilisateur de valider le plan. Une fois confirme, propose de lancer `/code` pour implementer.
+Demande a l'utilisateur de valider le plan. Une fois confirme, propose de lancer `/pipe-code` pour implementer.
 
 ```
 ---
 Plan ecrit dans `.claude/plans/plan-XX.md`.
-Ce plan te convient ? Tu veux que je lance `/code` pour implementer ca ?
+Ce plan te convient ? Tu veux que je lance `/pipe-code` pour implementer ca ?
 ```
 
 ---

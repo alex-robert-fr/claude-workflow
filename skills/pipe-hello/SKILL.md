@@ -1,5 +1,5 @@
 ---
-name: hello
+name: pipe-hello
 description: Briefing de debut de session. Affiche le contexte projet, le travail en cours et l'etat du repo. Utiliser en debut de session de travail.
 ---
 
@@ -37,7 +37,7 @@ Affiche un briefing concis et actionnable :
 
 ### En cours
 - feat/42-add-oauth → PR #43 ouverte
-- Plan #44 pret → lancer `/code 44`
+- Plan #44 pret → lancer `/pipe-code 44`
 
 ### Issues ouvertes
 - #45 — [titre] (label)

@@ -1,6 +1,6 @@
 ---
-name: review
-description: Review automatique du code via sub-agent. Verifie patterns, complexite, edge cases et securite. Utiliser apres /code et avant /test.
+name: pipe-review
+description: Review automatique du code via sub-agent. Verifie patterns, complexite, edge cases et securite. Utiliser apres /pipe-code et avant /pipe-test.
 ---
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
@@ -74,13 +74,13 @@ Affiche le rapport du sub-agent dans ce format :
 
 Selon le statut :
 
-- **OK** → propose de lancer `/test`
-- **Avertissements** → propose de corriger les avertissements ou de passer a `/test` en l'etat
+- **OK** → propose de lancer `/pipe-test`
+- **Avertissements** → propose de corriger les avertissements ou de passer a `/pipe-test` en l'etat
 - **Bloquant** → corrige les problemes bloquants, puis relance la review (max 2 iterations de correction)
 
 ```
 ---
-Review terminee. Prochaine etape : `/test` pour verifier que tout passe.
+Review terminee. Prochaine etape : `/pipe-test` pour verifier que tout passe.
 ```
 
 ---
