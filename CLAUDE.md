@@ -4,7 +4,7 @@ Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline c
 
 ## Plugin
 
-Ce repo est un **plugin Claude Code** (`name: workflow`). Les skills sont namespaces : `/workflow:code`, `/workflow:review`, etc.
+Ce repo est un **plugin Claude Code** (`name: workflow`). Les skills sont namespaces : `/workflow:pipe-code`, `/workflow:pipe-review`, etc.
 
 ### Installation
 
@@ -23,7 +23,7 @@ claude --plugin-dir /chemin/vers/claude-workflow
 Le workflow suit un pipeline sequentiel avec des gates de validation entre chaque etape. L'humain decide quand passer a l'etape suivante.
 
 ```
-/setup → /hello → /prepare-plan → /code → /review → /test → /create-pr → /notifier
+/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-pr → /pipe-notifier
 ```
 
 Chaque skill guide vers le skill suivant. Pas de skill monolithique — chaque etape est invocable independamment.
@@ -62,10 +62,9 @@ templates/nom/SKILL.md        → copies dans .claude/skills/ du projet cible un
 
 | Prefixe / pattern | Type | Exemples |
 |-------------------|------|----------|
-| `create-*` | Cree un artefact (issue, PR, skill) | `create-issue`, `create-pr` |
-| `setup-*` | Configure un aspect du projet (one-shot) | `setup`, `setup-mcp`, `setup-ui-ux` |
-| `prepare-*` | Analyse et prepare sans executer | `prepare-plan` |
+| `pipe-*` | Etape du pipeline de dev | `pipe-code`, `pipe-review`, `pipe-test`, `pipe-plan` |
+| `create-*` | Cree un artefact (issue, skill) | `create-issue`, `create-skill` |
+| `setup-*` | Configure un aspect du projet (one-shot) | `setup`, `setup-init`, `setup-mcp`, `setup-ui-ux` |
 | `audit-*` | Audite et recommande des corrections | `audit-lint` |
 | `*-conventions` | Expertise passive (non-invocable) | `git-conventions`, `frontend-code-conventions` |
 | `_*` | Skill interne (charge automatiquement, non-invocable) | `_workflow-persona` |
-| verbe simple | Action directe frequente du workflow | `commit`, `code`, `init`, `review`, `test`, `hello`, `notifier` |

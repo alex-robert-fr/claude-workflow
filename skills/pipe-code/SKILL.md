@@ -1,6 +1,6 @@
 ---
-name: code
-description: Implementer du code a partir d'un plan ou d'une issue. Cree la branche, ecrit le code, commit chaque etape. Utiliser apres /prepare-plan ou avec un numero d'issue.
+name: pipe-code
+description: Implementer du code a partir d'un plan ou d'une issue. Cree la branche, ecrit le code, commit chaque etape. Utiliser apres /pipe-plan ou avec un numero d'issue.
 argument-hint: [numero issue ou rien si plan deja present]
 ---
 
@@ -13,8 +13,8 @@ Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` av
 Le plan peut venir de trois sources (par ordre de priorite) :
 
 1. **Fichier de plan** — cherche dans `.claude/plans/` un fichier correspondant a l'issue ou au contexte. Si trouve, lis-le et utilise-le.
-2. **Conversation courante** — si `/prepare-plan` a ete lance dans cette session, le plan est dans la conversation.
-3. **Argument issue** — si un numero d'issue est passe et qu'aucun plan n'existe, lance `/prepare-plan` d'abord.
+2. **Conversation courante** — si `/pipe-plan` a ete lance dans cette session, le plan est dans la conversation.
+3. **Argument issue** — si un numero d'issue est passe et qu'aucun plan n'existe, lance `/pipe-plan` d'abord.
 
 ---
 
@@ -43,7 +43,7 @@ Suis les etapes du plan dans l'ordre. Pour chaque etape :
 
 Respecte les conventions definies dans le skill `tech-stack` (deja lu).
 
-Ne fais PAS de verification de style ou de formatage — c'est le role des hooks PostToolUse (lint/format automatique apres chaque ecriture) et de `/review` (verification par sub-agent).
+Ne fais PAS de verification de style ou de formatage — c'est le role des hooks PostToolUse (lint/format automatique apres chaque ecriture) et de `/pipe-review` (verification par sub-agent).
 
 ### Commits atomiques
 
@@ -91,7 +91,7 @@ Propose la suite du pipeline :
 
 ```
 ---
-Code termine. Prochaine etape : `/review` pour la review automatique.
+Code termine. Prochaine etape : `/pipe-review` pour la review automatique.
 ```
 
 ---

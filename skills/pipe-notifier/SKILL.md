@@ -1,6 +1,6 @@
 ---
-name: notifier
-description: Envoyer une notification apres creation ou mise a jour d'une PR. Utiliser apres /create-pr.
+name: pipe-notifier
+description: Envoyer une notification apres creation ou mise a jour d'une PR. Utiliser apres /pipe-pr.
 argument-hint: [URL de la PR ou rien si detectable depuis la branche]
 ---
 

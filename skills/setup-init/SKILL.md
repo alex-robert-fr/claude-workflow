@@ -1,5 +1,5 @@
 ---
-name: init
+name: setup-init
 description: Generer ou completer le CLAUDE.md d'un projet avec le contexte minimal necessaire. Utiliser pour initialiser un nouveau projet avec Claude Code.
 argument-hint: [rien — detecte automatiquement le projet]
 ---

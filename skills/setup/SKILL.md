@@ -117,7 +117,7 @@ Affiche la config generee et demande confirmation avant d'ecrire.
 
 Cree les repertoires manquants :
 
-- `.claude/plans/` — pour les plans generes par `/prepare-plan`
+- `.claude/plans/` — pour les plans generes par `/pipe-plan`
 - `.claude/rules/` — pour les rules contextuelles futures
 
 Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres).
@@ -139,10 +139,10 @@ Si `.mcp.exemple.json` n'existe pas et que des MCP sont utilises dans les skills
 - ✅ .claude/rules/
 
 ### Pipeline disponible
-/hello → /prepare-plan → /code → /review → /test → /create-pr → /notifier
+/pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-pr → /pipe-notifier
 
 ### Prochaine etape
-Lance `/hello` pour commencer ta session de travail.
+Lance `/pipe-hello` pour commencer ta session de travail.
 ```
 
 ---

@@ -1,6 +1,6 @@
 ---
-name: test
-description: Executer les tests du projet avec boucle corrective bornee (max 3 tentatives). Utiliser apres /review et avant /create-pr.
+name: pipe-test
+description: Executer les tests du projet avec boucle corrective bornee (max 3 tentatives). Utiliser apres /pipe-review et avant /pipe-pr.
 argument-hint: [rien ou fichier/pattern specifique]
 ---
 
@@ -19,7 +19,7 @@ Si pas de commande de test configuree → signale-le et arrete-toi :
 
 ```
 Pas de commande de test configuree dans workflow-config.
-Configure la section "Test" de `.claude/skills/workflow-config/SKILL.md` puis relance /test.
+Configure la section "Test" de `.claude/skills/workflow-config/SKILL.md` puis relance /pipe-test.
 ```
 
 ## Etape 1 — Executer les tests
@@ -84,7 +84,7 @@ Si tous les tests passent, propose la suite :
 
 ```
 ---
-Tests OK. Prochaine etape : `/create-pr` pour soumettre la branche.
+Tests OK. Prochaine etape : `/pipe-pr` pour soumettre la branche.
 ```
 
 ---
