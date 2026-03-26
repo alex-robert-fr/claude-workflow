@@ -3,7 +3,7 @@ name: review
 description: Review automatique du code via sub-agent. Verifie patterns, complexite, edge cases et securite. Utiliser apres /code et avant /test.
 ---
 
-Utilise Read pour charger `.claude/skills/_workflow-persona/SKILL.md` avant de commencer.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 
 ---
 

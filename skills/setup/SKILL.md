@@ -3,7 +3,7 @@ name: setup
 description: Configurer un projet pour le workflow AI-Driven Development. Scaffolde CLAUDE.md, workflow-config, hooks, plans et rules en une seule passe. Utiliser sur un nouveau projet ou pour completer une config existante.
 ---
 
-Utilise Read pour charger `.claude/skills/_workflow-persona/SKILL.md` avant de commencer.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 
 ---
 
@@ -64,7 +64,7 @@ Si `.claude/skills/tech-stack/SKILL.md` contient des placeholders, propose de le
 
 ## Etape 4 — Hooks
 
-Utilise Read pour charger `.claude/skills/setup/hooks-reference.md` pour les templates de hooks.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md` pour les templates de hooks.
 
 Genere `.claude/settings.json` avec les hooks adaptes au projet. Utilise les commandes definies dans `workflow-config` pour les hooks PostToolUse et Stop.
 

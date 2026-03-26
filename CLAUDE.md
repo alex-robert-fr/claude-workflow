@@ -1,6 +1,22 @@
 # claude-workflow
 
-Repo central de skills Claude Code, synchronises vers tous les projets via `sync.sh`.
+Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : setup, plan, code, review, test, PR.
+
+## Plugin
+
+Ce repo est un **plugin Claude Code** (`name: workflow`). Les skills sont namespaces : `/workflow:code`, `/workflow:review`, etc.
+
+### Installation
+
+Ajouter dans le `settings.json` du projet cible ou tester localement :
+
+```bash
+claude --plugin-dir /chemin/vers/claude-workflow
+```
+
+### Manifest
+
+`.claude-plugin/plugin.json` definit le plugin (name, version, description, author).
 
 ## Pipeline
 
@@ -14,20 +30,23 @@ Chaque skill guide vers le skill suivant. Pas de skill monolithique — chaque e
 
 ## Regles
 
-- Les fichiers dans `.claude/skills/` sont **partages** — ils sont copies tels quels dans le `.claude/` de chaque projet
+- Les fichiers dans `skills/` sont **partages** — ils sont distribues via le plugin
 - Les fichiers dans `templates/` sont des squelettes pour les fichiers **projet-specific** — ils ne sont copies que si le repertoire n'existe pas encore dans le projet cible
 - Ne jamais mettre de logique specifique a un projet (stack, architecture) dans les skills partages — ca va dans les templates
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
 - La qualite est garantie par les **hooks** (lint/format) et les **sub-agents** (review), jamais par des instructions au LLM
+- Les references entre skills du plugin utilisent `${CLAUDE_SKILL_DIR}/../autre-skill/`
+- Les references aux fichiers projet-specifiques (`workflow-config`, `tech-stack`, `ui-ux`) restent en `.claude/skills/`
 
 ## Structure
 
 ```
-.claude/skills/nom/SKILL.md   → copies dans .claude/skills/ de chaque projet
-templates/nom/SKILL.md        → copies dans .claude/skills/ uniquement si le repertoire n'existe pas
+.claude-plugin/plugin.json    → manifest du plugin
+skills/nom/SKILL.md           → skills distribues via le plugin
+templates/nom/SKILL.md        → copies dans .claude/skills/ du projet cible uniquement si le repertoire n'existe pas
 ```
 
-## Scripts
+## Scripts (legacy)
 
 - `sync.sh [path]` — synchronise un projet (defaut: repertoire courant)
 - `sync-all.sh` — synchronise tous les projets listes dans `projects.conf`

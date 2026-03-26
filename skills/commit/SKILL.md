@@ -4,7 +4,7 @@ description: Committer les changements en cours avec un message formate selon le
 argument-hint: [description optionnelle du changement]
 ---
 
-Utilise Read pour charger `.claude/skills/git-conventions/SKILL.md` (section Commits) avant de commencer.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (section Commits) avant de commencer.
 
 ---
 

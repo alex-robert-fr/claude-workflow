@@ -4,7 +4,7 @@ description: Creer des issues GitHub structurees avec decoupage intelligent, cri
 argument-hint: [description de ce qu'il faut faire]
 ---
 
-Utilise Read pour charger `.claude/skills/_workflow-persona/SKILL.md` avant de commencer.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 
 ---
 

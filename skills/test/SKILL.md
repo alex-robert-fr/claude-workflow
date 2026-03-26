@@ -4,7 +4,7 @@ description: Executer les tests du projet avec boucle corrective bornee (max 3 t
 argument-hint: [rien ou fichier/pattern specifique]
 ---
 
-Utilise Read pour charger `.claude/skills/_workflow-persona/SKILL.md` avant de commencer.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 
 ---
 

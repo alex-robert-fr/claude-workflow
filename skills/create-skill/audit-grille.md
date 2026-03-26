@@ -67,7 +67,7 @@ Chaque etape est un skill invocable independamment. L'humain decide quand passer
 - [ ] Les skills utilisent le progressive disclosure (frontmatter leger, details dans `reference.md`)
 - [ ] Les sub-agents sont utilises pour isoler review et tests du contexte principal
 - [ ] SKILL.md < 150 lignes — au-dela, fragmenter en fichiers supports
-- [ ] Max 3 fichiers charges en cascade par un skill (via "Lis .claude/skills/...")
+- [ ] Max 3 fichiers charges en cascade par un skill (via "utilise Read pour charger" `.claude/skills/...` ou `${CLAUDE_SKILL_DIR}/...`)
 - [ ] Les plans sont dans des fichiers, pas dans la conversation
 
 **Anti-patterns :**
@@ -114,12 +114,12 @@ Chaque etape est un skill invocable independamment. L'humain decide quand passer
 - [ ] Les commit messages suivent les conventional commits
 - [ ] Les branches suivent une convention configurable par projet
 - [ ] Les PR ont une structure de description standardisee mais configurable
-- [ ] Source unique de verite (claude-workflow repo) avec sync automatise
+- [ ] Source unique de verite (plugin ou claude-workflow repo) avec distribution automatisee
 
 **Anti-patterns :**
-- Editer les skills directement dans un projet (ecrase au prochain sync)
+- Editer les skills directement dans un projet (ecrase au prochain sync/update)
 - Templates qui ecrasent les personnalisations existantes
-- Pas de sync automatise (drift entre projets)
+- Pas de distribution automatisee (drift entre projets)
 
 ---
 

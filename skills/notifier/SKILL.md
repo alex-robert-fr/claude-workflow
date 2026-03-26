@@ -4,7 +4,7 @@ description: Envoyer une notification apres creation ou mise a jour d'une PR. Ut
 argument-hint: [URL de la PR ou rien si detectable depuis la branche]
 ---
 
-Utilise Read pour charger `.claude/skills/_workflow-persona/SKILL.md` avant de commencer.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 
 ---
 
