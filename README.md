@@ -4,20 +4,26 @@ Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline c
 
 ## Installation
 
-### Test local
+### 1. Cloner le repo
 
 ```bash
-claude --plugin-dir /chemin/vers/claude-workflow
+git clone git@github.com:ToolsForSaaS/claude-workflow.git
 ```
 
-### Installation projet
+### 2. Ajouter le plugin
 
-Ajouter dans `.claude/settings.json` du projet cible :
+Dans `.claude/settings.json` du projet cible :
 
 ```json
 {
   "plugins": ["/chemin/vers/claude-workflow"]
 }
+```
+
+Ou pour tester sur une session :
+
+```bash
+claude --plugin-dir /chemin/vers/claude-workflow
 ```
 
 Les skills sont accessibles avec le namespace `workflow:` (ex: `/workflow:pipe-code`).
