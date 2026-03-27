@@ -75,7 +75,6 @@ Le workflow suit un pipeline sequentiel. L'humain decide quand passer a l'etape 
 | Skill | Description |
 |-------|-------------|
 | `setup` | Configuration complete du projet (one-shot) |
-| `setup-init` | Generer le CLAUDE.md d'un projet |
 | `setup-templates` | Remplir les templates projet-specifiques |
 | `setup-mcp` | Configurer les MCP du projet |
 | `setup-ui-ux` | Generer les conventions UI/UX |
