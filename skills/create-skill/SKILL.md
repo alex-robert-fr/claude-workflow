@@ -1,9 +1,8 @@
 ---
 name: create-skill
-description: Concevoir, modifier ou auditer des skills Claude Code et le workflow AI-Driven Development. Utiliser pour creer un skill, modifier un existant ou lancer un audit projet avec "audit".
+description: Concevoir et modifier des skills Claude Code. Utiliser pour creer un nouveau skill ou modifier un existant en respectant les bonnes pratiques.
 user-invocable: true
-argument-hint:
-  [description du skill a creer | audit | audit commandes | audit workflow]
+argument-hint: [description du skill a creer]
 allowed-tools: Bash(ls *)
 ---
 
@@ -13,18 +12,6 @@ allowed-tools: Bash(ls *)
 - Skills plugin : !`ls ${CLAUDE_SKILL_DIR}/../`
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
-### Mode audit
-
-Si l'argument contient `audit` → utilise Read pour charger `audit-grille.md` et realise un audit du projet :
-
-1. Explorer : `.claude/` (skills, settings), `CLAUDE.md`, hooks, conventions
-2. Lire chaque skill et verifier la coherence
-3. Evaluer selon la grille (7 axes, scoring 1-10)
-4. Produire le rapport au format defini dans la grille
-5. Proposer des corrections par priorite
 
 ---
 
