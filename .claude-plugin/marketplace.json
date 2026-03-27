@@ -1,0 +1,38 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "toolsforsaas-workflow",
+  "owner": {
+    "name": "ToolsForSaaS"
+  },
+  "metadata": {
+    "description": "Pipeline AI-Driven Development : setup, plan, code, review, test, PR",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "claude-workflow",
+      "source": {
+        "source": "github",
+        "repo": "ToolsForSaaS/claude-workflow"
+      },
+      "description": "Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : setup, plan, code, review, test, PR.",
+      "version": "1.0.0",
+      "author": {
+        "name": "ToolsForSaaS"
+      },
+      "homepage": "https://github.com/ToolsForSaaS/claude-workflow",
+      "repository": "https://github.com/ToolsForSaaS/claude-workflow",
+      "license": "MIT",
+      "keywords": [
+        "workflow",
+        "pipeline",
+        "ai-driven-development",
+        "code-review",
+        "testing",
+        "pull-request",
+        "planning"
+      ],
+      "category": "development"
+    }
+  ]
+}
