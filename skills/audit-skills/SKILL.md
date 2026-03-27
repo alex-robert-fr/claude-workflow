@@ -23,24 +23,28 @@ Utilise Read pour charger `audit-grille.md` pour les criteres et le format de ra
 ## Etape 2 — Explorer le projet
 
 1. Explorer : `.claude/` (skills, settings), `CLAUDE.md`, hooks, conventions
-2. Lire chaque skill et verifier la coherence
+2. Lister tous les skills a auditer
 3. Identifier les fichiers de config (`workflow-config`, `tech-stack`, rules)
 
-## Etape 3 — Evaluer
+## Etape 3 — Auditer par sub-agents
 
-Evaluer selon la grille (7 axes, scoring 1-10) :
+Pour chaque skill ou groupe de fichiers a analyser, lancer un sub-agent en parallele via l'outil Agent (`subagent_type: "Explore"`).
 
-1. Process — Pipeline sequentiel avec gates
-2. Qualite — Par defaut, pas par effort
-3. Architecture — Plugin + Config projet
-4. Contexte — Ressource rare
-5. Permissions et autonomie
-6. Skills — Qualite de conception
-7. Replicabilite
+Chaque sub-agent recoit :
+- Le chemin du skill/fichier a analyser
+- Les criteres de la grille (axe 6 — Skills) a verifier
+- La consigne de retourner un rapport structure : conformite frontmatter, description, structure, fichiers supports, anti-patterns detectes
 
-## Etape 4 — Produire le rapport
+Lancer les sub-agents en parallele quand les analyses sont independantes.
 
-Produire le rapport au format defini dans la grille. Proposer des corrections par priorite (P0/P1/P2).
+Les axes globaux (1-5, 7) sont evalues dans le contexte principal a partir de `CLAUDE.md`, `settings.json`, hooks et de la structure generale — pas besoin de sub-agents pour ceux-la.
+
+## Etape 4 — Synthetiser et produire le rapport
+
+1. Agreger les rapports des sub-agents avec l'evaluation des axes globaux
+2. Scorer chaque axe (1-10) selon la grille
+3. Produire le rapport final au format defini dans `audit-grille.md`
+4. Proposer des corrections par priorite (P0/P1/P2)
 
 ---
 

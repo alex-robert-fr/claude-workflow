@@ -74,6 +74,24 @@ Oui si : expertise specifique, plus de 20 lignes de regles, reutilise par plusie
 
 Non sinon — integrer dans le skill appelant.
 
+## Pattern sub-agents pour analyse multi-fichiers
+
+Quand un skill doit analyser ou auditer **plus de 3 fichiers** (skills, configs, modules), ne pas tout charger dans le contexte principal. Utiliser des sub-agents pour decouper le travail :
+
+1. **Le skill principal orchestre** : collecte la liste des fichiers, dispatche vers des sub-agents, agregue les resultats
+2. **Chaque sub-agent analyse un fichier ou groupe** : charge le fichier, applique les criteres, retourne un rapport partiel
+3. **Le skill principal synthetise** : combine les rapports partiels en rapport final
+
+### Quand appliquer
+
+- Skills `audit-*` qui evaluent plusieurs fichiers/skills
+- Skills d'analyse qui parcourent un repertoire entier
+- Toute operation de review multi-fichiers
+
+### Comment implementer
+
+Le skill principal utilise l'outil Agent avec `subagent_type: "Explore"` (read-only) ou `"general-purpose"` (si ecriture necessaire) pour chaque fichier. Les sub-agents tournent en parallele quand les analyses sont independantes.
+
 ---
 
 ## Workflow de creation
