@@ -1,5 +1,5 @@
 {
-  "name": "workflow",
+  "name": "claude-workflow",
   "description": "Pipeline AI-Driven Development : setup, plan, code, review, test, PR",
   "version": "1.0.0",
   "author": {

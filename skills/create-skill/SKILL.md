@@ -39,11 +39,13 @@ Un fichier plat `.claude/skills/nom.md` n'est **pas valide**.
 name: nom-skill                       # kebab-case, max 64 chars
 description: Quand et pourquoi utiliser ce skill.  # CRITIQUE pour le routage auto
 argument-hint: [filename] [format]    # Hint affiche dans l'autocompletion
-user-invocable: true                  # false = cache du menu /, charge auto uniquement
+user-invocable: false                 # uniquement si skill expertise (non-invocable)
+context: fork                         # uniquement si isolation sub-agent necessaire
+agent: Explore | Plan                 # uniquement si fork + read-only
 ---
 ```
 
-Pour les champs avances (`allowed-tools`, `context`, `agent`, `model`, `effort`, `disable-model-invocation`), utilise Read pour charger `reference.md`.
+Frontmatter minimal. Ne pas ajouter `allowed-tools`, `effort`, `paths`, `model` sauf besoin explicite et justifie.
 
 ## Description — cle du routage
 
