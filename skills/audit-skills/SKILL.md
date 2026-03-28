@@ -3,14 +3,13 @@ name: audit-skills
 description: Auditer un projet selon la grille AI-Driven Development (7 axes, scoring 1-10). Evaluer skills, CLAUDE.md, hooks, conventions et workflow. Utiliser avec "audit" pour lancer une evaluation complete.
 user-invocable: true
 argument-hint: [audit | audit commandes | audit workflow | audit skills]
-allowed-tools: Bash(ls *)
 ---
 
 ## Contexte
 
-- Skills projet : !`ls .claude/skills/`
+- Skills projet : utilise Glob avec pattern `*/SKILL.md` dans `.claude/skills/` (si le repertoire existe)
 - Skills plugin : utilise Glob avec le pattern `${CLAUDE_SKILL_DIR}/../*/SKILL.md` pour lister les skills du plugin
-- Hooks : !`ls .claude/settings.json`
+- Hooks : utilise Read pour charger `.claude/settings.json` (si le fichier existe)
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 

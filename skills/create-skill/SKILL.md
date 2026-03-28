@@ -7,7 +7,7 @@ argument-hint: [description du skill a creer]
 
 ## Contexte
 
-- Skills projet : !`ls .claude/skills/`
+- Skills projet : utilise Glob avec pattern `*/SKILL.md` dans `.claude/skills/` (si le repertoire existe)
 - Skills plugin : utilise Glob avec pattern `*/SKILL.md` dans `${CLAUDE_SKILL_DIR}/../` pour lister les skills disponibles
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
