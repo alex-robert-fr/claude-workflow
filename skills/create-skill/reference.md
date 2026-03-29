@@ -80,6 +80,44 @@ Si omis : `general-purpose` par defaut.
 
 ---
 
+## model — tiers de modele
+
+Indique le tier de modele recommande pour l'execution du skill. Permet d'optimiser les couts en adaptant la puissance du modele a la complexite de la tache.
+
+### Valeurs possibles
+
+| Valeur | Modele | Usage |
+|--------|--------|-------|
+| `opus` | Claude Opus | Raisonnement complexe, multi-etapes, generation de code |
+| `sonnet` | Claude Sonnet | Taches structurees, reviews, configuration |
+| `haiku` | Claude Haiku | Taches simples, affichage, reference pure |
+
+Si omis : pas de recommandation (le modele de la session est utilise).
+
+### Comportement
+
+- **Skills inline** (sans `context: fork`) : le champ sert de **recommandation** pour l'utilisateur. Claude Code ne force pas le modele automatiquement — l'utilisateur choisit de switcher avant d'invoquer.
+- **Skills avec `context: fork`** : le champ controle le modele du sub-agent. Note : le type d'agent (`Explore`, `Plan`) peut fixer son propre modele (ex. `Explore` utilise Haiku). Dans ce cas, le type d'agent a la precedence sur `model`.
+- **Sub-agents lances par le skill** (via Agent tool) : le skill peut passer `model: "sonnet"` ou `model: "haiku"` dans l'appel Agent pour controler le cout des sous-taches.
+
+### Criteres de choix
+
+| Tier | Criteres | Exemples |
+|------|----------|----------|
+| `opus` | Raisonnement multi-etapes, generation de code, analyse d'issues, planification technique | `pipe-code`, `pipe-plan`, `create-issue`, `create-skill` |
+| `sonnet` | Taches structurees, reviews, generation de texte formate, configuration, audits | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `setup`, `audit-*` |
+| `haiku` | Affichage simple, formatage, reference pure, notifications | `pipe-hello`, `pipe-notifier`, `pipe-tag`, `*-conventions` |
+
+### Grille de categorisation (22 skills)
+
+| Tier | Skills |
+|------|--------|
+| `opus` | `pipe-code`, `pipe-plan`, `create-issue`, `create-skill` |
+| `sonnet` | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `pipe-commit`, `setup`, `setup-templates`, `setup-ui-ux`, `setup-mcp`, `audit-skills`, `audit-lint`, `audit-naming` |
+| `haiku` | `pipe-hello`, `pipe-notifier`, `pipe-tag`, `git-conventions`, `frontend-code-conventions`, `_workflow-persona` |
+
+---
+
 ## Hierarchie de decouverte des skills
 
 Par ordre de priorite (le plus haut gagne en cas de conflit de noms) :
