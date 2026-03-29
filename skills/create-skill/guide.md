@@ -27,7 +27,7 @@ agent: Explore | Plan                 # uniquement si fork + read-only
 ---
 ```
 
-Frontmatter minimal. Ne pas ajouter `allowed-tools`, `effort`, `paths`, `model` sauf besoin explicite et justifie.
+Frontmatter minimal. Ne pas ajouter `allowed-tools`, `effort`, `paths` sauf besoin explicite et justifie. Ajouter `model` pour indiquer le tier recommande (voir reference.md section `model`).
 
 ## Description — cle du routage
 
@@ -87,6 +87,7 @@ Un seul template. Les sections conditionnelles sont marquees `[SI condition]`.
 ---
 name: prefixe-nom
 description: [Verbe infinitif] [objet]. [Contexte/contrainte]. Utiliser [quand].
+model: sonnet                         # opus si complexe, haiku si simple
 argument-hint: "[param]"              # [SI le skill accepte des arguments]
 user-invocable: false                 # [SI skill expertise (non-invocable)]
 context: fork                         # [SI isolation sub-agent necessaire]
@@ -131,6 +132,7 @@ $ARGUMENTS
 
 | Condition | Sections / champs concernes |
 |---|---|
+| Tout skill | `model` avec le tier recommande (`opus`, `sonnet`, `haiku`) |
 | Accepte des arguments | `argument-hint` + `## Input utilisateur` + `$ARGUMENTS` |
 | Non-invocable (expertise) | `user-invocable: false`, pas d'etapes numerotees, `## Contexte` optionnel |
 | Isolation sub-agent | `context: fork`, pas de chargement persona |
@@ -146,7 +148,8 @@ $ARGUMENTS
 - Commandes simples dans `!`cmd`` — pas de redirections, pipes, operateurs, ni single quotes
 - Ordre : contexte dynamique → persona (Read) → etapes
 - Les donnees pre-chargees dans `## Contexte` ne doivent pas etre re-cherchees par les etapes. Claude peut utiliser des outils externes uniquement pour des donnees absentes du contexte pre-charge, et seulement si le skill le demande explicitement.
-- Frontmatter minimal : pas de `effort`, `paths`, `model` sauf besoin explicite
+- Frontmatter minimal : pas de `effort`, `paths` sauf besoin explicite
+- Chaque skill doit inclure `model` avec le tier recommande (`opus`, `sonnet`, `haiku`)
 - `allowed-tools` obligatoire si le skill utilise `!`cmd`` — declarer les commandes du contexte dynamique pour eviter les prompts de permission
 - Confirmation obligatoire avant toute action irreversible : `"Je [action] ?"`
 - Description : 20-50 mots, format verbe infinitif + objet + declencheur
