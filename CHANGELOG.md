@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Références traçables dans les entrées de changelog : SHA court, PR et issues résolues en fin de ligne (#18, PR #19, 81ff178)
+
+### Changed
+
+- Détection élargie des mots-clés GitHub pour les issues résolues : `close(s|d)`, `fix(es|ed)`, `resolve(s|d)` (#18, PR #19, 3d2c7ef)
+- Préfixe `PR #N` pour distinguer les PR des issues dans les références (#18, PR #19, 3d2c7ef)
+
 ## [1.3.0] - 2026-03-29
 
 ### Added
