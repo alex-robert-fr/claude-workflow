@@ -26,7 +26,9 @@ Rassemble les informations necessaires :
 
 ## Etape 2 — Lancer la review en sub-agent
 
-Lance un **sub-agent** (Agent tool, type `general-purpose`) pour isoler la review du contexte principal. Passe-lui ce prompt :
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../audit-naming/reference.md` (referentiel de conventions de nommage).
+
+Lance un **sub-agent** (Agent tool, type `general-purpose`) pour isoler la review du contexte principal. Injecte le referentiel de nommage dans le prompt. Passe-lui ce prompt :
 
 ```
 Tu es un reviewer de code senior. Review les changements sur la branche courante.
@@ -39,8 +41,11 @@ Lis chaque fichier modifie ou cree et verifie :
 4. **Securite** — pas d'injection, XSS, secrets en dur, donnees sensibles loguees
 5. **Code mort** — pas de code commente, imports inutilises, variables orphelines
 6. **Taille des fichiers** — aucun fichier > 300 lignes
-7. **Nommage** — coherent avec le reste du codebase
+7. **Nommage** — coherent avec le reste du codebase, conforme au referentiel de conventions de nommage (voir section Referentiel ci-dessous)
 8. **Duplication** — pas de copier-coller d'un pattern qui existe deja
+
+Referentiel de conventions de nommage :
+[contenu de audit-naming/reference.md]
 
 Pour chaque probleme, donne :
 - Fichier et ligne
