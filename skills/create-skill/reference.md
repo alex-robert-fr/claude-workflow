@@ -106,15 +106,15 @@ Si omis : pas de recommandation (le modele de la session est utilise).
 |------|----------|----------|
 | `opus` | Raisonnement multi-etapes, generation de code, analyse d'issues, planification technique | `pipe-code`, `pipe-plan`, `create-issue`, `create-skill` |
 | `sonnet` | Taches structurees, reviews, generation de texte formate, configuration, audits | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `setup`, `audit-*` |
-| `haiku` | Affichage simple, formatage, reference pure, notifications | `pipe-hello`, `pipe-notifier`, `pipe-tag`, `*-conventions` |
+| `haiku` | Affichage simple, formatage, reference pure, notifications | `pipe-hello`, `pipe-notifier`, `*-conventions` |
 
 ### Grille de categorisation (22 skills)
 
 | Tier | Skills |
 |------|--------|
 | `opus` | `pipe-code`, `pipe-plan`, `create-issue`, `create-skill` |
-| `sonnet` | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `pipe-commit`, `setup`, `setup-templates`, `setup-ui-ux`, `setup-mcp`, `audit-skills`, `audit-lint`, `audit-naming` |
-| `haiku` | `pipe-hello`, `pipe-notifier`, `pipe-tag`, `git-conventions`, `frontend-code-conventions`, `_workflow-persona` |
+| `sonnet` | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `pipe-commit`, `pipe-tag`, `setup`, `setup-templates`, `setup-ui-ux`, `setup-mcp`, `audit-skills`, `audit-lint`, `audit-naming` |
+| `haiku` | `pipe-hello`, `pipe-notifier`, `git-conventions`, `frontend-code-conventions`, `_workflow-persona` |
 
 ---
 
