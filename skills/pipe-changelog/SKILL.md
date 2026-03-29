@@ -41,7 +41,7 @@ Contexte de versioning :
 
 Utilise Read pour charger `reference.md` (referentiel de conventions et mapping des types).
 
-1. **Lister les commits** — `git log <dernier-tag>..HEAD --oneline` (ou `git log --oneline` si aucun tag)
+1. **Lister les commits** — `git log <dernier-tag>..HEAD --format="%h %s"` (ou `git log --format="%h %s"` si aucun tag). Le `%h` donne le SHA court de chaque commit.
 2. **Filtrer les exclusions** — supprimer selon les regles du referentiel :
    - Merges (`Merge branch...`, `Merge pull request...`)
    - Fixups/squashs (`fixup!`, `squash!`)
@@ -50,7 +50,11 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
    - Typos de commentaires ou docs internes
 3. **Detecter les changesets** — si `.changeset/` existe et contient des fichiers `.md`, les utiliser comme source primaire au lieu des commits
 4. **Classer par type** — utiliser le mapping prefixe → type CHANGELOG du referentiel
-5. **Reformuler** — chaque entree est redigee pour le consommateur, pas copiee du message de commit
+5. **Enrichir avec les references** — pour chaque commit retenu, trouver la PR associee :
+   - Utiliser `gh pr list --state merged --search "SHA" --json number --jq '.[0].number'` pour trouver la PR qui a merge ce commit.
+   - Si une PR est trouvee, c'est la reference de l'entree. Si pas de PR (commit direct), utiliser le SHA court en fallback.
+   - Si `gh` echoue ou est indisponible, utiliser le SHA seul — ne pas bloquer la generation.
+6. **Reformuler** — chaque entree est redigee pour le consommateur, pas copiee du message de commit. Terminer chaque entree par la reference entre parentheses avec un lien Markdown explicite selon le format defini dans `reference.md` (section "References dans les entrees"). L'URL de base du remote est detectee a l'etape 1.
 
 Affiche les entrees classees avant de continuer :
 
@@ -58,13 +62,13 @@ Affiche les entrees classees avant de continuer :
 Changements detectes :
 
 ### Added
-- [entree reformulee]
+- [entree reformulee] ([#15](url/pull/15))
 
 ### Changed
-- [entree reformulee]
+- [entree reformulee] ([#8](url/pull/8))
 
 ### Fixed
-- [entree reformulee]
+- [entree reformulee] ([`9a8b7c6`](url/commit/9a8b7c6))
 
 [N] commits exclus (merges, fixups, CI...)
 ```

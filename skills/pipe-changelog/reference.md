@@ -63,9 +63,40 @@ Cas speciaux (detectes par le contenu du commit, pas par le prefixe seul) :
 - Une entree = un changement notable cote utilisateur/consommateur
 - Redigee pour le lecteur, pas pour le dev — pas de detail d'implementation interne
 - Chaque entree sur une ligne, commencant par un verbe a l'infinitif ou un nom
-- Pas de PR/commit SHA dans les entrees
+- Chaque entree inclut ses references tracables en fin de ligne (voir section "References dans les entrees")
 - Breaking changes marques : `**BREAKING**` en prefixe de l'entree
 - Ne jamais copier les messages de commit verbatim — reformuler pour le consommateur
+
+## References dans les entrees
+
+Chaque entree de changelog inclut une reference tracable entre parentheses en fin de ligne. Cela permet de remonter a l'origine d'un changement.
+
+### Regle
+
+- **Si une PR existe** : lier la PR. C'est la reference principale — elle contient le contexte, les commits et les issues liees.
+- **Si pas de PR** (commit direct) : lier le SHA court en fallback.
+
+Une seule reference par entree. Pas besoin de doublonner PR + SHA + issue.
+
+### Format
+
+```
+- Texte reformule ([#N](url))
+```
+
+**Important** : GitHub n'auto-link pas les references dans les fichiers `.md` du depot. Il faut systematiquement utiliser des liens Markdown explicites `[texte](url)`. L'URL du remote est detectee a l'etape 1 du skill.
+
+### Exemples
+
+```markdown
+- Ajouter le support multi-langue ([#15](https://github.com/org/repo/pull/15))
+```
+PR #15 — le lecteur y trouvera les commits, l'issue liee et le contexte.
+
+```markdown
+- Corriger le parsing des dates ([`def5678`](https://github.com/org/repo/commit/def5678))
+```
+Commit direct, pas de PR — SHA court en fallback.
 
 ## Versioning
 
