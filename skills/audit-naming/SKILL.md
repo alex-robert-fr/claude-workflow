@@ -38,7 +38,7 @@ Verifie qu'il y a au moins un fichier source dans le projet (Glob `**/*.{ts,js,p
 
 Utilise Read pour charger `reference.md` (referentiel de conventions).
 
-Lance un sub-agent (`Agent` tool, type `general-purpose`) avec le prompt suivant. Injecte dans le prompt :
+Lance un sub-agent (`Agent` tool, type `general-purpose`, model `sonnet`) avec le prompt suivant. Injecte dans le prompt :
 - Le referentiel de conventions (contenu de reference.md)
 - Le(s) langage(s) detecte(s) et les conventions de casse applicables
 - Les conventions projet-specific si trouvees a l'etape 1

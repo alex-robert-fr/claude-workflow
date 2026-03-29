@@ -29,7 +29,7 @@ Rassemble les informations necessaires :
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../audit-naming/reference.md` (referentiel de conventions de nommage).
 
-Lance un **sub-agent** (Agent tool, type `general-purpose`) pour isoler la review du contexte principal. Injecte le referentiel de nommage dans le prompt. Passe-lui ce prompt :
+Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Injecte le referentiel de nommage dans le prompt. Passe-lui ce prompt :
 
 ```
 Tu es un reviewer de code senior. Review les changements sur la branche courante.
