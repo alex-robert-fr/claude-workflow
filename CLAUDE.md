@@ -17,7 +17,7 @@ Structure : `.claude-plugin/plugin.json` (manifest), `skills/nom/SKILL.md` (skil
 Le workflow suit un pipeline sequentiel avec des gates de validation entre chaque etape. L'humain decide quand passer a l'etape suivante.
 
 ```
-/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-pr → /pipe-notifier
+/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → /pipe-notifier
 ```
 
 Chaque skill guide vers le skill suivant. Pas de skill monolithique — chaque etape est invocable independamment.
