@@ -63,9 +63,46 @@ Cas speciaux (detectes par le contenu du commit, pas par le prefixe seul) :
 - Une entree = un changement notable cote utilisateur/consommateur
 - Redigee pour le lecteur, pas pour le dev — pas de detail d'implementation interne
 - Chaque entree sur une ligne, commencant par un verbe a l'infinitif ou un nom
-- Pas de PR/commit SHA dans les entrees
+- Chaque entree inclut ses references tracables en fin de ligne (voir section "References dans les entrees")
 - Breaking changes marques : `**BREAKING**` en prefixe de l'entree
 - Ne jamais copier les messages de commit verbatim — reformuler pour le consommateur
+
+## References dans les entrees
+
+Chaque entree de changelog inclut des references tracables entre parentheses en fin de ligne. Cela permet de remonter a l'origine d'un changement.
+
+### Format
+
+```
+- Texte reformule (references)
+```
+
+### Ordre des references
+
+Les references apparaissent entre parentheses, separees par des virgules, dans cet ordre :
+
+1. **Issues resolues** — `#N` (optionnel, present si detecte via mots-cles `closes`, `fixes`, `resolves`)
+2. **PR associee** — `#N` (optionnel, present si detecte)
+3. **SHA court** — `abc1234` (obligatoire, toujours present)
+
+Omettre les elements non detectes. Le SHA court est le seul element obligatoire.
+
+### Exemples
+
+```markdown
+- Ajouter le support multi-langue (#12, #15, abc1234)
+```
+Issue #12 resolue, PR #15, commit abc1234.
+
+```markdown
+- Corriger le parsing des dates (def5678)
+```
+Pas de PR ni d'issue detectee, uniquement le SHA court.
+
+```markdown
+- Refactorer le module auth (#8, 9a8b7c6)
+```
+PR #8, pas d'issue resolue, SHA 9a8b7c6.
 
 ## Versioning
 
