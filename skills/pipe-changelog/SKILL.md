@@ -26,6 +26,10 @@ Recupere les informations necessaires :
 2. **URL du remote** — via `git remote get-url origin`, transforme en URL HTTPS pour les liens de comparaison (ex: `git@github.com:org/repo.git` → `https://github.com/org/repo`).
 3. **Phase de versioning** — si le dernier tag est `0.x.y`, on est en pre-v1.0.0. Sinon, post-v1.0.0.
 4. **Version cible** — si un argument est fourni (ex: `1.3.0`), c'est la version a publier. Sinon, on met a jour la section `[Unreleased]`.
+5. **Tags existants** — pour chaque version presente dans CHANGELOG.md (hors `[Unreleased]`) et pour la version cible, verifier si le tag existe :
+   - `git tag --list "v${version}"` → si resultat non vide, le tag `v${version}` existe
+   - `git tag --list "${version}"` → fallback sans prefixe `v`
+   - Construire un map `{ version → nom du tag tel que matche (ex: "v1.3.2") | null }` utilise a l'etape 3 pour generer les en-tetes de version
 
 Affiche le contexte detecte :
 
@@ -97,6 +101,7 @@ Lire le contenu existant et :
 - Ne pas inclure les types sans entrees
 - Breaking changes prefixes par `**BREAKING**`
 - Format de version `[MAJOR.MINOR.PATCH]` sans prefixe `v` dans les titres de section
+- En-tete de version : si le tag existe (map de l'etape 1), utiliser le lien inline `## [X.Y.Z](https://github.com/{owner}/{repo}/releases/tag/{tagRef}) - YYYY-MM-DD`. Si le tag n'existe pas, texte brut `## [X.Y.Z] - YYYY-MM-DD`. `[Unreleased]` n'est jamais linke.
 - Dates au format ISO 8601 (`YYYY-MM-DD`)
 
 ## Etape 4 — Afficher le resultat et confirmer

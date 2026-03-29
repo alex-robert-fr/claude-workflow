@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Les en-têtes de version dans CHANGELOG.md sont maintenant liés au tag git correspondant quand il existe ([#22](https://github.com/ToolsForSaaS/claude-workflow/issues/22))
+
 ## [1.3.2] - 2026-03-29
 
 ### Added
