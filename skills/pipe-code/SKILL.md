@@ -1,6 +1,7 @@
 ---
 name: pipe-code
 description: Implementer du code a partir d'un plan ou d'une issue. Cree la branche, ecrit le code, commit chaque etape. Utiliser apres /pipe-plan ou avec un numero d'issue.
+model: opus
 argument-hint: [numero issue ou rien si plan deja present]
 ---
 

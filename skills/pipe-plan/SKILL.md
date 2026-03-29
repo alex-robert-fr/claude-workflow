@@ -1,6 +1,7 @@
 ---
 name: pipe-plan
 description: Planifier l'implementation d'une issue GitHub. Analyse le code, produit un plan technique detaille avec etapes, fichiers et approche. Utiliser avant /pipe-code.
+model: opus
 argument-hint: [numero issue, URL ou texte]
 ---
 
