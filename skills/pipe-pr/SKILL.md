@@ -99,7 +99,9 @@ Propose la suite :
 
 ```
 ---
-PR soumise. Prochaine etape : `/pipe-notifier` pour envoyer la notification de review.
+PR soumise. Prochaines etapes :
+- Apres merge sur main : `/pipe-tag [vX.Y.Z]` pour creer le tag de release.
+- Ou directement : `/pipe-notifier` pour envoyer la notification de review.
 ```
 
 ---
