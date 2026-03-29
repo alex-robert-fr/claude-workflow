@@ -86,7 +86,7 @@ Si tous les tests passent, propose la suite :
 
 ```
 ---
-Tests OK. Prochaine etape : `/pipe-pr` pour soumettre la branche.
+Tests OK. Prochaine etape : `/pipe-changelog` pour mettre a jour le CHANGELOG.
 ```
 
 ---
