@@ -41,12 +41,11 @@ Lis chaque fichier modifie ou cree et verifie :
 4. **Securite** — pas d'injection, XSS, secrets en dur, donnees sensibles loguees
 5. **Code mort** — pas de code commente, imports inutilises, variables orphelines
 6. **Taille des fichiers** — aucun fichier > 300 lignes
-7. **Nommage** — coherent avec le reste du codebase, conforme au referentiel de conventions de nommage (injecte ci-dessous)
+7. **Nommage** — coherent avec le reste du codebase, conforme au referentiel de conventions de nommage (voir section Referentiel ci-dessous)
+8. **Duplication** — pas de copier-coller d'un pattern qui existe deja
 
 Referentiel de conventions de nommage :
 [contenu de audit-naming/reference.md]
-
-8. **Duplication** — pas de copier-coller d'un pattern qui existe deja
 
 Pour chaque probleme, donne :
 - Fichier et ligne
