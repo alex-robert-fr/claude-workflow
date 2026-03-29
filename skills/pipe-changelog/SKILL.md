@@ -41,7 +41,7 @@ Contexte de versioning :
 
 Utilise Read pour charger `reference.md` (referentiel de conventions et mapping des types).
 
-1. **Lister les commits** — `git log <dernier-tag>..HEAD --oneline` (ou `git log --oneline` si aucun tag)
+1. **Lister les commits** — `git log <dernier-tag>..HEAD --format="%h %s"` (ou `git log --format="%h %s"` si aucun tag). Le `%h` donne le SHA court de chaque commit.
 2. **Filtrer les exclusions** — supprimer selon les regles du referentiel :
    - Merges (`Merge branch...`, `Merge pull request...`)
    - Fixups/squashs (`fixup!`, `squash!`)
@@ -50,7 +50,12 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
    - Typos de commentaires ou docs internes
 3. **Detecter les changesets** — si `.changeset/` existe et contient des fichiers `.md`, les utiliser comme source primaire au lieu des commits
 4. **Classer par type** — utiliser le mapping prefixe → type CHANGELOG du referentiel
-5. **Reformuler** — chaque entree est redigee pour le consommateur, pas copiee du message de commit
+5. **Enrichir avec les references** — pour chaque commit retenu, collecter les references tracables :
+   - **SHA court** : deja recupere via `%h` (obligatoire, toujours present)
+   - **PR associee** : utiliser `gh pr list --state merged --search "SHA" --json number --jq '.[0].number'` pour trouver la PR qui a merge ce commit. Si pas de resultat, pas de reference PR.
+   - **Issues resolues** : chercher les mots-cles `closes #X`, `fixes #X`, `resolves #X` (case-insensitive) dans le message de commit ET dans le body de la PR (si PR trouvee, via `gh pr view N --json body`). Extraire les numeros d'issues.
+   - Si `gh` echoue ou est indisponible, continuer avec le SHA seul — ne pas bloquer la generation.
+6. **Reformuler** — chaque entree est redigee pour le consommateur, pas copiee du message de commit. Terminer chaque entree par les references entre parentheses selon le format defini dans `reference.md` (section "References dans les entrees") : `(#issue, #PR, SHA)` — omettre les elements non detectes, SHA toujours present.
 
 Affiche les entrees classees avant de continuer :
 
@@ -58,13 +63,13 @@ Affiche les entrees classees avant de continuer :
 Changements detectes :
 
 ### Added
-- [entree reformulee]
+- [entree reformulee] (#12, #15, abc1234)
 
 ### Changed
-- [entree reformulee]
+- [entree reformulee] (#8, def5678)
 
 ### Fixed
-- [entree reformulee]
+- [entree reformulee] (9a8b7c6)
 
 [N] commits exclus (merges, fixups, CI...)
 ```
