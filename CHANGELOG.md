@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Convention de sélection de modèle (`model`) dans le frontmatter des skills avec 3 tiers (opus, sonnet, haiku) et grille de catégorisation des 22 skills existants ([#26](https://github.com/ToolsForSaaS/claude-workflow/pull/26))
+- Choix du tier modèle intégré dans le flow de création de skill (`/create-skill`) ([#26](https://github.com/ToolsForSaaS/claude-workflow/pull/26))
+
 ## [1.3.3](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.3.3) - 2026-03-29
 
 ### Fixed
