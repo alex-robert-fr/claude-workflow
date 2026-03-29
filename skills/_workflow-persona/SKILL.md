@@ -1,6 +1,7 @@
 ---
 name: _workflow-persona
 description: Persona et posture commune aux workflows AI-Driven Development. Definit l'identite Lead Developer senior et les contraintes comportementales. Charge automatiquement lors de l'execution d'un skill workflow.
+model: haiku
 user-invocable: false
 ---
 

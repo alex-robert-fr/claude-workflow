@@ -1,6 +1,7 @@
 ---
 name: pipe-tag
 description: Creer et pousser un tag git annote pour une release. Verifie la branche principale, detecte la version depuis CHANGELOG.md ou argument, cree un tag annote semantique. Utiliser apres merge de la PR sur main et avant /pipe-notifier.
+model: haiku
 argument-hint: "[v1.2.3]"
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: git-conventions
 description: Conventions git du projet. Branches, commits et Pull Requests. Utiliser lors de la creation de branches, commits ou PRs pour respecter les formats standard.
+model: haiku
 user-invocable: false
 ---
 

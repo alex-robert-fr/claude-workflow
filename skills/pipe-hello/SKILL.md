@@ -1,6 +1,7 @@
 ---
 name: pipe-hello
 description: Briefing de debut de session. Affiche le contexte projet, le travail en cours et l'etat du repo. Utiliser en debut de session de travail.
+model: haiku
 allowed-tools: Bash(git *), Bash(gh *), Bash(find *)
 ---
 

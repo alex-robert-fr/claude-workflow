@@ -1,6 +1,7 @@
 ---
 name: pipe-notifier
 description: Envoyer une notification sur le canal configure (Slack, Discord) apres creation ou mise a jour d'une PR. Recupere les infos et formate le message. Utiliser apres /pipe-pr pour notifier l'equipe.
+model: haiku
 argument-hint: [URL de la PR ou rien si detectable depuis la branche]
 ---
 

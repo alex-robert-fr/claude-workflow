@@ -1,6 +1,7 @@
 ---
 name: frontend-code-conventions
 description: Conventions d'architecture frontend framework-agnostiques. Structure pages/features/shared, flux de donnees, politiques types/mappers/services/screens. Utiliser lors de l'ecriture ou la revue de code frontend pour respecter l'architecture.
+model: haiku
 user-invocable: false
 ---
 
