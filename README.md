@@ -4,6 +4,8 @@ Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline c
 
 **21 skills** organises en 5 categories, avec selection automatique du modele optimal (opus/sonnet/haiku) par skill.
 
+Compatible **GitHub** et **Jira** — les skills de planification et d'implementation acceptent des issues des deux plateformes.
+
 ## Installation
 
 ### Via la marketplace (recommande)
@@ -96,17 +98,20 @@ Affiche un briefing complet : contexte projet, branches actives, travail en cour
 
 ```
 /workflow:pipe-plan #42
+/workflow:pipe-plan PROJ-123
+/workflow:pipe-plan https://myorg.atlassian.net/browse/PROJ-123
 ```
 
-Analyse l'issue GitHub (numero, URL ou texte libre), explore le code concerne et produit un plan technique detaille : etapes, fichiers a modifier, approche, risques.
+Analyse l'issue (GitHub ou Jira — numero, cle, URL ou texte libre), explore le code concerne et produit un plan technique detaille : etapes, fichiers a modifier, approche, risques.
 
 ### 4. Implementation
 
 ```
 /workflow:pipe-code #42
+/workflow:pipe-code PROJ-123
 ```
 
-Cree la branche, implemente le code selon le plan, commit chaque etape. Fonctionne aussi sans numero d'issue si un plan est deja present en session.
+Cree la branche, implemente le code selon le plan, commit chaque etape. Accepte un numero GitHub ou une cle Jira. Fonctionne aussi sans argument si un plan est deja present en session.
 
 ### 5. Review
 
