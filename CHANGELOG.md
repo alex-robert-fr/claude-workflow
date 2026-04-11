@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support JIRA et multi-plateforme dans `/pipe-plan` avec classification des issues et génération de plans plus concis ([#28](https://github.com/ToolsForSaaS/claude-workflow/pull/28))
+
+### Changed
+
+- Refonte de `/pipe-review` avec prompt expert structuré en 5 catégories d'analyse (bugs, sécurité, performance, architecture, types) et 3 niveaux de sévérité ([#29](https://github.com/ToolsForSaaS/claude-workflow/pull/29))
+- `/pipe-pr` impose désormais `Closes #XX` dans chaque body de PR pour l'auto-close automatique des issues au merge ([#29](https://github.com/ToolsForSaaS/claude-workflow/pull/29))
+
 ## [1.4.0](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.0) - 2026-03-29
 
 ### Added
