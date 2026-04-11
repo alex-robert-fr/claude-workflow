@@ -31,6 +31,8 @@
 
 ## Template PR — Body
 
+**Important** : `Closes #XX` est obligatoire, pas optionnel. Toujours present avec le bon numero d'issue. Si plusieurs issues sont liees : `Closes #12, Closes #15`.
+
 ```markdown
 ## Contexte
 

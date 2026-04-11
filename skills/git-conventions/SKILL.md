@@ -77,6 +77,10 @@ Format : `[Type] Titre de l'issue (#numero)`
 
 Pour rediger le body ou un commentaire d'iteration, utilise Read pour charger `reference.md` et suivre les templates.
 
+### Auto-close des issues (obligatoire)
+
+Le body de chaque PR doit contenir `Closes #XX` pour chaque issue liee. Cela ferme automatiquement les issues au merge. Si plusieurs issues sont concernees : `Closes #12, Closes #15`. Ne jamais omettre cette ligne.
+
 ### Regles de formatage MCP GitHub
 
 Ne jamais utiliser `\n` litteraux dans le parametre `body` des appels MCP GitHub (`create_pull_request`, `update_pull_request`, `add_issue_comment`). Utiliser de vrais sauts de ligne dans le texte, sinon les `\n` s'affichent en dur dans le markdown.

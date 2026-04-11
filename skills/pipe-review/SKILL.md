@@ -1,6 +1,6 @@
 ---
 name: pipe-review
-description: Review automatique du code via sub-agent. Verifie patterns, complexite, edge cases et securite. Utiliser apres /pipe-code et avant /pipe-test.
+description: Review automatique du code via sub-agent. Analyse bugs, securite, performance, architecture et types avec rapport structure. Utiliser apres /pipe-code et avant /pipe-test.
 model: sonnet
 ---
 
@@ -12,73 +12,102 @@ Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` av
 
 ## Etape 0 — Verifications
 
-- [ ] Il y a des changements a reviewer (au moins un commit d'avance sur la branche par defaut)
 - [ ] La branche courante n'est pas la branche par defaut
+- [ ] Il y a au moins un commit d'avance sur la branche par defaut
 
 Si rien a reviewer, signale-le et arrete-toi.
 
-## Etape 1 — Collecter le contexte
+## Etape 1 — Charger le contexte projet
+
+- Utilise Read pour charger `CLAUDE.md` a la racine du repo (si absent, continue sans)
+- Utilise Read pour charger `.claude/_review-persona.md` (si present — personnalisation projet-specifique du style de review)
+
+## Etape 2 — Collecter le contexte
 
 Rassemble les informations necessaires :
 
 - **Diff complet** de la branche vs branche par defaut (`git diff <branche-defaut>...HEAD`)
 - **Liste des fichiers** modifies et crees
+- **Contenu integral** de chaque fichier modifie via Read (pas seulement le diff — le reviewer a besoin du contexte complet)
 - **Issue liee** (depuis le numero dans le nom de branche, ex: `feat/42-...` → issue #42)
 
-## Etape 2 — Lancer la review en sub-agent
+## Etape 3 — Lancer la review en sub-agent
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../audit-naming/reference.md` (referentiel de conventions de nommage).
+Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Passe-lui le diff, la liste des fichiers, le contenu de `CLAUDE.md` (si charge) et le contenu de `_review-persona.md` (si charge). Le sub-agent lit chaque fichier modifie en entier via Read.
 
-Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Injecte le referentiel de nommage dans le prompt. Passe-lui ce prompt :
+Prompt du sub-agent :
 
 ```
-Tu es un reviewer de code senior. Review les changements sur la branche courante.
+Tu es un reviewer expert. Ton role est de detecter les vrais problemes et de les signaler directement, au bon endroit, de facon actionnable.
 
-Lis chaque fichier modifie ou cree et verifie :
+Lis chaque fichier modifie dans son integralite via Read, puis analyse les changements en profondeur.
 
-1. **Patterns du projet** — le code suit les conventions existantes, pas de nouvelle abstraction injustifiee
-2. **Complexite** — pas de fonction > 40 lignes, pas de nesting > 3 niveaux, logique lisible
-3. **Edge cases** — null, vide, erreurs, cas limites couverts
-4. **Securite** — pas d'injection, XSS, secrets en dur, donnees sensibles loguees
-5. **Code mort** — pas de code commente, imports inutilises, variables orphelines
-6. **Taille des fichiers** — aucun fichier > 300 lignes
-7. **Nommage** — coherent avec le reste du codebase, conforme au referentiel de conventions de nommage (voir section Referentiel ci-dessous)
-8. **Duplication** — pas de copier-coller d'un pattern qui existe deja
+Pour chaque fichier, cherche activement :
 
-Referentiel de conventions de nommage :
-[contenu de audit-naming/reference.md]
+**Bugs et correctness**
+- Logique incorrecte, cas limites non geres, conditions inversees
+- Race conditions, mutations inattendues, effets de bord
+- Promesses non awaited, erreurs silencieuses
+
+**Securite**
+- Injection (SQL, commande, XSS), donnees non validees cote serveur
+- Secrets exposes, permissions trop larges, IDOR
+
+**Performance**
+- N+1 queries, appels redondants en boucle
+- Chargements bloquants inutiles, fuites memoire
+
+**Architecture et maintenabilite**
+- Violation des conventions du projet (voir CLAUDE.md ci-dessous si fourni)
+- Couplage fort, responsabilites melangees
+- Duplication de logique metier critique
+
+**Types et contrats**
+- `any` injustifie, assertions forcees (`as`, `!`) sans garde
+- Props/parametres mal types, retours inconsistants
 
 Pour chaque probleme, donne :
 - Fichier et ligne
-- Categorie (pattern, complexite, edge-case, securite, code-mort, taille, nommage, duplication)
-- Severite (bloquant, avertissement, suggestion)
-- Description precise et correction proposee
+- Severite : BLOQUANT (bug, faille, regression) / AVERTISSEMENT (dette significative) / SUGGESTION (lisibilite, robustesse)
+- Description en 1-2 phrases centree sur l'impact
+- Correction proposee
 
-Produis un rapport structure avec un statut global : OK, AVERTISSEMENTS, ou BLOQUANT.
+**Ce que tu ne fais PAS :**
+- Pas de commentaire sur le style ou le formatting (c'est le role de Biome/ESLint)
+- Pas de reformulation de ce que fait le code
+- Pas de compliments generiques
+- Pas de rapport exhaustif de tous les changements
+
+**Style** : ecris comme si tu parlais a un developpeur competent. Une phrase pour le probleme, une pour la correction — pas plus. L'impact doit etre immediatement comprehensible (ex: "ca peut crasher si X est null" plutot que "violation du principe de null-safety").
+
+Produis un rapport structure avec statut global : OK, AVERTISSEMENTS, ou BLOQUANT.
 ```
 
-## Etape 3 — Afficher le rapport
+## Etape 4 — Afficher le rapport
 
 Affiche le rapport du sub-agent dans ce format :
 
 ```
 ## Review — [branche]
 
-### Statut : ✅ OK / ⚠️ Avertissements / ❌ Bloquant
+### Statut : OK / Avertissements / Bloquant
 
 ### Problemes bloquants (a corriger avant de continuer)
-- `fichier.ts:42` — [categorie] description du probleme
+- `fichier.ts:42` description du probleme
   → Correction proposee
 
 ### Avertissements
-- `fichier.ts:15` — [categorie] description
+- `fichier.ts:15` description
   → Suggestion
 
-### Points positifs
-- Ce qui est bien fait dans cette implementation
+### Suggestions
+- `fichier.ts:8` description
+  → Suggestion
 ```
 
-## Etape 4 — Corrections et suite
+Si aucun probleme dans une categorie, ne pas afficher la section (pas de liste vide).
+
+## Etape 5 — Corrections et suite
 
 Selon le statut :
 

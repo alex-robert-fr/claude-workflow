@@ -49,6 +49,15 @@ Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (sec
 
 Que ce soit pour une nouvelle PR ou une mise a jour, la description suit le format defini dans git-conventions et doit toujours refleter l'etat actuel complet de la PR — jamais de mention "ajoute", "mis a jour" ou "nouveau". C'est le role du commentaire d'iteration (etape 4).
 
+### Auto-close des issues (obligatoire)
+
+Le body de la PR doit **toujours** contenir `Closes #XX` dans la section Contexte pour chaque issue liee. Cela ferme automatiquement les issues au merge.
+
+- Une issue : `Closes #42`
+- Plusieurs issues : `Closes #12, Closes #15`
+
+Si aucune issue n'est identifiable depuis le nom de branche, demande le numero a l'utilisateur avant de continuer — ne jamais omettre cette ligne.
+
 ## Etape 4 — Rediger le commentaire d'iteration (mise a jour uniquement)
 
 Cette etape ne s'applique que si une PR existe deja. Sinon, passe directement a l'etape 5.
