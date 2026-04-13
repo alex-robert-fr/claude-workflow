@@ -1,8 +1,9 @@
 ---
 name: worktree
 description: Creer et gerer des worktrees git pour travailler en parallele sur plusieurs branches. Utiliser pour isoler le travail sur une issue sans perdre le contexte courant.
+model: sonnet
 argument-hint: [create|list|remove|switch] [branche]
-allowed-tools: Bash(git *)
+allowed-tools: Read, Bash(git *)
 ---
 
 ## Contexte
@@ -70,7 +71,7 @@ Worktree cree :
 
 ```
 Tu peux maintenant :
-- `/worktree switch $1` pour naviguer vers ce worktree
+- `/worktree switch $1` pour basculer Claude Code vers ce worktree (via EnterWorktree)
 - Lancer `/pipe-code` dans ce worktree pour implementer une issue en parallele
 ```
 
@@ -123,7 +124,7 @@ Prochaine etape : `/worktree list` pour verifier.
 
 1. Calcule le slug et le chemin cible
 2. Verifie que le worktree existe dans la liste des worktrees actifs
-3. Change le repertoire de travail vers le chemin du worktree
+3. Utilise l'outil natif `EnterWorktree` avec le chemin du worktree pour basculer le contexte Claude Code
 4. Confirme :
 
 ```
@@ -131,7 +132,7 @@ Contexte bascule vers le worktree :
   Branche : $1
   Chemin  : <chemin>
 
-Tu travailles maintenant dans ce worktree. Utilise `/worktree switch <branche-principale>` ou `/worktree list` pour revenir.
+Tu travailles maintenant dans ce worktree. Utilise `ExitWorktree` ou `/worktree list` pour revenir.
 ```
 
 ---
