@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Skill `/worktree` pour créer, lister, supprimer et basculer entre des worktrees git (`create`, `list`, `remove`, `switch`) avec intégration de l'outil natif `EnterWorktree` ([`fb2cce4`](https://github.com/ToolsForSaaS/claude-workflow/commit/fb2cce4))
+
 ## [1.4.1] - 2026-04-11
 
 ### Added
