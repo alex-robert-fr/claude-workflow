@@ -107,13 +107,68 @@ Affiche le rapport du sub-agent dans ce format :
 
 Si aucun probleme dans une categorie, ne pas afficher la section (pas de liste vide).
 
-## Etape 5 — Corrections et suite
+## Etape 5 — Synthese et revue interactive
 
-Selon le statut :
+### Phase 1 — Synthese rapide
 
-- **OK** → propose de lancer `/pipe-test`
-- **Avertissements** → propose de corriger les avertissements ou de passer a `/pipe-test` en l'etat
-- **Bloquant** → corrige les problemes bloquants, puis relance la review (max 2 iterations de correction)
+Apres l'affichage du rapport (etape 4), produis un recap condense :
+
+```
+### Synthese
+
+- X bloquant(s)
+- Y avertissement(s)
+- Z suggestion(s)
+```
+
+Ne rien corriger a ce stade.
+
+**Si statut OK** (aucun probleme) → propose directement `/pipe-test`. Fin du skill.
+
+**Si des problemes sont trouves** → demande a l'utilisateur :
+
+```
+Tu veux passer en revue les problemes un par un ? (oui / non — si non, on passe directement a `/pipe-test`)
+```
+
+Si l'utilisateur decline, propose `/pipe-test` et termine.
+
+### Phase 2 — Revue interactive
+
+Parcours chaque probleme dans l'ordre de severite (bloquants d'abord, puis avertissements, puis suggestions).
+
+Pour chaque probleme :
+
+1. **Explique en detail** : contexte, impact, code concerne (lis le fichier via Read pour montrer le code exact)
+2. **Propose la correction concrete** telle que decrite dans le rapport du sub-agent
+3. **Attends la decision de l'utilisateur** :
+   - **corriger** → relis d'abord le fichier via Read (les corrections precedentes ont pu modifier les lignes), puis applique la correction
+   - **adapter** → demande la modification souhaitee a l'utilisateur, relis le fichier via Read, puis applique
+   - **ignorer** → passe au probleme suivant sans rien modifier
+
+Ne jamais corriger automatiquement sans validation explicite de l'utilisateur.
+
+### Cloture
+
+Si au moins un probleme a ete traite en phase 2, affiche un recap des actions :
+
+```
+### Recap review interactive
+
+- X probleme(s) corrige(s)
+- Y probleme(s) ignore(s)
+- Z probleme(s) adapte(s)
+```
+
+Si l'utilisateur a decline la revue (phase 2 non executee), saute le recap.
+
+Si des bloquants ont ete ignores, signale-le explicitement avant de proposer `/pipe-test` :
+
+```
+⚠️ Attention : X bloquant(s) ont ete ignores. Ces problemes peuvent causer des bugs ou regressions.
+```
+
+Puis propose la suite :
 
 ```
 ---
