@@ -108,7 +108,7 @@ Si `.mcp.exemple.json` n'existe pas et que des MCP sont utilises dans les skills
 - ✅ .claude/rules/
 
 ### Pipeline disponible
-/pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-pr → /pipe-notifier
+/pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
 
 ### Prochaine etape
 Lance `/pipe-hello` pour commencer ta session de travail.

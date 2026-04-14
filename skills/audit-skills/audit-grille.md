@@ -6,7 +6,7 @@ Principe central : **la qualite est garantie par le process, pas par la discipli
 ## Pipeline de reference
 
 ```
-/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-pr → /pipe-notifier
+/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
 ```
 
 Chaque etape est un skill invocable independamment. L'humain decide quand passer a l'etape suivante.

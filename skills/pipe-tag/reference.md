@@ -77,6 +77,4 @@ Apres suppression, creer un nouveau tag avec un numero corrige plutot que de reu
 [merge de la PR sur main]
         ↓
 /pipe-tag [v1.2.3]         <- cree et pousse le tag
-        ↓
-/pipe-notifier             <- notifie l'equipe
 ```

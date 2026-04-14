@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.4.2] - 2026-04-14
+
+### Added
+
+- Skill `/worktree` pour créer, lister, supprimer et basculer entre des worktrees git (`create`, `list`, `remove`, `switch`) avec intégration de l'outil natif `EnterWorktree` ([`fb2cce4`](https://github.com/ToolsForSaaS/claude-workflow/commit/fb2cce4))
+
+### Removed
+
+- Skill `pipe-notifier` supprimé : jugé inutile, le pipeline se termine désormais à `/pipe-tag` ([#21](https://github.com/ToolsForSaaS/claude-workflow/pull/21))
 
 ## [1.4.1] - 2026-04-11
 
@@ -48,7 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Intégration de `/pipe-tag` dans le pipeline entre `/pipe-pr` et `/pipe-notifier` ([#20](https://github.com/ToolsForSaaS/claude-workflow/pull/20))
+- Intégration de `/pipe-tag` dans le pipeline après `/pipe-pr` ([#20](https://github.com/ToolsForSaaS/claude-workflow/pull/20))
 
 ## [1.3.1] - 2026-03-29
 
@@ -113,7 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Pipeline AI-Driven Development : `/pipe-hello` → `/pipe-plan` → `/pipe-code` → `/pipe-review` → `/pipe-test` → `/pipe-pr` → `/pipe-notifier` ([`60bcaba`](https://github.com/ToolsForSaaS/claude-workflow/commit/60bcaba))
+- Pipeline AI-Driven Development : `/pipe-hello` → `/pipe-plan` → `/pipe-code` → `/pipe-review` → `/pipe-test` → `/pipe-pr` ([`60bcaba`](https://github.com/ToolsForSaaS/claude-workflow/commit/60bcaba))
 - Skill `/setup` pour configurer un projet complet ([#9](https://github.com/ToolsForSaaS/claude-workflow/pull/9))
 - Skill `/setup-mcp` pour configurer les serveurs MCP avec catalogue de référence ([#2](https://github.com/ToolsForSaaS/claude-workflow/pull/2))
 - Skill `/setup-templates` pour initialiser les templates projet-spécifiques ([`9f156fd`](https://github.com/ToolsForSaaS/claude-workflow/commit/9f156fd))
