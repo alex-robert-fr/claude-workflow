@@ -119,21 +119,9 @@ Apres l'affichage du rapport (etape 4), produis un recap condense :
 - X bloquant(s)
 - Y avertissement(s)
 - Z suggestion(s)
-
-**Bloquants**
-- `fichier.ts:42` — description courte
-- `fichier.ts:78` — description courte
-
-**Avertissements**
-- `fichier.ts:15` — description courte
-
-**Suggestions**
-- `fichier.ts:8` — description courte
 ```
 
 Ne rien corriger a ce stade.
-
-Si aucune categorie n'a de problemes, ne pas l'afficher (pas de liste vide).
 
 **Si statut OK** (aucun probleme) → propose directement `/pipe-test`. Fin du skill.
 
@@ -151,18 +139,18 @@ Parcours chaque probleme dans l'ordre de severite (bloquants d'abord, puis avert
 
 Pour chaque probleme :
 
-1. **Explique en detail** : contexte, impact, code concerne (lis le fichier via Read si necessaire pour montrer le code en question)
+1. **Explique en detail** : contexte, impact, code concerne (lis le fichier via Read pour montrer le code exact)
 2. **Propose la correction concrete** telle que decrite dans le rapport du sub-agent
 3. **Attends la decision de l'utilisateur** :
-   - **corriger** → applique la correction proposee
-   - **adapter** → demande la modification souhaitee a l'utilisateur, puis applique
+   - **corriger** → relis d'abord le fichier via Read (les corrections precedentes ont pu modifier les lignes), puis applique la correction
+   - **adapter** → demande la modification souhaitee a l'utilisateur, relis le fichier via Read, puis applique
    - **ignorer** → passe au probleme suivant sans rien modifier
 
 Ne jamais corriger automatiquement sans validation explicite de l'utilisateur.
 
 ### Cloture
 
-Apres le dernier probleme (ou si l'utilisateur a decline la revue), affiche un recap des actions :
+Si au moins un probleme a ete traite en phase 2, affiche un recap des actions :
 
 ```
 ### Recap review interactive
@@ -170,6 +158,14 @@ Apres le dernier probleme (ou si l'utilisateur a decline la revue), affiche un r
 - X probleme(s) corrige(s)
 - Y probleme(s) ignore(s)
 - Z probleme(s) adapte(s)
+```
+
+Si l'utilisateur a decline la revue (phase 2 non executee), saute le recap.
+
+Si des bloquants ont ete ignores, signale-le explicitement avant de proposer `/pipe-test` :
+
+```
+⚠️ Attention : X bloquant(s) ont ete ignores. Ces problemes peuvent causer des bugs ou regressions.
 ```
 
 Puis propose la suite :
