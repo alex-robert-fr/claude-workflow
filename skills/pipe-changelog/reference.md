@@ -62,10 +62,60 @@ Cas speciaux (detectes par le contenu du commit, pas par le prefixe seul) :
 
 - Une entree = un changement notable cote utilisateur/consommateur
 - Redigee pour le lecteur, pas pour le dev — pas de detail d'implementation interne
-- Chaque entree sur une ligne, commencant par un verbe a l'infinitif ou un nom
+- Chaque entree tient sur **une seule ligne** — pas de retour a la ligne manuel au milieu d'une phrase. Les editeurs gerent le wrap, pas l'auteur.
 - Chaque entree inclut ses references tracables en fin de ligne (voir section "References dans les entrees")
 - Breaking changes marques : `**BREAKING**` en prefixe de l'entree
 - Ne jamais copier les messages de commit verbatim — reformuler pour le consommateur
+
+## Rediger pour le consommateur
+
+Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle l'API, utilisateur de la lib, ops qui deploie), pas au contributeur qui a ecrit le code. Elle decrit un effet observable, pas une modification interne.
+
+### Principes
+
+1. **Exposer l'effet observable** — codes HTTP, parametres accessibles, exigences cote client, comportement visible. Pas les noms de fonctions internes, decorateurs, hooks, ou refactors qui ne changent rien a l'usage.
+2. **Expliciter les valeurs concretes** — remplacer les formulations vagues par les contraintes reelles. "politique renforcee" → "minimum 12 caracteres avec majuscule, chiffre et symbole". "nouveau filtre" → "filtre `category_id` sur `GET /api/recipes`".
+3. **Fusionner les entrees liees** — plusieurs commits/PRs qui decrivent un **meme changement user-facing** (ex: ajout du cookie HttpOnly + marquage BREAKING + CORS credentials) deviennent une seule entree. Cote lecteur, c'est un seul evenement.
+4. **Indiquer l'impact client quand il existe** — si le consommateur doit adapter son code (headers, options fetch, configuration), le dire explicitement dans l'entree.
+
+### Avant / apres
+
+```
+❌ Ajout du decorateur @Public() et desactivation du guard JWT sur les GET
+✅ Les endpoints `GET` des ressources metier sont desormais accessibles publiquement sans authentification
+
+❌ Refactor de find_by_email pour masquer l'existence des comptes
+✅ Consultation d'une recette privee par un utilisateur non autorise : retour `404 Not Found` au lieu de `403 Forbidden` pour ne pas divulguer l'existence de la ressource
+
+❌ Ajout du cookie HttpOnly, BREAKING, CORS credentials (3 entrees)
+✅ **BREAKING — Authentification par cookie HttpOnly** : les endpoints `POST /auth/register` et `POST /auth/login` ne retournent plus le JWT dans le corps JSON. Le token est desormais pose dans un cookie `HttpOnly`, `SameSite=strict`, `Secure` en production. Les clients doivent utiliser `credentials: 'include'` sur leurs requetes HTTP. (1 entree fusionnee)
+
+❌ Politique de mot de passe renforcee a l'inscription
+✅ Politique de mot de passe renforcee a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
+```
+
+### Heuristique rapide
+
+Si l'entree reformulee ne permet **pas** a un consommateur de repondre a l'une de ces questions, elle manque probablement de contenu :
+
+- Qu'est-ce qui change concretement pour moi ?
+- Est-ce que je dois adapter mon code ?
+- Quelle est la nouvelle valeur / le nouveau comportement ?
+
+## Coherence versions/dates
+
+Une entree placee sous une section versionnee `[X.Y.Z] - YYYY-MM-DD` doit correspondre a un commit (ou a une PR) **mergee avant la date du tag**. Un changement introduit apres la date de release appartient a `[Unreleased]`, jamais a une version deja publiee.
+
+### Verification
+
+Lors de la generation ou de l'audit d'un CHANGELOG existant :
+
+1. Recuperer la date de chaque tag versionne : `git log -1 --format=%aI v<X.Y.Z>`.
+2. Pour chaque PR referencee dans une section versionnee, comparer sa date de merge avec la date du tag : `gh pr view <N> --json mergedAt --jq .mergedAt`.
+3. Pour les entrees referencees par SHA, utiliser la date du commit : `git log -1 --format=%aI <sha>`.
+4. Si la reference est **posterieure** a la date du tag, deplacer l'entree vers `[Unreleased]`.
+
+Cas typique : un CHANGELOG cree tardivement apres un premier tag, qui a absorbe par erreur des changements mergees plus tard. L'audit doit etre systematique a chaque passage de `/pipe-changelog`.
 
 ## References dans les entrees
 

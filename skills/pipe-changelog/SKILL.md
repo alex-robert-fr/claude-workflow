@@ -59,7 +59,7 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
    - Utiliser `gh pr list --state merged --search "SHA" --json number --jq '.[0].number'` pour trouver la PR qui a merge ce commit.
    - Si une PR est trouvee, c'est la reference de l'entree. Si pas de PR (commit direct), utiliser le SHA court en fallback.
    - Si `gh` echoue ou est indisponible, utiliser le SHA seul — ne pas bloquer la generation.
-6. **Reformuler** — chaque entree est redigee pour le consommateur, pas copiee du message de commit. Terminer chaque entree par la reference entre parentheses avec un lien Markdown explicite selon le format defini dans `reference.md` (section "References dans les entrees"). L'URL de base du remote est detectee a l'etape 1.
+6. **Reformuler** — chaque entree est redigee pour le consommateur selon les principes de la section "Rediger pour le consommateur" de `reference.md` : exposer l'effet observable, expliciter les valeurs concretes, fusionner les entrees liees qui decrivent un meme changement, indiquer l'impact client. Chaque entree tient sur **une seule ligne** — pas de retour a la ligne manuel dans la phrase. Terminer chaque entree par la reference entre parentheses avec un lien Markdown explicite selon le format defini dans `reference.md` (section "References dans les entrees"). L'URL de base du remote est detectee a l'etape 1.
 
 Affiche les entrees classees avant de continuer :
 
@@ -79,6 +79,29 @@ Changements detectes :
 ```
 
 Demande confirmation si le classement semble correct avant de continuer.
+
+## Etape 2.5 — Auditer la coherence historique
+
+Avant de toucher aux entrees, verifier que le CHANGELOG existant ne contient pas d'entrees mal placees : une PR mergee apres la date d'un tag ne peut pas figurer sous la section de ce tag.
+
+Procedure (voir `reference.md` section "Coherence versions/dates") :
+
+1. Pour chaque section versionnee `[X.Y.Z] - YYYY-MM-DD` du CHANGELOG, recuperer la date du tag correspondant via `git log -1 --format=%aI v<X.Y.Z>` (fallback sans prefixe `v`).
+2. Pour chaque entree sous cette section, extraire la reference (PR ou SHA) et recuperer sa date :
+   - PR : `gh pr view <N> --json mergedAt --jq .mergedAt`
+   - SHA : `git log -1 --format=%aI <sha>`
+3. Si la date de la reference est **posterieure** a la date du tag, l'entree doit etre deplacee vers `[Unreleased]`.
+
+Si des entrees mal placees sont detectees, les lister clairement :
+
+```
+Entrees mal placees (a deplacer vers [Unreleased]) :
+- Section [0.1.0] (tag du YYYY-MM-DD) :
+  - PR #N (mergee le YYYY-MM-DD) : "texte de l'entree"
+  - ...
+```
+
+Demander confirmation avant de reorganiser. Cette etape est rapide si le CHANGELOG est sain (aucune entree mal placee detectee) — la mentionner brievement et passer a l'etape suivante.
 
 ## Etape 3 — Generer / mettre a jour le CHANGELOG
 

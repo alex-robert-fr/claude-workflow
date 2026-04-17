@@ -7,102 +7,101 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.4] - 2026-04-17
+
+### Added
+
+- `/pipe-changelog` ajoute une étape 2.5 d'audit de cohérence historique : détecte les entrées dont la PR/commit a été mergé après la date du tag de leur section et propose de les déplacer vers `[Unreleased]` ([`96cc25b`](https://github.com/ToolsForSaaS/claude-workflow/commit/96cc25b))
+
+### Changed
+
+- `/pipe-changelog` applique des principes de rédaction orientés consommateur : chaque entrée expose l'effet observable, explicite les valeurs concrètes (noms de commandes, fichiers, paramètres), fusionne les changements liés, indique l'impact client quand il existe, et tient sur une seule ligne ([`96cc25b`](https://github.com/ToolsForSaaS/claude-workflow/commit/96cc25b))
+
 ## [1.4.3] - 2026-04-14
 
 ### Added
 
-- Review interactive dans `pipe-review` : synthèse des problèmes puis validation manuelle problème par problème (corriger / ignorer / adapter) ([`43fa4b8`](https://github.com/ToolsForSaaS/claude-workflow/commit/43fa4b8))
-
-### Changed
-
-- Flow post-review affiné : synthèse réduite aux compteurs, relecture du fichier avant chaque correction, recap conditionnel, avertissement si des bloquants sont ignorés ([`5562f17`](https://github.com/ToolsForSaaS/claude-workflow/commit/5562f17))
+- `/pipe-review` devient interactif : après la synthèse (compteurs par sévérité), chaque problème est validé manuellement avec trois options — corriger, ignorer, adapter — avec relecture du fichier avant chaque correction et avertissement explicite si des bloquants sont ignorés ([`43fa4b8`](https://github.com/ToolsForSaaS/claude-workflow/commit/43fa4b8), [`5562f17`](https://github.com/ToolsForSaaS/claude-workflow/commit/5562f17))
 
 ## [1.4.2](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.2) - 2026-04-14
 
 ### Added
 
-- Skill `/worktree` pour créer, lister, supprimer et basculer entre des worktrees git (`create`, `list`, `remove`, `switch`) avec intégration de l'outil natif `EnterWorktree` ([`fb2cce4`](https://github.com/ToolsForSaaS/claude-workflow/commit/fb2cce4))
+- `/worktree` permet de créer, lister, supprimer et basculer entre des worktrees git via quatre actions (`create`, `list`, `remove`, `switch`) en s'appuyant sur l'outil natif `EnterWorktree` ([`fb2cce4`](https://github.com/ToolsForSaaS/claude-workflow/commit/fb2cce4))
 
 ### Removed
 
-- Skill `pipe-notifier` supprimé : jugé inutile, le pipeline se termine désormais à `/pipe-tag` ([#21](https://github.com/ToolsForSaaS/claude-workflow/pull/21))
+- `/pipe-notifier` supprimé — le pipeline se termine désormais à `/pipe-tag` ([#21](https://github.com/ToolsForSaaS/claude-workflow/pull/21))
 
 ## [1.4.1] - 2026-04-11
 
 ### Added
 
-- Support JIRA et multi-plateforme dans `/pipe-plan` avec classification des issues et génération de plans plus concis ([#28](https://github.com/ToolsForSaaS/claude-workflow/pull/28))
+- `/pipe-plan` supporte JIRA et les trackers externes (Linear), avec classification du ticket (technique / métier / mixte) et génération de plans plus concis ([#28](https://github.com/ToolsForSaaS/claude-workflow/pull/28))
 
 ### Changed
 
-- Refonte de `/pipe-review` avec prompt expert structuré en 5 catégories d'analyse (bugs, sécurité, performance, architecture, types) et 3 niveaux de sévérité ([#29](https://github.com/ToolsForSaaS/claude-workflow/pull/29))
-- `/pipe-pr` impose désormais `Closes #XX` dans chaque body de PR pour l'auto-close automatique des issues au merge ([#29](https://github.com/ToolsForSaaS/claude-workflow/pull/29))
+- `/pipe-review` réorganisé autour d'un prompt expert structuré en cinq catégories d'analyse (bugs, sécurité, performance, architecture, types) avec trois niveaux de sévérité (blocker, major, minor) ([#29](https://github.com/ToolsForSaaS/claude-workflow/pull/29))
+- `/pipe-pr` exige désormais une ligne `Closes #XX` dans chaque body de PR pour déclencher l'auto-close des issues liées au merge ([#29](https://github.com/ToolsForSaaS/claude-workflow/pull/29))
 
 ## [1.4.0](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.0) - 2026-03-29
 
 ### Added
 
-- Convention de sélection de modèle (`model`) dans le frontmatter des skills avec 3 tiers (opus, sonnet, haiku) et grille de catégorisation des 22 skills existants ([#26](https://github.com/ToolsForSaaS/claude-workflow/pull/26))
-- Choix du tier modèle intégré dans le flow de création de skill (`/create-skill`) ([#26](https://github.com/ToolsForSaaS/claude-workflow/pull/26))
+- Convention de sélection de modèle (`model: opus | sonnet | haiku`) obligatoire dans le frontmatter de chaque skill, avec grille de catégorisation des 22 skills du plugin et choix du tier intégré dans le flow `/create-skill` ([#26](https://github.com/ToolsForSaaS/claude-workflow/pull/26))
 
 ### Changed
 
-- Tous les skills déclarent leur tier de modèle recommandé dans le frontmatter : 4 opus, 13 sonnet, 5 haiku ([`6b7249d`](https://github.com/ToolsForSaaS/claude-workflow/commit/6b7249d))
-- Les sub-agents de `pipe-review` et `audit-naming` utilisent explicitement le modèle sonnet ([`e69b5f9`](https://github.com/ToolsForSaaS/claude-workflow/commit/e69b5f9))
+- Tous les skills déclarent leur tier de modèle dans le frontmatter (4 opus, 13 sonnet, 5 haiku) et les sub-agents de `/pipe-review` et `/audit-naming` utilisent explicitement sonnet ([`6b7249d`](https://github.com/ToolsForSaaS/claude-workflow/commit/6b7249d), [`e69b5f9`](https://github.com/ToolsForSaaS/claude-workflow/commit/e69b5f9))
 
 ### Fixed
 
-- `pipe-tag` reclassé de haiku à sonnet (parsing SemVer et vérification de branche) ([`b1e470e`](https://github.com/ToolsForSaaS/claude-workflow/commit/b1e470e))
+- `/pipe-tag` reclassé de haiku à sonnet : le parsing SemVer et la vérification de branche principale nécessitent plus de capacité ([`b1e470e`](https://github.com/ToolsForSaaS/claude-workflow/commit/b1e470e))
 
 ## [1.3.3](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.3.3) - 2026-03-29
 
 ### Fixed
 
-- Les en-têtes de version dans CHANGELOG.md sont maintenant liés au tag git correspondant quand il existe ([#23](https://github.com/ToolsForSaaS/claude-workflow/pull/23))
+- Les en-têtes de version dans `CHANGELOG.md` sont rendus sous forme de lien Markdown vers le tag git correspondant (`## [X.Y.Z](url/releases/tag/vX.Y.Z)`) quand le tag existe ([#23](https://github.com/ToolsForSaaS/claude-workflow/pull/23))
 
 ## [1.3.2](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.3.2) - 2026-03-29
 
 ### Added
 
-- Skill `/pipe-tag` pour créer et pousser un tag git annoté SemVer depuis CHANGELOG ([#20](https://github.com/ToolsForSaaS/claude-workflow/pull/20))
-
-### Changed
-
-- Intégration de `/pipe-tag` dans le pipeline après `/pipe-pr` ([#20](https://github.com/ToolsForSaaS/claude-workflow/pull/20))
+- `/pipe-tag` crée et pousse un tag git annoté sémantique (`vX.Y.Z`) en lisant la version depuis `CHANGELOG.md`, avec vérification préalable de la branche principale. Intégré dans le pipeline après `/pipe-pr` ([#20](https://github.com/ToolsForSaaS/claude-workflow/pull/20))
 
 ## [1.3.1] - 2026-03-29
 
 ### Added
 
-- Références traçables dans les entrées de changelog avec liens cliquables vers la PR ou le commit source ([#19](https://github.com/ToolsForSaaS/claude-workflow/pull/19))
+- Chaque entrée de CHANGELOG se termine par une référence traçable cliquable en fin de ligne : `([#NN](url/pull/NN))` si une PR est associée, `([` SHA `](url/commit/SHA))` en fallback ([#19](https://github.com/ToolsForSaaS/claude-workflow/pull/19))
 
 ## [1.3.0] - 2026-03-29
 
 ### Added
 
-- Skill `/audit-naming` pour auditer les conventions de nommage du projet avec référentiel dédié ([#15](https://github.com/ToolsForSaaS/claude-workflow/pull/15))
-- Intégration du référentiel audit-naming dans `/pipe-review` ([#15](https://github.com/ToolsForSaaS/claude-workflow/pull/15))
-- Skill `/pipe-changelog` pour générer et maintenir le CHANGELOG avec référentiel de conventions ([#17](https://github.com/ToolsForSaaS/claude-workflow/pull/17))
+- `/audit-naming` audite les conventions de nommage du projet (fichiers, dossiers, variables, fonctions, classes/types) avec référentiel dédié consommé automatiquement par `/pipe-review` ([#15](https://github.com/ToolsForSaaS/claude-workflow/pull/15))
+- `/pipe-changelog` génère et maintient `CHANGELOG.md` selon Keep a Changelog et SemVer, avec référentiel de conventions (types, exclusions, format des entrées) ([#17](https://github.com/ToolsForSaaS/claude-workflow/pull/17))
 
 ### Changed
 
-- Chaînage du pipeline : `/pipe-test` → `/pipe-changelog` → `/pipe-pr` ([#17](https://github.com/ToolsForSaaS/claude-workflow/pull/17))
+- Pipeline réordonné : `/pipe-test` → `/pipe-changelog` → `/pipe-pr` ([#17](https://github.com/ToolsForSaaS/claude-workflow/pull/17))
 
 ### Fixed
 
-- Séquence git explicite dans `/pipe-code` pour la création de branche ([#13](https://github.com/ToolsForSaaS/claude-workflow/pull/13))
+- `/pipe-code` expose une séquence git explicite (création et basculement de branche) avant toute écriture de code ([#13](https://github.com/ToolsForSaaS/claude-workflow/pull/13))
 
 ## [1.2.4] - 2026-03-28
 
 ### Fixed
 
-- Compatibilité sandbox : remplacement de tous les `ls` inline par `Glob/Read` dans l'ensemble des skills ([`4e3b0a4`](https://github.com/ToolsForSaaS/claude-workflow/commit/4e3b0a4))
+- Compatibilité sandbox : tous les appels `ls` inline remplacés par `Glob` ou `Read` dans l'ensemble des skills ([`4e3b0a4`](https://github.com/ToolsForSaaS/claude-workflow/commit/4e3b0a4))
 
 ## [1.2.3] - 2026-03-28
 
 ### Fixed
 
-- Compatibilité sandbox : remplacement de `ls` par `Glob` dans `/create-skill` ([`52ee483`](https://github.com/ToolsForSaaS/claude-workflow/commit/52ee483))
+- Compatibilité sandbox : `ls` remplacé par `Glob` dans `/create-skill` ([`52ee483`](https://github.com/ToolsForSaaS/claude-workflow/commit/52ee483))
 
 ## [1.2.2] - 2026-03-27
 
@@ -110,40 +109,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Skill `/setup-init` supprimé (fonctionnalité intégrée dans `/setup`) ([`a7bb330`](https://github.com/ToolsForSaaS/claude-workflow/commit/a7bb330))
+- `/setup-init` supprimé — sa fonctionnalité est désormais intégrée dans `/setup` ([`a7bb330`](https://github.com/ToolsForSaaS/claude-workflow/commit/a7bb330))
 
 ## [1.2.0] - 2026-03-27
 
 ### Changed
 
-- Conformité de tous les skills au template canonique unifié ([`37013b6`](https://github.com/ToolsForSaaS/claude-workflow/commit/37013b6))
+- Tous les skills alignés sur le template canonique unifié (frontmatter standardisé, structure de sections homogène) ([`37013b6`](https://github.com/ToolsForSaaS/claude-workflow/commit/37013b6))
 
 ### Fixed
 
-- Compatibilité sandbox : remplacement de `ls` par `Glob` dans `/audit-skills` ([`72e5f8c`](https://github.com/ToolsForSaaS/claude-workflow/commit/72e5f8c))
+- Compatibilité sandbox : `ls` remplacé par `Glob` dans `/audit-skills` ([`72e5f8c`](https://github.com/ToolsForSaaS/claude-workflow/commit/72e5f8c))
 
 ## [1.1.0] - 2026-03-27
 
 ### Added
 
-- Pattern sub-agents dans `/create-skill` pour analyse multi-fichiers ([`81c5cda`](https://github.com/ToolsForSaaS/claude-workflow/commit/81c5cda))
-- Skill `/audit-skills` extrait de `/create-skill` pour évaluer la maturité AI-Driven Development ([`20088cc`](https://github.com/ToolsForSaaS/claude-workflow/commit/20088cc))
+- `/create-skill` expose un pattern sub-agents pour analyser plusieurs fichiers en parallèle lors de la conception d'un skill ([`81c5cda`](https://github.com/ToolsForSaaS/claude-workflow/commit/81c5cda))
+- `/audit-skills` (extrait de `/create-skill`) évalue la maturité AI-Driven Development du projet sur 7 axes avec scoring 1-10 ([`20088cc`](https://github.com/ToolsForSaaS/claude-workflow/commit/20088cc))
 
 ## [1.0.0] - 2026-03-27
 
 ### Added
 
-- Pipeline AI-Driven Development : `/pipe-hello` → `/pipe-plan` → `/pipe-code` → `/pipe-review` → `/pipe-test` → `/pipe-pr` ([`60bcaba`](https://github.com/ToolsForSaaS/claude-workflow/commit/60bcaba))
-- Skill `/setup` pour configurer un projet complet ([#9](https://github.com/ToolsForSaaS/claude-workflow/pull/9))
-- Skill `/setup-mcp` pour configurer les serveurs MCP avec catalogue de référence ([#2](https://github.com/ToolsForSaaS/claude-workflow/pull/2))
-- Skill `/setup-templates` pour initialiser les templates projet-spécifiques ([`9f156fd`](https://github.com/ToolsForSaaS/claude-workflow/commit/9f156fd))
-- Skill `/setup-ui-ux` pour générer les conventions UI/UX ([#2](https://github.com/ToolsForSaaS/claude-workflow/pull/2))
-- Skill `/create-skill` pour créer de nouveaux skills au format `directory/SKILL.md` ([`9e23bf6`](https://github.com/ToolsForSaaS/claude-workflow/commit/9e23bf6))
-- Conventions frontend (`/frontend-code-conventions`) et git (`/git-conventions`) ([`00d17bb`](https://github.com/ToolsForSaaS/claude-workflow/commit/00d17bb))
-- Architecture plugin avec manifest `plugin.json` et skills distribués ([#7](https://github.com/ToolsForSaaS/claude-workflow/pull/7))
-- Template canonique unifié pour les skills avec chargement progressif ([`843c650`](https://github.com/ToolsForSaaS/claude-workflow/commit/843c650))
-- Préfixage des skills par catégorie (`pipe-*`, `create-*`, `setup-*`, `audit-*`) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
-- Installation via marketplace ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
+- Pipeline AI-Driven Development complet : `/pipe-hello` → `/pipe-plan` → `/pipe-code` → `/pipe-review` → `/pipe-test` → `/pipe-pr` ([`60bcaba`](https://github.com/ToolsForSaaS/claude-workflow/commit/60bcaba))
+- `/setup` configure un projet complet (CLAUDE.md, workflow-config, hooks, plans, rules) en une passe ([#9](https://github.com/ToolsForSaaS/claude-workflow/pull/9))
+- `/setup-mcp` génère un `.mcp.exemple.json` de référence avec détection automatique des MCP utilisés ([#2](https://github.com/ToolsForSaaS/claude-workflow/pull/2))
+- `/setup-templates` initialise les templates projet-spécifiques dans `.claude/skills/` avec détection des placeholders ([`9f156fd`](https://github.com/ToolsForSaaS/claude-workflow/commit/9f156fd))
+- `/setup-ui-ux` génère `.claude/skills/ui-ux/SKILL.md` avec les préférences visuelles et patterns d'interaction du projet ([#2](https://github.com/ToolsForSaaS/claude-workflow/pull/2))
+- `/create-skill` crée de nouveaux skills au format `repertoire/SKILL.md` avec frontmatter obligatoire ([`9e23bf6`](https://github.com/ToolsForSaaS/claude-workflow/commit/9e23bf6))
+- Skills de conventions partagés : `/frontend-code-conventions` et `/git-conventions` ([`00d17bb`](https://github.com/ToolsForSaaS/claude-workflow/commit/00d17bb))
+- Architecture plugin avec manifest `.claude-plugin/plugin.json` et skills distribués sous `skills/nom/SKILL.md` ([#7](https://github.com/ToolsForSaaS/claude-workflow/pull/7))
+- Template canonique unifié pour les skills avec frontmatter standardisé et chargement progressif des références ([`843c650`](https://github.com/ToolsForSaaS/claude-workflow/commit/843c650))
+- Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
+- Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
 [Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.3...HEAD
 [1.4.3]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.2...v1.4.3
