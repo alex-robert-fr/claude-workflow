@@ -93,7 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renommer le plugin et ajouter `.gitignore` ([`3f0423a`](https://github.com/ToolsForSaaS/claude-workflow/commit/3f0423a))
 - Supprimer le tableau de routage des skills et le template d'index devenus obsoletes ([`88ef12c`](https://github.com/ToolsForSaaS/claude-workflow/commit/88ef12c))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.3...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...HEAD
 [1.4.2]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.3.3...v1.4.0
