@@ -41,18 +41,26 @@ Les types doivent toujours apparaitre dans cet ordre. Ne pas inclure les types s
 
 Pas de types custom (`Improved`, `Refactored`, `Chore`, etc.).
 
-## Mapping prefixe de commit → type CHANGELOG
+## Mapping prefixe de commit → fichier + type
 
-| Prefixe commit | Type CHANGELOG | Notes |
+Le classement se fait en deux fichiers : `CHANGELOG.md` (consommateur) et `TECHNICAL_CHANGES.md` (contributeur). Chaque commit retenu va dans **un seul** des deux.
+
+| Prefixe commit | Defaut | Exception (impact consommateur) |
 |---|---|---|
-| `feat` | Added | Nouvelle fonctionnalite |
-| `refactor` | Changed | Modification de comportement ou restructuration |
-| `perf` | Changed | Optimisation de performance |
-| `fix` | Fixed | Correction de bug |
-| `docs` | — | Exclure sauf si impact utilisateur (ex: nouveau guide public) |
-| `chore` | — | Exclure sauf si impact utilisateur (ex: changement de config publique) |
+| `feat` | CHANGELOG → `Added` | — |
+| `fix` | CHANGELOG → `Fixed` | — |
+| `perf` | CHANGELOG → `Changed` | — |
+| `refactor` | TECHNICAL → `Refactor` | CHANGELOG → `Changed` si l'API publique change |
+| `docs` | TECHNICAL → `Docs` | CHANGELOG → `Added`/`Changed` si doc user-facing (README public, doc API consommee) |
+| `chore` | TECHNICAL → `Chore`, `Dependencies` ou `CI` (voir ci-dessous) | CHANGELOG → `Changed` si config publique (`.mcp.json` exemple, manifest consomme) |
+| `test` | TECHNICAL → `Tests` | — |
 
-Cas speciaux (detectes par le contenu du commit, pas par le prefixe seul) :
+Sous-classement des `chore` dans TECHNICAL :
+- Bump de dependance → `Dependencies`
+- Modification d'un workflow CI, d'un hook git, d'un script de build → `CI`
+- Tout le reste (config interne, meta, scripts divers) → `Chore`
+
+Cas speciaux CHANGELOG (detectes par le contenu du commit, pas par le prefixe seul) :
 - Suppression explicite d'une fonctionnalite → `Removed`
 - Deprecation explicite → `Deprecated`
 - Patch de securite → `Security`
@@ -102,6 +110,70 @@ Si l'entree reformulee ne permet **pas** a un consommateur de repondre a l'une d
 - Est-ce que je dois adapter mon code ?
 - Quelle est la nouvelle valeur / le nouveau comportement ?
 
+## TECHNICAL_CHANGES.md — journal technique
+
+`TECHNICAL_CHANGES.md` est le pendant de `CHANGELOG.md` pour les contributeurs. Il capture les changements internes qui n'affectent pas le consommateur mais qui interessent un developpeur qui ouvre le repo : refactors, docs internes, tests, CI, bumps de deps, maintenance.
+
+### Symetrie avec CHANGELOG.md
+
+- Meme format Keep a Changelog + SemVer
+- Memes versions et memes dates (un tag git = une release, une seule date)
+- Meme mecanisme de liens de comparaison en bas de fichier
+- Meme regle de liens inline sur les en-tetes `## [X.Y.Z](tag-url) - YYYY-MM-DD` quand le tag existe
+
+### Types d'entrees (ordre impose)
+
+| Type | Usage |
+|---|---|
+| `Refactor` | Restructuration de code sans impact utilisateur (renommages internes, extraction de services, reorganisation de modules) |
+| `Docs` | Documentation interne (ADR, CONTRIBUTING, commentaires, README contributeur) |
+| `Tests` | Ajout, modification ou suppression de tests |
+| `CI` | Workflows, hooks git, pipelines de build, scripts d'automatisation |
+| `Dependencies` | Bumps de dependances (dev et runtime) |
+| `Chore` | Maintenance et config interne ne relevant d'aucune autre categorie |
+
+Pas de types custom hors de cette liste. Ne pas inclure les types sans entrees.
+
+### Structure globale
+
+```markdown
+# Technical Changes
+
+All notable technical changes targeted at contributors will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.2.0](https://github.com/org/repo/releases/tag/v1.2.0) - 2026-03-29
+
+### Refactor
+
+- Extraction du service de detection de plateforme git dans `platform-detector` ([#18](https://github.com/org/repo/pull/18))
+
+### Dependencies
+
+- Bump `typescript` 5.3.0 → 5.4.2 ([`a1b2c3d`](https://github.com/org/repo/commit/a1b2c3d))
+
+[Unreleased]: https://github.com/org/repo/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/org/repo/compare/v1.1.0...v1.2.0
+```
+
+### Regles de contenu
+
+- Une entree = un changement technique notable **pour un contributeur** (pas pour l'utilisateur final)
+- Redigee de facon concise, orientee "ce qui a change dans le repo"
+- Chaque entree tient sur **une seule ligne** et inclut sa reference tracable (meme regle que CHANGELOG)
+- Ne jamais dupliquer une entree du CHANGELOG dans le TECHNICAL_CHANGES : un changement va **dans un seul** des deux fichiers
+- Les bumps de deps peuvent etre groupes : `Bump des dependances dev (typescript, vitest, biome) ([#N](url))` si la PR couvre plusieurs bumps liees
+
+### Cas limites
+
+- **Commit refactor qui prepare une feature user-facing** : l'entree va dans le CHANGELOG uniquement quand la feature est livree. Le refactor intermediaire, s'il est livre seul sans impact visible, va dans TECHNICAL.
+- **Docs qui impactent le consommateur** (ex: nouveau guide d'utilisation publique, doc d'API) : CHANGELOG, pas TECHNICAL.
+- **Update de doc contributeur** (CONTRIBUTING, ADR, README interne) : TECHNICAL, pas CHANGELOG.
+
 ## Coherence versions/dates
 
 Une entree placee sous une section versionnee `[X.Y.Z] - YYYY-MM-DD` doit correspondre a un commit (ou a une PR) **mergee avant la date du tag**. Un changement introduit apres la date de release appartient a `[Unreleased]`, jamais a une version deja publiee.
@@ -116,6 +188,8 @@ Lors de la generation ou de l'audit d'un CHANGELOG existant :
 4. Si la reference est **posterieure** a la date du tag, deplacer l'entree vers `[Unreleased]`.
 
 Cas typique : un CHANGELOG cree tardivement apres un premier tag, qui a absorbe par erreur des changements mergees plus tard. L'audit doit etre systematique a chaque passage de `/pipe-changelog`.
+
+Le meme audit s'applique a `TECHNICAL_CHANGES.md` : chaque entree sous une section versionnee doit referencer un commit/PR mergee avant la date du tag. Les deux fichiers sont audites a chaque passage du skill.
 
 ## References dans les entrees
 
@@ -197,14 +271,15 @@ Format :
 
 ## Exclusions
 
-Ne pas inclure dans le CHANGELOG :
+Exclus des deux fichiers (CHANGELOG et TECHNICAL) :
 
 - Les merges (`Merge branch...`, `Merge pull request...`)
 - Les rebases et fixups (`fixup!`, `squash!`)
-- Les changements de CI/CD internes
-- Les mises a jour de dependances mineures (sauf impact API publique)
-- Les typos de commentaires ou de docs internes
-- Le contenu des commits verbatim
+- Les typos purs (commentaires, fautes de frappe dans la doc)
+- Les commits de revert immediatement suivis du recommit
+- Le contenu des commits verbatim (toujours reformuler)
+
+Les changements CI/CD, les bumps de deps et les docs internes ne sont **pas** exclus : ils vont dans `TECHNICAL_CHANGES.md` (sections `CI`, `Dependencies`, `Docs`).
 
 ## Changesets (Turborepo) — optionnel
 

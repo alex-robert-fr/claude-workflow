@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.5] - 2026-04-17
+
+### Changed
+
+- `/pipe-changelog` genere et maintient desormais **deux fichiers** : `CHANGELOG.md` (orienté consommateur) et `TECHNICAL_CHANGES.md` (orienté contributeur, pour les changements techniques internes — refactors, docs internes, tests, CI, dependances, chore). Chaque commit est classe automatiquement dans un seul des deux fichiers selon son prefixe ([`c524b13`](https://github.com/ToolsForSaaS/claude-workflow/commit/c524b13))
+
 ## [1.4.4] - 2026-04-17
 
 ### Added
@@ -144,7 +150,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.3...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...HEAD
+[1.4.5]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.4...v1.4.5
+[1.4.4]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.3...v1.4.4
 [1.4.3]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.0...v1.4.1
