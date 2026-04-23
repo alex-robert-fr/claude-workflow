@@ -140,7 +140,7 @@ Si l'utilisateur decline, propose `/pipe-test` et termine.
 
 Parcours chaque probleme dans l'ordre de severite (bloquants d'abord, puis avertissements, puis suggestions).
 
-Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique suivant**, en te basant sur les 6 champs produits par le sub-agent a l'etape 3. Relis le fichier concerne via Read avant l'affichage pour pouvoir montrer le code exact dans "D'ou ca vient ?" ou "Comment on corrige ?" si pertinent.
+Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique suivant**, en te basant sur les 6 champs produits par le sub-agent a l'etape 3.
 
 ```
 [Severite N/Total] — <fichier>:<ligne>
@@ -153,6 +153,7 @@ Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique s
 
 ❓ D'ou ca vient ?
    <cause>
+   [extrait de code pertinent si necessaire]
 
 ❓ Comment on corrige ?
    <correction>
