@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Refactor
+
+- Restructurer le skill `pipe-review` : le sub-agent produit 6 champs structures par probleme (fichier, severite, probleme_une_phrase, gravite_impact, cause, correction) et la phase 2 affiche chaque probleme en format Question/Reponse pedagogique avec exemple de rendu ([`c32e199`](https://github.com/ToolsForSaaS/claude-workflow/commit/c32e199))
+
 ## [1.4.2](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.2) - 2026-04-14
 
 ### Docs
