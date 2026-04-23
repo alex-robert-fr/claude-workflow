@@ -68,7 +68,7 @@ Cas speciaux CHANGELOG (detectes par le contenu du commit, pas par le prefixe se
 
 ## Regles de contenu
 
-- Une entree = un changement notable cote utilisateur/consommateur
+- Une entree = **une seule information user-facing distincte**. Si un changement couvre plusieurs aspects distincts (nouveau champ + nouveau filtre + nouvel endpoint), decouper en autant d'entrees separees plutot que de tout fusionner sur une ligne.
 - Redigee pour le lecteur, pas pour le dev — pas de detail d'implementation interne
 - Chaque entree tient sur **une seule ligne** — pas de retour a la ligne manuel au milieu d'une phrase. Les editeurs gerent le wrap, pas l'auteur.
 - Chaque entree inclut ses references tracables en fin de ligne (voir section "References dans les entrees")
@@ -83,7 +83,9 @@ Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle
 
 1. **Exposer l'effet observable** — codes HTTP, parametres accessibles, exigences cote client, comportement visible. Pas les noms de fonctions internes, decorateurs, hooks, ou refactors qui ne changent rien a l'usage.
 2. **Expliciter les valeurs concretes** — remplacer les formulations vagues par les contraintes reelles. "politique renforcee" → "minimum 12 caracteres avec majuscule, chiffre et symbole". "nouveau filtre" → "filtre `category_id` sur `GET /api/recipes`".
-3. **Fusionner les entrees liees** — plusieurs commits/PRs qui decrivent un **meme changement user-facing** (ex: ajout du cookie HttpOnly + marquage BREAKING + CORS credentials) deviennent une seule entree. Cote lecteur, c'est un seul evenement.
+3. **Fusionner les entrees liees, mais decouper les aspects distincts** — la regle : si le lecteur peut consommer un aspect sans connaitre les autres, c'est qu'il merite sa propre ligne. La fusion ne s'applique qu'aux commits/PRs qui decrivent **le meme evenement vu du consommateur** :
+   - ✅ **Fusion OK** : ajout du cookie HttpOnly + marquage BREAKING + CORS credentials → un seul evenement auth, donc une seule entree.
+   - ❌ **Fusion abusive** : nouveau champ obligatoire + nouveau filtre + nouvel endpoint + inclusion dans un GET → ce sont autant d'informations user-facing distinctes, chacune doit etre sa propre entree.
 4. **Indiquer l'impact client quand il existe** — si le consommateur doit adapter son code (headers, options fetch, configuration), le dire explicitement dans l'entree.
 
 ### Avant / apres
@@ -100,6 +102,18 @@ Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle
 
 ❌ Politique de mot de passe renforcee a l'inscription
 ✅ Politique de mot de passe renforcee a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
+```
+
+#### Decoupage : plusieurs aspects user-facing distincts
+
+```
+❌ Ajout du champ `type` obligatoire sur POST, nouveau filtre `?type=` sur GET, nouvel endpoint `PATCH /pricing` et inclusion de `pricing` dans `GET /:id` (1 entree fourre-tout)
+
+✅ 4 entrees distinctes :
+   - **BREAKING** — `POST /recipes` : le champ `type` est desormais obligatoire (`'base'` ou `'composed'`)
+   - Nouveau filtre `?type=base|composed` sur `GET /recipes`
+   - `GET /recipes/:id` inclut un objet `pricing` quand les informations tarifaires sont renseignees
+   - Nouvel endpoint `PATCH /recipes/:id/pricing` (admin) pour creer ou mettre a jour le pricing
 ```
 
 ### Heuristique rapide

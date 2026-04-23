@@ -60,6 +60,7 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
 6. **Reformuler** —
    - Pour CHANGELOG : appliquer les principes de la section "Rediger pour le consommateur" de `reference.md` (effet observable, valeurs concretes, fusion des entrees liees, impact client).
    - Pour TECHNICAL : entree concise orientee contributeur (ce qui a change dans le repo), meme regle d'une seule ligne et meme reference tracable.
+   - **Une entree = une seule information user-facing distincte** : si un changement couvre plusieurs aspects (nouveau champ + nouveau filtre + nouvel endpoint), decouper en autant d'entrees separees (principe #3 de la section "Rediger pour le consommateur" de `reference.md`).
    - Chaque entree tient sur **une seule ligne** et se termine par la reference entre parentheses avec un lien Markdown explicite (voir section "References dans les entrees" de `reference.md`). L'URL de base du remote est detectee a l'etape 1.
 
 Affiche les entrees classees avant de continuer, en deux blocs distincts :
