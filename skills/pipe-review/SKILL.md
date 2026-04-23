@@ -66,11 +66,14 @@ Pour chaque fichier, cherche activement :
 - `any` injustifie, assertions forcees (`as`, `!`) sans garde
 - Props/parametres mal types, retours inconsistants
 
-Pour chaque probleme, donne :
-- Fichier et ligne
-- Severite : BLOQUANT (bug, faille, regression) / AVERTISSEMENT (dette significative) / SUGGESTION (lisibilite, robustesse)
-- Description en 1-2 phrases centree sur l'impact
-- Correction proposee
+Pour chaque probleme, produis ces 6 champs structures (utilises ensuite par la phase 2 du skill pour la revue interactive) :
+
+- **fichier** : chemin et ligne (ex: `src/services/user.service.ts:42`)
+- **severite** : BLOQUANT (bug, faille, regression) / AVERTISSEMENT (dette significative) / SUGGESTION (lisibilite, robustesse)
+- **probleme_une_phrase** : description courte du probleme, sans jargon. Doit etre comprehensible meme sans contexte technique
+- **gravite_impact** : consequence concrete pour l'utilisateur final, le code ou la donnee, avec une notion de frequence ou de risque (ex: "1 chargement sur 10 affiche les anciennes infos pendant 2 secondes" plutot que "violation du principe de coherence")
+- **cause** : cause technique en restant comprehensible — explique l'origine sans noyer le lecteur
+- **correction** : correction courte et actionnable, idealement avec un avant/apres tres bref
 
 **Ce que tu ne fais PAS :**
 - Pas de commentaire sur le style ou le formatting (c'est le role de Biome/ESLint)
@@ -78,7 +81,7 @@ Pour chaque probleme, donne :
 - Pas de compliments generiques
 - Pas de rapport exhaustif de tous les changements
 
-**Style** : ecris comme si tu parlais a un developpeur competent. Une phrase pour le probleme, une pour la correction — pas plus. L'impact doit etre immediatement comprehensible (ex: "ca peut crasher si X est null" plutot que "violation du principe de null-safety").
+**Style** : pour chacun des 6 champs, ecris comme si tu expliquais a un developpeur competent qui n'a pas tout le contexte en tete. L'impact doit etre exprime en termes concrets (consequence visible) et non en vocabulaire technique abstrait : preferer "ca peut crasher si X est null" a "violation du principe de null-safety". Une phrase par champ suffit.
 
 Produis un rapport structure avec statut global : OK, AVERTISSEMENTS, ou BLOQUANT.
 ```
