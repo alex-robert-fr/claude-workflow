@@ -140,16 +140,56 @@ Si l'utilisateur decline, propose `/pipe-test` et termine.
 
 Parcours chaque probleme dans l'ordre de severite (bloquants d'abord, puis avertissements, puis suggestions).
 
-Pour chaque probleme :
+Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique suivant**, en te basant sur les 6 champs produits par le sub-agent a l'etape 3. Relis le fichier concerne via Read avant l'affichage pour pouvoir montrer le code exact dans "D'ou ca vient ?" ou "Comment on corrige ?" si pertinent.
 
-1. **Explique en detail** : contexte, impact, code concerne (lis le fichier via Read pour montrer le code exact)
-2. **Propose la correction concrete** telle que decrite dans le rapport du sub-agent
-3. **Attends la decision de l'utilisateur** :
-   - **corriger** → relis d'abord le fichier via Read (les corrections precedentes ont pu modifier les lignes), puis applique la correction
-   - **adapter** → demande la modification souhaitee a l'utilisateur, relis le fichier via Read, puis applique
-   - **ignorer** → passe au probleme suivant sans rien modifier
+```
+[Severite N/Total] — <fichier>:<ligne>
+
+❓ Le probleme en une phrase
+   <probleme_une_phrase>
+
+❓ C'est grave ?
+   <gravite_impact>
+
+❓ D'ou ca vient ?
+   <cause>
+
+❓ Comment on corrige ?
+   <correction>
+
+→ corriger / adapter / ignorer ?
+```
+
+Puis **attends la decision de l'utilisateur** :
+
+- **corriger** → relis d'abord le fichier via Read (les corrections precedentes ont pu modifier les lignes), puis applique la correction
+- **adapter** → demande la modification souhaitee a l'utilisateur, relis le fichier via Read, puis applique
+- **ignorer** → passe au probleme suivant sans rien modifier
 
 Ne jamais corriger automatiquement sans validation explicite de l'utilisateur.
+
+#### Exemple de rendu
+
+```
+[Bloquant 1/3] — src/services/user.service.ts:42
+
+❓ Le probleme en une phrase
+   On notifie le client avant d'avoir fini d'enregistrer ses donnees.
+
+❓ C'est grave ?
+   Oui. Dans environ 1 cas sur 10, l'utilisateur verra l'ancienne
+   version de son profil juste apres l'avoir modifie.
+
+❓ D'ou ca vient ?
+   Un `await` oublie devant `saveCache(user)` : la notification
+   part immediatement, sans attendre la fin de l'ecriture en cache.
+
+❓ Comment on corrige ?
+   Ajouter `await` devant l'appel :
+   `await saveCache(user)` au lieu de `saveCache(user)`.
+
+→ corriger / adapter / ignorer ?
+```
 
 ### Cloture
 
