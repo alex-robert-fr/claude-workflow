@@ -79,6 +79,28 @@ Cas speciaux CHANGELOG (detectes par le contenu du commit, pas par le prefixe se
 
 Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle l'API, utilisateur de la lib, ops qui deploie), pas au contributeur qui a ecrit le code. Elle decrit un effet observable, pas une modification interne.
 
+### Regles de redaction
+
+Checklist a appliquer a chaque entree avant de la valider :
+
+1. **Ecrire pour le consommateur, pas pour le dev** — decrire l'effet observable cote utilisateur (endpoint, option, comportement), pas l'implementation interne (decorateur, hook, refactor).
+2. **Verbe a la voix active, au present** — `Ajoute`, `Corrige`, `Supprime`, `Renvoie`, `Inclut`. Pas `a ete ajoute`, pas `ajout de`, pas de formulation nominale.
+3. **Un changement = une ligne** — une entree porte une et une seule information user-facing distincte (voir principe #3 ci-dessous pour la fusion vs decoupage).
+4. **Preciser l'API publique impactee** — nom de l'endpoint, du parametre, de l'option ou du fichier de config concerne, entre backticks.
+5. **Marquer explicitement les breaking changes** — prefixe `**BREAKING**` en debut d'entree, avec mention de la migration requise.
+
+### Template mental
+
+```
+[Verbe actif present] [symbole/feature publique] [effet visible utilisateur] [migration si breaking]
+```
+
+Exemple d'application :
+
+> Ajoute le filtre `?type=base|composed` sur `GET /recipes` pour limiter les resultats par categorie.
+
+(verbe actif present `Ajoute` + symbole public `?type=...` sur `GET /recipes` + effet `limiter les resultats par categorie` ; pas de migration car non-breaking)
+
 ### Principes
 
 1. **Exposer l'effet observable** — codes HTTP, parametres accessibles, exigences cote client, comportement visible. Pas les noms de fonctions internes, decorateurs, hooks, ou refactors qui ne changent rien a l'usage.
