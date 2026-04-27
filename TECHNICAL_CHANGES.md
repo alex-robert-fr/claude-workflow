@@ -7,11 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Docs
-
-- Enrichit `skills/pipe-changelog/reference.md` avec une checklist de redaction explicite (5 regles : ecrire pour le consommateur / voix active au present / une information distincte par entree / API publique en backticks / BREAKING explicite), un template mental et la regle "Consolider en etat final" (n'ecrire que l'etat final quand plusieurs commits successifs touchent le meme artefact dans une meme release) ([`8f01fed`](https://github.com/ToolsForSaaS/claude-workflow/commit/8f01fed))
-- Clarifie dans `skills/pipe-changelog/SKILL.md` (etape Reformuler) les regles transversales applicables a TECHNICAL (regles 2 et 3 uniquement) vs CHANGELOG (toutes les regles), et renvoie vers les nouvelles sous-sections de `reference.md` ([`f829325`](https://github.com/ToolsForSaaS/claude-workflow/commit/f829325))
-
 ## [1.4.6] - 2026-04-23
 
 ### Refactor
