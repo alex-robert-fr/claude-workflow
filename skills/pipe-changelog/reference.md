@@ -79,6 +79,28 @@ Cas speciaux CHANGELOG (detectes par le contenu du commit, pas par le prefixe se
 
 Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle l'API, utilisateur de la lib, ops qui deploie), pas au contributeur qui a ecrit le code. Elle decrit un effet observable, pas une modification interne.
 
+### Regles de redaction
+
+Checklist a appliquer a chaque entree avant de la valider :
+
+1. **Ecrire pour le consommateur, pas pour le dev** — decrire l'effet observable cote utilisateur (endpoint, option, comportement), pas l'implementation interne (decorateur, hook, refactor).
+2. **Verbe a la voix active, au present** — `Ajoute`, `Corrige`, `Supprime`, `Renvoie`, `Inclut`. Pas `a ete ajoute`, pas `ajout de`, pas de formulation nominale.
+3. **Une information user-facing distincte par entree** — une entree porte un et un seul changement observable (voir principe #3 ci-dessous pour la fusion vs decoupage). La contrainte de format "une seule ligne physique" est traitee dans la section "Regles de contenu".
+4. **Preciser l'API publique impactee** — nom de l'endpoint, du parametre, de l'option ou du fichier de config concerne, entre backticks.
+5. **Marquer explicitement les breaking changes** — prefixe `**BREAKING**` en debut d'entree, avec mention de la migration requise.
+
+### Template mental
+
+```
+[Verbe actif present] [symbole/feature publique] [effet visible utilisateur] [migration si breaking]
+```
+
+Exemple d'application :
+
+> Ajoute le filtre `?type=base|composed` sur `GET /recipes` pour limiter les resultats par categorie.
+
+(verbe actif present `Ajoute` + symbole public `?type=...` sur `GET /recipes` + effet `limiter les resultats par categorie` ; pas de migration car non-breaking)
+
 ### Principes
 
 1. **Exposer l'effet observable** — codes HTTP, parametres accessibles, exigences cote client, comportement visible. Pas les noms de fonctions internes, decorateurs, hooks, ou refactors qui ne changent rien a l'usage.
@@ -92,16 +114,16 @@ Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle
 
 ```
 ❌ Ajout du decorateur @Public() et desactivation du guard JWT sur les GET
-✅ Les endpoints `GET` des ressources metier sont desormais accessibles publiquement sans authentification
+✅ Expose les endpoints `GET` des ressources metier publiquement, sans authentification requise
 
 ❌ Refactor de find_by_email pour masquer l'existence des comptes
-✅ Consultation d'une recette privee par un utilisateur non autorise : retour `404 Not Found` au lieu de `403 Forbidden` pour ne pas divulguer l'existence de la ressource
+✅ Renvoie `404 Not Found` au lieu de `403 Forbidden` lors de la consultation d'une recette privee par un utilisateur non autorise, pour ne pas divulguer l'existence de la ressource
 
 ❌ Ajout du cookie HttpOnly, BREAKING, CORS credentials (3 entrees)
-✅ **BREAKING — Authentification par cookie HttpOnly** : les endpoints `POST /auth/register` et `POST /auth/login` ne retournent plus le JWT dans le corps JSON. Le token est desormais pose dans un cookie `HttpOnly`, `SameSite=strict`, `Secure` en production. Les clients doivent utiliser `credentials: 'include'` sur leurs requetes HTTP. (1 entree fusionnee)
+✅ **BREAKING** — Pose le JWT dans un cookie `HttpOnly`, `SameSite=strict`, `Secure` (en production) au lieu du corps JSON sur `POST /auth/register` et `POST /auth/login`. Les clients doivent utiliser `credentials: 'include'` sur leurs requetes HTTP. (1 entree fusionnee)
 
 ❌ Politique de mot de passe renforcee a l'inscription
-✅ Politique de mot de passe renforcee a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
+✅ Renforce la politique de mot de passe a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
 ```
 
 #### Decoupage : plusieurs aspects user-facing distincts
@@ -110,11 +132,40 @@ Une entree de CHANGELOG parle au lecteur qui consomme le projet (dev qui appelle
 ❌ Ajout du champ `type` obligatoire sur POST, nouveau filtre `?type=` sur GET, nouvel endpoint `PATCH /pricing` et inclusion de `pricing` dans `GET /:id` (1 entree fourre-tout)
 
 ✅ 4 entrees distinctes :
-   - **BREAKING** — `POST /recipes` : le champ `type` est desormais obligatoire (`'base'` ou `'composed'`)
-   - Nouveau filtre `?type=base|composed` sur `GET /recipes`
-   - `GET /recipes/:id` inclut un objet `pricing` quand les informations tarifaires sont renseignees
-   - Nouvel endpoint `PATCH /recipes/:id/pricing` (admin) pour creer ou mettre a jour le pricing
+   - **BREAKING** — Rend le champ `type` obligatoire sur `POST /recipes` (`'base'` ou `'composed'`)
+   - Ajoute le filtre `?type=base|composed` sur `GET /recipes`
+   - Inclut un objet `pricing` dans `GET /recipes/:id` quand les informations tarifaires sont renseignees
+   - Ajoute l'endpoint `PATCH /recipes/:id/pricing` (admin) pour creer ou mettre a jour le pricing
 ```
+
+### Consolider en etat final
+
+Quand plusieurs commits successifs touchent le **meme artefact** (fichier, endpoint, fonction publique, option de config, dependance...) **au sein de la meme release**, n'ecrire qu'une seule entree decrivant l'**etat final** du point de vue du consommateur. Les etats intermediaires n'ont jamais ete livres, ils ne doivent pas apparaitre.
+
+Cette regle s'applique aux **deux fichiers** : `CHANGELOG.md` et `TECHNICAL_CHANGES.md`. Le scope est la release en cours (`[Unreleased]` ou la section en preparation), jamais entre deux versions deja taggees.
+
+Cas typiques :
+
+- **Ajout puis suppression** dans la meme release → ne rien ecrire (l'artefact n'a jamais existe pour le consommateur)
+- **Ajout puis renommage/deplacement** dans la meme release → une seule entree avec le nom final
+- **Modification puis re-modification** successive → une seule entree decrivant le comportement final
+- **Ajout puis depreciation/breaking** dans la meme release → une seule entree decrivant l'etat final (et son impact)
+
+Distinction avec le principe #3 (fusion vs decoupage) : le principe #3 traite les **aspects distincts simultanes** (a decouper si independants). La consolidation traite les **succession sur le meme artefact** (a fusionner sur l'etat final). Les deux sont compatibles.
+
+#### Avant / apres
+
+```
+Commits de la PR : "Ajoute le fichier config/legacy.json" → "Renomme legacy.json en deprecated.json" → "Supprime deprecated.json"
+❌ 3 entrees (Added, Changed, Removed) — l'utilisateur lit l'historique d'un fichier qui n'a jamais existe pour lui
+✅ Aucune entree — le fichier n'a jamais ete livre
+
+Commits de la PR : "Ajoute l'endpoint POST /export" → "Renomme POST /export en POST /reports/export"
+❌ 2 entrees (Added /export, Changed → /reports/export)
+✅ 1 entree (Added) : Ajoute l'endpoint `POST /reports/export` pour declencher la generation d'un rapport
+```
+
+En cas de doute sur la detection d'une succession (chemin renomme, identifiant ambigu), demander confirmation a l'utilisateur plutot que de consolider silencieusement.
 
 ### Heuristique rapide
 
