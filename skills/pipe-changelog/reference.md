@@ -114,16 +114,16 @@ Exemple d'application :
 
 ```
 ❌ Ajout du decorateur @Public() et desactivation du guard JWT sur les GET
-✅ Les endpoints `GET` des ressources metier sont desormais accessibles publiquement sans authentification
+✅ Expose les endpoints `GET` des ressources metier publiquement, sans authentification requise
 
 ❌ Refactor de find_by_email pour masquer l'existence des comptes
-✅ Consultation d'une recette privee par un utilisateur non autorise : retour `404 Not Found` au lieu de `403 Forbidden` pour ne pas divulguer l'existence de la ressource
+✅ Renvoie `404 Not Found` au lieu de `403 Forbidden` lors de la consultation d'une recette privee par un utilisateur non autorise, pour ne pas divulguer l'existence de la ressource
 
 ❌ Ajout du cookie HttpOnly, BREAKING, CORS credentials (3 entrees)
-✅ **BREAKING — Authentification par cookie HttpOnly** : les endpoints `POST /auth/register` et `POST /auth/login` ne retournent plus le JWT dans le corps JSON. Le token est desormais pose dans un cookie `HttpOnly`, `SameSite=strict`, `Secure` en production. Les clients doivent utiliser `credentials: 'include'` sur leurs requetes HTTP. (1 entree fusionnee)
+✅ **BREAKING** — Pose le JWT dans un cookie `HttpOnly`, `SameSite=strict`, `Secure` (en production) au lieu du corps JSON sur `POST /auth/register` et `POST /auth/login`. Les clients doivent utiliser `credentials: 'include'` sur leurs requetes HTTP. (1 entree fusionnee)
 
 ❌ Politique de mot de passe renforcee a l'inscription
-✅ Politique de mot de passe renforcee a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
+✅ Renforce la politique de mot de passe a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
 ```
 
 #### Decoupage : plusieurs aspects user-facing distincts
@@ -132,10 +132,10 @@ Exemple d'application :
 ❌ Ajout du champ `type` obligatoire sur POST, nouveau filtre `?type=` sur GET, nouvel endpoint `PATCH /pricing` et inclusion de `pricing` dans `GET /:id` (1 entree fourre-tout)
 
 ✅ 4 entrees distinctes :
-   - **BREAKING** — `POST /recipes` : le champ `type` est desormais obligatoire (`'base'` ou `'composed'`)
-   - Nouveau filtre `?type=base|composed` sur `GET /recipes`
-   - `GET /recipes/:id` inclut un objet `pricing` quand les informations tarifaires sont renseignees
-   - Nouvel endpoint `PATCH /recipes/:id/pricing` (admin) pour creer ou mettre a jour le pricing
+   - **BREAKING** — Rend le champ `type` obligatoire sur `POST /recipes` (`'base'` ou `'composed'`)
+   - Ajoute le filtre `?type=base|composed` sur `GET /recipes`
+   - Inclut un objet `pricing` dans `GET /recipes/:id` quand les informations tarifaires sont renseignees
+   - Ajoute l'endpoint `PATCH /recipes/:id/pricing` (admin) pour creer ou mettre a jour le pricing
 ```
 
 ### Consolider en etat final
