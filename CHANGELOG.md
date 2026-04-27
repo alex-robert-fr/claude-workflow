@@ -7,16 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- `/pipe-changelog` applique desormais une checklist de redaction explicite (5 regles : ecrire pour le consommateur, voix active au present, une information distincte par entree, API publique en backticks, BREAKING explicites) et un template mental `[Verbe actif present] [symbole/feature publique] [effet visible utilisateur] [migration si breaking]` ([#46](https://github.com/ToolsForSaaS/claude-workflow/pull/46))
-- `/pipe-changelog` consolide les entrees par etat final : quand plusieurs commits successifs touchent le meme artefact dans une meme release, une seule entree decrit l'etat final (un fichier ajoute puis supprime dans la meme PR ne donne aucune entree) ([#46](https://github.com/ToolsForSaaS/claude-workflow/pull/46))
-
-## [1.4.6] - 2026-04-23
+## [1.4.7] - 2026-04-27
 
 ### Changed
 
 - `/pipe-review` présente maintenant chaque problème détecté en format Question/Réponse pédagogique avec 6 champs structurés (fichier, sévérité, description, impact, cause, correction) ([#42](https://github.com/ToolsForSaaS/claude-workflow/pull/42))
+- `/pipe-changelog` applique desormais une checklist de redaction explicite (5 regles : ecrire pour le consommateur, voix active au present, une information distincte par entree, API publique en backticks, BREAKING explicites) et un template mental `[Verbe actif present] [symbole/feature publique] [effet visible utilisateur] [migration si breaking]` ([#46](https://github.com/ToolsForSaaS/claude-workflow/pull/46))
+- `/pipe-changelog` consolide les entrees par etat final : quand plusieurs commits successifs touchent le meme artefact dans une meme release, une seule entree decrit l'etat final (un fichier ajoute puis supprime dans la meme PR ne donne aucune entree) ([#46](https://github.com/ToolsForSaaS/claude-workflow/pull/46))
 
 ## [1.4.5] - 2026-04-17
 
