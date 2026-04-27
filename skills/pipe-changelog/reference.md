@@ -85,7 +85,7 @@ Checklist a appliquer a chaque entree avant de la valider :
 
 1. **Ecrire pour le consommateur, pas pour le dev** — decrire l'effet observable cote utilisateur (endpoint, option, comportement), pas l'implementation interne (decorateur, hook, refactor).
 2. **Verbe a la voix active, au present** — `Ajoute`, `Corrige`, `Supprime`, `Renvoie`, `Inclut`. Pas `a ete ajoute`, pas `ajout de`, pas de formulation nominale.
-3. **Un changement = une ligne** — une entree porte une et une seule information user-facing distincte (voir principe #3 ci-dessous pour la fusion vs decoupage).
+3. **Une information user-facing distincte par entree** — une entree porte un et un seul changement observable (voir principe #3 ci-dessous pour la fusion vs decoupage). La contrainte de format "une seule ligne physique" est traitee dans la section "Regles de contenu".
 4. **Preciser l'API publique impactee** — nom de l'endpoint, du parametre, de l'option ou du fichier de config concerne, entre backticks.
 5. **Marquer explicitement les breaking changes** — prefixe `**BREAKING**` en debut d'entree, avec mention de la migration requise.
 
