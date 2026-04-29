@@ -66,14 +66,15 @@ Pour chaque fichier, cherche activement :
 - `any` injustifie, assertions forcees (`as`, `!`) sans garde
 - Props/parametres mal types, retours inconsistants
 
-Pour chaque probleme, produis ces 6 champs structures (utilises ensuite par la phase 2 du skill pour la revue interactive) :
+Pour chaque probleme, produis ces 7 champs structures (utilises ensuite par la phase 2 du skill pour la revue interactive) :
 
 - **fichier** : chemin et ligne (ex: `src/services/user.service.ts:42`)
 - **severite** : BLOQUANT (bug, faille, regression) / AVERTISSEMENT (dette significative) / SUGGESTION (lisibilite, robustesse)
-- **probleme_une_phrase** : description courte du probleme, sans jargon. Doit etre comprehensible meme sans contexte technique
-- **gravite_impact** : consequence concrete pour l'utilisateur final, le code ou la donnee, avec une notion de frequence ou de risque (ex: "1 chargement sur 10 affiche les anciennes infos pendant 2 secondes" plutot que "violation du principe de coherence")
-- **cause** : cause technique en restant comprehensible — explique l'origine sans noyer le lecteur
-- **correction** : correction courte et actionnable, idealement avec un avant/apres tres bref
+- **contexte_fonctionnel** : 1-2 phrases qui resituent le bout de code dans le parcours utilisateur ou le flux metier. Reponds a "qui appelle ce code, dans quelle situation, pour faire quoi ?" en langage du domaine. Pas de noms de fonctions, pas de tags XML/HTML, pas de jargon technique. Si le contexte n'est pas inferrable depuis le diff et les fichiers lus, ecris explicitement "Contexte non identifie depuis le diff" plutot que d'inventer
+- **probleme_une_phrase** : reformulation **fonctionnelle** du probleme, comprehensible sans le code. **Interdit** : noms de fonctions ou variables, tags XML/HTML, syntaxe de code, noms de types. Exemple : "Si la reponse du logiciel de caisse est incomplete, on continue comme si tout allait bien" et non "La garde `single.children.length > 0` accepte un `<resultCustomerType>` sans `<id>`"
+- **gravite_impact** : la **premiere phrase** doit decrire une consequence concrete et observable cote utilisateur final ou metier (ce qu'il voit, perd, risque). Les nuances de frequence et le contexte technique viennent ensuite. Exemple : "L'utilisateur en caisse verrait un ecran de confirmation avec un numero de carte vide. Cas rare en pratique, mais sans message d'erreur le caissier n'a aucun moyen de comprendre ce qui s'est passe"
+- **cause** : explication accessible de l'origine. **Prefere** "le code", "la verification", "la fonction qui parse la reponse" plutot que les noms exacts de symboles. Ne nomme un symbole precis que si c'est indispensable pour pointer le bon endroit
+- **correction** : commence par une **phrase d'introduction fonctionnelle** ("Verifier que la reponse contient bien un numero de carte avant de continuer") puis donne la directive technique courte et actionnable, avec un avant/apres tres bref si pertinent
 
 **Ce que tu ne fais PAS :**
 - Pas de commentaire sur le style ou le formatting (c'est le role de Biome/ESLint)
@@ -81,7 +82,7 @@ Pour chaque probleme, produis ces 6 champs structures (utilises ensuite par la p
 - Pas de compliments generiques
 - Pas de rapport exhaustif de tous les changements
 
-**Style** : pour chacun des 6 champs, ecris comme si tu expliquais a un developpeur competent qui n'a pas tout le contexte en tete. L'impact doit etre exprime en termes concrets (consequence visible) et non en vocabulaire technique abstrait : preferer "ca peut crasher si X est null" a "violation du principe de null-safety". Une phrase par champ suffit.
+**Style** : pour chacun des 7 champs, ecris comme si tu expliquais a quelqu'un qui n'a **pas** le code sous les yeux — un decideur produit, un dev qui reprend le projet la semaine prochaine, ou toi-meme dans 6 mois. L'impact doit etre exprime en termes concrets (consequence visible) et non en vocabulaire technique abstrait : preferer "ca peut crasher si X est null" a "violation du principe de null-safety". Une a deux phrases par champ suffisent.
 
 Produis un rapport structure avec statut global : OK, AVERTISSEMENTS, ou BLOQUANT.
 ```
