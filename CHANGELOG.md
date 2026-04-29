@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.4.7] - 2026-04-27
+### Changed
+
+- `/pipe-review` enrichit la revue interactive avec une question de contexte fonctionnel ("De quoi on parle ?") en tete de chaque probleme, reformule les descriptions sans jargon technique et inclut le contexte dans le rapport de synthese ([`72a4cec`](https://github.com/ToolsForSaaS/claude-workflow/commit/72a4cec))
+
+## [1.4.7](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.7) - 2026-04-27
 
 ### Changed
 
@@ -163,7 +167,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...HEAD
+[1.4.7]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...v1.4.6
 [1.4.5]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.4...v1.4.5
 [1.4.4]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.3...v1.4.4
