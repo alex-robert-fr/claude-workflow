@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.8](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.8) - 2026-04-29
+
 ### Changed
 
 - `/pipe-review` enrichit la revue interactive avec une question de contexte fonctionnel ("De quoi on parle ?") en tete de chaque probleme, reformule les descriptions sans jargon technique et inclut le contexte dans le rapport de synthese ([`72a4cec`](https://github.com/ToolsForSaaS/claude-workflow/commit/72a4cec))
