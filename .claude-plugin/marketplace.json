@@ -5,8 +5,8 @@
     "name": "ToolsForSaaS"
   },
   "metadata": {
-    "description": "Pipeline AI-Driven Development : setup, plan, code, review, test, PR",
-    "version": "1.0.0"
+    "description": "Pipeline AI-Driven Development : setup, plan, code, review, test, changelog, PR, tag",
+    "version": "1.4.8"
   },
   "plugins": [
     {
@@ -15,8 +15,8 @@
         "source": "github",
         "repo": "ToolsForSaaS/claude-workflow"
       },
-      "description": "Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : setup, plan, code, review, test, PR.",
-      "version": "1.0.0",
+      "description": "Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : setup, plan, code, review, test, changelog, PR, tag.",
+      "version": "1.4.8",
       "author": {
         "name": "ToolsForSaaS"
       },

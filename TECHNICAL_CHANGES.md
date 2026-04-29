@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Docs
+
+- Enrichit la regle de versioning de `CLAUDE.md` pour exiger la mise a jour simultanee de `plugin.json`, `marketplace.json` (deux champs `version`) et `CHANGELOG.md` a chaque release ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
+
 ## [1.4.8](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.8) - 2026-04-29
 
 ## [1.4.7](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.7) - 2026-04-27

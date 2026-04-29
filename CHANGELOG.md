@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Aligne les descriptions de `plugin.json` et `marketplace.json` pour inclure toutes les etapes du pipeline (les anciennes descriptions courtes omettaient `changelog` et `tag`) ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
+- Refond la presentation du `README.md` autour d'une nouvelle section "Pourquoi ce plugin ?" qui resume le probleme adresse et les profils cibles (devs solo, equipes) ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- Reorganise les categories de skills dans le `README.md` : nouvelle categorie "Utilitaires" pour `pipe-commit` et `worktree`, et scission de "Conventions" en "Referentiels" et "Interne" ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- Transforme chaque skill liste dans le `README.md` en lien cliquable vers son fichier `SKILL.md` correspondant ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- Explicite dans le `README.md` que la lecture d'issues est compatible GitHub et Jira mais que la creation d'issues et de Pull Requests reste sur GitHub uniquement ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- Ajoute une section "Ressources" au `README.md` avec liens vers `CHANGELOG.md`, le repo GitHub et `CLAUDE.md` ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+
+### Fixed
+
+- Synchronise la version annoncee dans `marketplace.json` (passe de `1.0.0` a `1.4.8`) pour aligner la version visible sur la marketplace publique avec la version reelle du plugin ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
+
 ## [1.4.8](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.8) - 2026-04-29
 
 ### Changed

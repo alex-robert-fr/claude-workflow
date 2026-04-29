@@ -1,6 +1,6 @@
 {
   "name": "claude-workflow",
-  "description": "Pipeline AI-Driven Development : setup, plan, code, review, test, PR",
+  "description": "Pipeline AI-Driven Development : setup, plan, code, review, test, changelog, PR, tag",
   "version": "1.4.8",
   "author": {
     "name": "ToolsForSaaS"
