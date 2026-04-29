@@ -180,20 +180,29 @@ Ne jamais corriger automatiquement sans validation explicite de l'utilisateur.
 ```
 [Bloquant 1/3] — src/services/user.service.ts:42
 
+❓ De quoi on parle ?
+   De la modification du profil utilisateur. Quand l'utilisateur
+   enregistre des changements, on met a jour la base, on rafraichit
+   le cache, puis on lui confirme que c'est sauvegarde pour qu'il
+   voie les bonnes infos sur les ecrans suivants.
+
 ❓ Le probleme en une phrase
-   On notifie le client avant d'avoir fini d'enregistrer ses donnees.
+   On confirme la sauvegarde a l'utilisateur avant que le cache
+   soit reellement a jour.
 
 ❓ C'est grave ?
-   Oui. Dans environ 1 cas sur 10, l'utilisateur verra l'ancienne
-   version de son profil juste apres l'avoir modifie.
+   L'utilisateur verra l'ancienne version de son profil juste apres
+   l'avoir modifie. Ca se produit environ 1 fois sur 10 selon la
+   charge, et il faut recharger la page pour voir les bonnes infos.
 
 ❓ D'ou ca vient ?
-   Un `await` oublie devant `saveCache(user)` : la notification
-   part immediatement, sans attendre la fin de l'ecriture en cache.
+   Le code lance le rafraichissement du cache mais n'attend pas
+   sa fin avant d'envoyer la confirmation. Un mot-cle d'attente
+   est manquant a cet endroit precis.
 
 ❓ Comment on corrige ?
-   Ajouter `await` devant l'appel :
-   `await saveCache(user)` au lieu de `saveCache(user)`.
+   Attendre la fin du rafraichissement du cache avant de notifier
+   l'utilisateur : ajouter `await` devant l'appel a `saveCache(user)`.
 
 → corriger / adapter / ignorer ?
 ```
