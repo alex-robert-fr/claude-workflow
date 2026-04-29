@@ -143,10 +143,13 @@ Parcours chaque probleme dans l'ordre de severite (bloquants d'abord, puis avert
 
 `N/Total` = position du probleme dans la liste globale triee par severite, sur le nombre total de problemes toutes severites confondues (ex: si 2 bloquants + 1 suggestion, le premier bloquant est `1/3`, la suggestion est `3/3`).
 
-Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique suivant**, en te basant sur les 6 champs produits par le sub-agent a l'etape 3.
+Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique suivant**, en te basant sur les 7 champs produits par le sub-agent a l'etape 3.
 
 ```
 [Severite N/Total] — <fichier>:<ligne>
+
+❓ De quoi on parle ?
+   <contexte_fonctionnel>
 
 ❓ Le probleme en une phrase
    <probleme_une_phrase>
