@@ -17,9 +17,9 @@ Si rien a committer → signale-le et arrete-toi.
 
 Si des fichiers ne sont pas stages :
 
-- Propose les fichiers a stager (pas de `git add .` aveugle)
+- Stage les fichiers pertinents par chemin explicite (pas de `git add .` aveugle)
 - Exclure les fichiers sensibles (.env, credentials, etc.)
-- Demande confirmation si necessaire
+- Ne demande confirmation que si un fichier sensible ou sans rapport evident avec le changement est present
 
 ## Etape 2 — Formater le message
 
@@ -34,12 +34,14 @@ A partir des changements stages et de l'argument utilisateur (si fourni), determ
 
 Format : `emoji type(scope): description`
 
-## Etape 3 — Confirmer et committer
+## Etape 3 — Committer
 
-Affiche le recap :
+Committe directement, sans demander confirmation — un commit local est reversible (`git reset --soft HEAD~1`), la confirmation systematique est de la friction inutile.
+
+Affiche le recap apres coup :
 
 ```
-Commit propose :
+Commit cree :
 
 emoji type(scope): description
 
@@ -47,8 +49,6 @@ Fichiers :
 - chemin/fichier.ts
 - chemin/autre.ts
 ```
-
-Demande confirmation puis commit.
 
 ## Etape 4 — Push (optionnel)
 
