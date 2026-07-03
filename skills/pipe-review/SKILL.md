@@ -26,64 +26,25 @@ Rassemble les informations necessaires :
 
 ## Etape 3 — Lancer la review en sub-agent
 
-Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Passe-lui le diff, la liste des fichiers, le contenu de `CLAUDE.md` (si charge) et le contenu de `_review-persona.md` (si charge). Le sub-agent lit chaque fichier modifie en entier via Read.
+Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Le protocole complet du reviewer (7 champs structures, categories d'analyse, style) est dans `reference.md` — **ne le charge pas dans le contexte principal**, c'est le sub-agent qui le lit.
 
 Prompt du sub-agent :
 
 ```
-Tu es un reviewer expert. Ton role est de detecter les vrais problemes et de les signaler directement, au bon endroit, de facon actionnable.
+Utilise Read pour charger `[chemin absolu de ${CLAUDE_SKILL_DIR}/reference.md]` et applique la section "Protocole du reviewer".
 
-Lis chaque fichier modifie dans son integralite via Read, puis analyse les changements en profondeur.
+Contexte de la review :
+- Branche : [branche courante] (diff vs [branche par defaut])
+- Fichiers modifies : [liste des fichiers]
+- CLAUDE.md du projet : [chemin, ou "absent"]
+- Persona de review projet : [chemin de .claude/_review-persona.md, ou "absent"]
 
-Pour chaque fichier, cherche activement :
+Lis chaque fichier modifie dans son integralite via Read, ainsi que CLAUDE.md et le persona s'ils existent.
 
-**Bugs et correctness**
-- Logique incorrecte, cas limites non geres, conditions inversees
-- Race conditions, mutations inattendues, effets de bord
-- Promesses non awaited, erreurs silencieuses
-
-**Securite**
-- Injection (SQL, commande, XSS), donnees non validees cote serveur
-- Secrets exposes, permissions trop larges, IDOR
-
-**Performance**
-- N+1 queries, appels redondants en boucle
-- Chargements bloquants inutiles, fuites memoire
-
-**Architecture et maintenabilite**
-- Violation des conventions du projet (voir CLAUDE.md ci-dessous si fourni)
-- Couplage fort, responsabilites melangees
-- Duplication de logique metier critique
-
-**Types et contrats**
-- `any` injustifie, assertions forcees (`as`, `!`) sans garde
-- Props/parametres mal types, retours inconsistants
-
-Pour chaque probleme, produis ces 7 champs structures (utilises ensuite par la phase 2 du skill pour la revue interactive) :
-
-- **fichier** : chemin et ligne (ex: `src/services/user.service.ts:42`)
-- **severite** : BLOQUANT (bug, faille, regression) / AVERTISSEMENT (dette significative) / SUGGESTION (lisibilite, robustesse)
-- **contexte_fonctionnel** : 1-2 phrases qui resituent le bout de code dans le parcours utilisateur ou le flux metier. Reponds a "qui appelle ce code, dans quelle situation, pour faire quoi ?" en langage du domaine. Pas de noms de fonctions, pas de tags XML/HTML, pas de jargon technique. Si le contexte n'est pas inferrable depuis le diff et les fichiers lus, ecris explicitement "Contexte non identifie depuis le diff" plutot que d'inventer
-- **probleme_une_phrase** : reformulation **fonctionnelle** du probleme, comprehensible sans le code. **Interdit dans ce champ** : noms de fonctions ou variables, tags XML/HTML, syntaxe de code, noms de types. Exemple : "Si la reponse du logiciel de caisse est incomplete, on continue comme si tout allait bien" et non "La garde `single.children.length > 0` accepte un `<resultCustomerType>` sans `<id>`"
-- **gravite_impact** : la **premiere phrase** doit decrire une consequence concrete et observable cote utilisateur final ou metier (ce qu'il voit, perd, risque). Les nuances de frequence et le contexte technique viennent ensuite. Exemple : "L'utilisateur en caisse verrait un ecran de confirmation avec un numero de carte vide. Cas rare en pratique, mais sans message d'erreur le caissier n'a aucun moyen de comprendre ce qui s'est passe"
-- **cause** : explication accessible de l'origine. **Prefere** "le code", "la verification", "la fonction qui parse la reponse" plutot que les noms exacts de symboles. Ne nomme un symbole precis que si c'est indispensable pour pointer le bon endroit
-- **correction** : commence par une **phrase d'introduction fonctionnelle** ("Verifier que la reponse contient bien un numero de carte avant de continuer") puis donne la directive technique courte et actionnable, avec un avant/apres tres bref si pertinent. **Les noms de symboles sont autorises et souvent necessaires ici** pour pointer le fix exact (`saveCache`, `await`, type `Customer`, etc.) — l'interdiction posee sur `probleme_une_phrase` ne s'applique pas a ce champ ni a `cause`
-
-**Ce que tu ne fais PAS :**
-- Pas de commentaire sur le style ou le formatting (c'est le role de Biome/ESLint)
-- Pas de reformulation de ce que fait le code
-- Pas de compliments generiques
-- Pas de rapport exhaustif de tous les changements
-
-**Style** : deux audiences selon les champs.
-
-- `contexte_fonctionnel`, `probleme_une_phrase`, `gravite_impact` s'adressent a quelqu'un qui n'a **pas** le code sous les yeux — un decideur produit, un dev qui reprend le projet la semaine prochaine, ou toi-meme dans 6 mois. Vocabulaire fonctionnel, consequence visible plutot qu'abstraction technique : preferer "ca peut crasher si X est null" a "violation du principe de null-safety".
-- `cause` et `correction` s'adressent au developpeur qui va corriger dans la foulee. Reste precis et actionnable, nomme les symboles quand c'est necessaire.
-
-Une a deux phrases par champ suffisent.
-
-Produis un rapport structure avec statut global : OK, AVERTISSEMENTS, ou BLOQUANT.
+[diff complet]
 ```
+
+Remplace les crochets par les valeurs reelles avant de lancer le sub-agent.
 
 ## Etape 4 — Afficher le rapport
 
@@ -176,37 +137,7 @@ Puis **attends la decision de l'utilisateur** :
 
 Ne jamais corriger automatiquement sans validation explicite de l'utilisateur.
 
-#### Exemple de rendu
-
-```
-[Bloquant 1/3] — src/services/user.service.ts:42
-
-❓ De quoi on parle ?
-   De la modification du profil utilisateur. Quand l'utilisateur
-   enregistre des changements, on met a jour la base, on rafraichit
-   le cache, puis on lui confirme que c'est sauvegarde pour qu'il
-   voie les bonnes infos sur les ecrans suivants.
-
-❓ Le probleme en une phrase
-   On confirme la sauvegarde a l'utilisateur avant que le cache
-   soit reellement a jour.
-
-❓ C'est grave ?
-   L'utilisateur verra l'ancienne version de son profil juste apres
-   l'avoir modifie. Ca se produit environ 1 fois sur 10 selon la
-   charge, et il faut recharger la page pour voir les bonnes infos.
-
-❓ D'ou ca vient ?
-   Le code lance le rafraichissement du cache mais n'attend pas
-   sa fin avant d'envoyer la confirmation. Un mot-cle d'attente
-   est manquant a cet endroit precis.
-
-❓ Comment on corrige ?
-   Attendre la fin du rafraichissement du cache avant de notifier
-   l'utilisateur : ajouter `await` devant l'appel a `saveCache(user)`.
-
-→ corriger / adapter / ignorer ?
-```
+Si besoin d'un exemple complet de rendu, utilise Read pour charger `reference.md` (section "Exemple de rendu Question/Reponse").
 
 ### Cloture
 
