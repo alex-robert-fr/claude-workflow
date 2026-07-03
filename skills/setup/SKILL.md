@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Configurer un projet pour le workflow AI-Driven Development. Scaffolde CLAUDE.md, workflow-config, hooks, plans et rules en une seule passe. Utiliser sur un nouveau projet ou pour completer une config existante.
+description: Configurer un projet pour le workflow AI-Driven Development. Scaffolde CLAUDE.md, workflow-config, hooks, plans et rules en une seule passe, et remplit les placeholders des templates projet. Utiliser sur un nouveau projet ou pour completer une config existante.
 model: sonnet
 ---
 
@@ -19,6 +19,7 @@ Analyse l'etat actuel du projet et identifie ce qui manque :
 - [ ] `.claude/skills/tech-stack/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
 - [ ] `.claude/settings.json` existe avec des hooks configures
 - [ ] `.claude/plans/` existe
+- [ ] Aucun autre fichier de `.claude/skills/` ne contient de placeholders `<!-- ... -->`
 
 Affiche un recap :
 
@@ -64,6 +65,8 @@ Propose des valeurs detectees automatiquement, demande confirmation, puis ecris 
 ## Etape 3 — tech-stack
 
 Si `.claude/skills/tech-stack/SKILL.md` n'existe pas, utilise Read pour charger `${CLAUDE_SKILL_DIR}/tech-stack-template.md` comme squelette. Si le fichier contient des placeholders, propose de les remplir a partir de ce qui a ete detecte a l'etape 2.
+
+Meme mecanique pour tout autre fichier de `.claude/skills/` contenant des placeholders `<!-- ... -->` (detecte a l'etape 0) : proposer une valeur detectee automatiquement, poser une question courte si rien n'est detectable, confirmer, puis remplacer le placeholder. Ne jamais toucher aux champs deja remplis.
 
 ## Etape 4 — Hooks
 
