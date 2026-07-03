@@ -14,18 +14,19 @@ Structure : `.claude-plugin/plugin.json` (manifest), `skills/nom/SKILL.md` (skil
 
 ## Pipeline
 
-Le workflow suit un pipeline sequentiel avec des gates de validation entre chaque etape. L'humain decide quand passer a l'etape suivante.
+Chemin nominal en 3 gestes — l'humain ne decide qu'aux vrais points de decision :
 
 ```
-/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
+/setup (une fois) → /pipe-plan → /pipe-ship → [merge] → /pipe-tag
 ```
 
-Chaque skill guide vers le skill suivant. Pas de skill monolithique — chaque etape est invocable independamment.
+`/pipe-ship` enchaine code → review → test → changelog → PR avec arret uniquement sur bloquant, en reutilisant les skills unitaires (`/pipe-code`, `/pipe-review`, `/pipe-test`, `/pipe-changelog`, `/pipe-pr`) qui restent invocables independamment pour derouler pas a pas.
 
 ## Regles
 
 - Les fichiers dans `skills/` sont **partages** — distribues via le plugin
-- Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`
+- `.claude/skills/` contient l'outillage local du repo (create-skill) — jamais distribue
+- Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (niveau A/B, plateforme, commandes, stack)
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
 - La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM

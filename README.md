@@ -1,8 +1,8 @@
 # claude-workflow
 
-Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet de dev : setup, plan, code, review, test, changelog, PR et tag.
+Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet de dev : setup, plan, ship (code → review → test → changelog → PR) et tag.
 
-**21 skills** organises en 5 categories, avec selection automatique du modele optimal (opus/sonnet/haiku) par skill.
+**13 skills** distribues : le chemin nominal tient en 3 gestes (`/pipe-plan` → `/pipe-ship` → merge → `/pipe-tag`), chaque etape unitaire reste invocable independamment.
 
 Compatible **GitHub** et **Jira** — les skills de planification et d'implementation acceptent des issues des deux plateformes.
 
@@ -43,22 +43,30 @@ Ou pour tester sur une session :
 claude --plugin-dir /chemin/vers/claude-workflow
 ```
 
-Les skills sont accessibles avec le namespace `workflow:` (ex: `/workflow:pipe-code`).
+Les skills sont accessibles avec le namespace `workflow:` (ex: `/workflow:pipe-ship`).
 
 ## Pipeline
 
-Le workflow suit un pipeline sequentiel avec des gates de validation entre chaque etape. L'humain decide quand passer a l'etape suivante. Chaque skill est invocable independamment.
+Chemin nominal — 3 gestes, l'humain ne decide qu'aux vrais points de decision (quoi faire, le code est-il bon, on publie) :
 
 ```
-/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
+/setup (une fois) → /pipe-plan → /pipe-ship → [merge] → /pipe-tag
+```
+
+`/pipe-ship` enchaine code → review → tests → changelog → PR et ne s'arrete que sur probleme bloquant (incoherence de plan, bloquant de review, tests rouges apres 3 tentatives) puis demande une seule confirmation avant push + PR.
+
+Chaque etape reste invocable individuellement pour derouler pas a pas :
+
+```
+/pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr
 ```
 
 ### Demarrage rapide
 
 1. **Installer** le plugin (voir ci-dessus)
-2. **`/workflow:setup`** — configure le projet (CLAUDE.md, hooks, workflow-config, tech-stack)
-3. **`/workflow:setup-templates`** — remplir les templates projet-specifiques
-4. **`/workflow:pipe-hello`** — briefing de session, puis commencer a travailler
+2. **`/workflow:setup`** — configure le projet (CLAUDE.md, hooks, workflow-config) et remplit les placeholders detectes
+3. **`/workflow:pipe-plan #42`** — planifie une issue
+4. **`/workflow:pipe-ship`** — livre l'issue planifiee
 
 ## Guide d'utilisation
 
@@ -68,33 +76,13 @@ Le workflow suit un pipeline sequentiel avec des gates de validation entre chaqu
 /workflow:setup
 ```
 
-Scaffolde tout le necessaire pour un projet AI-Driven Development :
+Scaffolde tout le necessaire :
 - `CLAUDE.md` avec les instructions du projet
-- `.claude/skills/workflow-config/SKILL.md` — commandes lint/test/build, plateforme, notifications
-- `.claude/skills/tech-stack/SKILL.md` — stack technique et conventions de code
-- Hooks de pre-commit et de qualite
+- `.claude/skills/workflow-config/SKILL.md` — **source unique de config projet** : niveau (A: pipeline complet / B: workflow leger), plateforme, commandes lint/test/build, stack, conventions
+- Hooks de qualite (PreToolUse, PostToolUse, Stop)
+- Remplissage des placeholders `<!-- ... -->` detectes dans `.claude/skills/`
 
-Ensuite, personnaliser les templates :
-
-```
-/workflow:setup-templates
-```
-
-Detecte les placeholders (`__PLACEHOLDER__`) dans les fichiers generes et propose des valeurs adaptees au projet.
-
-Optionnel :
-- **`/workflow:setup-ui-ux`** — genere les conventions UI/UX (wizard interactif ou theme fourni)
-- **`/workflow:setup-mcp`** — genere un `.mcp.exemple.json` avec les MCP detectes dans le projet
-
-### 2. Debut de session
-
-```
-/workflow:pipe-hello
-```
-
-Affiche un briefing complet : contexte projet, branches actives, travail en cours, etat du repo. A lancer a chaque debut de session.
-
-### 3. Planification
+### 2. Planification
 
 ```
 /workflow:pipe-plan #42
@@ -102,50 +90,17 @@ Affiche un briefing complet : contexte projet, branches actives, travail en cour
 /workflow:pipe-plan https://myorg.atlassian.net/browse/PROJ-123
 ```
 
-Analyse l'issue (GitHub ou Jira — numero, cle, URL ou texte libre), explore le code concerne et produit un plan technique detaille : etapes, fichiers a modifier, approche, risques.
+Analyse l'issue (GitHub ou Jira — numero, cle, URL ou texte libre), explore le code concerne et produit un plan technique persiste dans `.claude/plans/`.
 
-### 4. Implementation
-
-```
-/workflow:pipe-code #42
-/workflow:pipe-code PROJ-123
-```
-
-Cree la branche, implemente le code selon le plan, commit chaque etape. Accepte un numero GitHub ou une cle Jira. Fonctionne aussi sans argument si un plan est deja present en session.
-
-### 5. Review
+### 3. Livraison
 
 ```
-/workflow:pipe-review
+/workflow:pipe-ship
 ```
 
-Lance un sub-agent de review automatique qui verifie : patterns du projet, complexite, edge cases, securite, conventions de nommage.
+Implemente selon le plan, review par sub-agent, tests avec boucle corrective bornee, changelog, puis PR — une seule confirmation, avant push. Sur un projet **niveau B**, la route se reduit a code → tests → push.
 
-### 6. Tests
-
-```
-/workflow:pipe-test
-```
-
-Execute les tests avec une boucle corrective bornee (max 3 tentatives). Corrige automatiquement les erreurs entre chaque tentative.
-
-### 7. Changelog
-
-```
-/workflow:pipe-changelog 1.5.0
-```
-
-Genere ou met a jour le `CHANGELOG.md` depuis les commits. Passer une version pour preparer une release, ou rien pour alimenter la section `[Unreleased]`.
-
-### 8. Pull Request
-
-```
-/workflow:pipe-pr
-```
-
-Cree ou met a jour la PR GitHub : titre, description structuree et commentaire d'iteration. Detecte automatiquement la branche courante.
-
-### 9. Merge puis Tag
+### 4. Merge puis tag
 
 Apres le merge de la PR :
 
@@ -153,65 +108,47 @@ Apres le merge de la PR :
 /workflow:pipe-tag v1.5.0
 ```
 
-Cree et pousse un tag git annote SemVer. Verifie qu'on est sur la branche principale et que la version existe dans le CHANGELOG.
+Cree et pousse un tag git annote SemVer (verifie la branche principale, `git pull --ff-only` avant de tagger, notes extraites du CHANGELOG).
+
+### A tout moment
+
+```
+/workflow:pipe-commit      # commit formate selon les conventions (sans friction)
+/workflow:create-issue     # transformer une demande en issues structurees
+/workflow:worktree         # travailler en parallele sur plusieurs branches
+```
 
 ## Skills
 
 ### Pipeline (`pipe-*`)
 
-| Skill | Description | Modele |
-|-------|-------------|--------|
-| `pipe-hello` | Briefing de debut de session | haiku |
-| `pipe-plan` | Planifier l'implementation d'une issue | opus |
-| `pipe-code` | Implementer a partir d'un plan ou d'une issue | opus |
-| `pipe-review` | Review automatique via sub-agent | sonnet |
-| `pipe-test` | Tests avec boucle corrective (max 3) | sonnet |
-| `pipe-changelog` | Generer/maintenir le CHANGELOG | sonnet |
-| `pipe-commit` | Commit formate selon les conventions | sonnet |
-| `pipe-pr` | Creer ou mettre a jour une PR | sonnet |
-| `pipe-tag` | Creer et pousser un tag SemVer | sonnet |
+| Skill | Description |
+|-------|-------------|
+| `pipe-plan` | Planifier l'implementation d'une issue |
+| `pipe-ship` | Livrer une issue en un geste (code → review → test → changelog → PR) |
+| `pipe-code` | Implementer a partir d'un plan ou d'une issue |
+| `pipe-review` | Review automatique via sub-agent |
+| `pipe-test` | Tests avec boucle corrective (max 3) |
+| `pipe-changelog` | Generer/maintenir CHANGELOG.md et TECHNICAL_CHANGES.md |
+| `pipe-commit` | Commit formate selon les conventions |
+| `pipe-pr` | Creer ou mettre a jour une PR |
+| `pipe-tag` | Creer et pousser un tag SemVer (slash-only) |
 
-### Setup (`setup-*`)
+### Autres skills invocables
 
-| Skill | Description | Modele |
-|-------|-------------|--------|
-| `setup` | Configuration complete du projet (one-shot) | sonnet |
-| `setup-templates` | Remplir les templates projet-specifiques | sonnet |
-| `setup-mcp` | Configurer les MCP du projet | sonnet |
-| `setup-ui-ux` | Generer les conventions UI/UX | sonnet |
-
-### Creation (`create-*`)
-
-| Skill | Description | Modele |
-|-------|-------------|--------|
-| `create-issue` | Issues GitHub structurees avec decoupage | opus |
-| `create-skill` | Creation et audit de skills Claude Code | opus |
-
-### Audit (`audit-*`)
-
-| Skill | Description | Modele |
-|-------|-------------|--------|
-| `audit-skills` | Audit maturite AI-Driven Development (7 axes, scoring 1-10) | sonnet |
-| `audit-naming` | Audit conventions de nommage via sub-agent | sonnet |
-| `audit-lint` | Audit lint/format avec recommandations | sonnet |
+| Skill | Description |
+|-------|-------------|
+| `setup` | Configuration complete du projet, one-shot (slash-only) |
+| `create-issue` | Issues GitHub structurees avec decoupage |
+| `worktree` | Creer/gerer des worktrees git |
 
 ### Conventions (non-invocables)
 
-| Skill | Description | Modele |
-|-------|-------------|--------|
-| `git-conventions` | Branches, commits, PRs | haiku |
-| `frontend-code-conventions` | Architecture frontend | haiku |
-| `_workflow-persona` | Persona commune (interne) | haiku |
+| Skill | Description |
+|-------|-------------|
+| `git-conventions` | Branches, commits, PRs |
 
-## Tiers de modeles
-
-Chaque skill declare un tier de modele dans son frontmatter pour optimiser le ratio cout/qualite :
-
-| Tier | Usage | Skills |
-|------|-------|--------|
-| **opus** | Raisonnement complexe, generation de code, planification | 4 skills |
-| **sonnet** | Taches structurees, reviews, configuration | 13 skills |
-| **haiku** | References, conventions, persona | 4 skills |
+Les skills marques **slash-only** (`disable-model-invocation: true`) ne coutent aucun contexte en session : ils ne sont charges que quand tu les invoques.
 
 ## Structure du plugin
 
@@ -219,40 +156,34 @@ Chaque skill declare un tier de modele dans son frontmatter pour optimiser le ra
 claude-workflow/
 ├── .claude-plugin/
 │   └── plugin.json                    # manifest (name, version, author)
+├── .claude/skills/
+│   └── create-skill/                  # outillage local du repo (non distribue)
 ├── CLAUDE.md                          # conventions du plugin
 ├── CHANGELOG.md                       # historique des versions
 └── skills/
-    ├── pipe-hello/SKILL.md            # pipeline
-    ├── pipe-plan/SKILL.md
-    ├── pipe-code/SKILL.md
-    ├── pipe-review/SKILL.md
-    ├── pipe-test/SKILL.md
-    ├── pipe-changelog/SKILL.md
-    ├── pipe-commit/SKILL.md
-    ├── pipe-pr/SKILL.md
-    ├── pipe-tag/SKILL.md
-    ├── setup/SKILL.md                 # setup + templates de reference
-    ├── setup-templates/SKILL.md
-    ├── setup-mcp/SKILL.md
-    ├── setup-ui-ux/SKILL.md
-    ├── create-issue/SKILL.md          # creation
-    ├── create-skill/SKILL.md
-    ├── audit-skills/SKILL.md          # audit
-    ├── audit-naming/SKILL.md
-    ├── audit-lint/SKILL.md
-    ├── git-conventions/SKILL.md       # conventions
-    ├── frontend-code-conventions/SKILL.md
-    └── _workflow-persona/SKILL.md     # interne
+    ├── pipe-plan/
+    ├── pipe-ship/
+    ├── pipe-code/
+    ├── pipe-review/
+    ├── pipe-test/
+    ├── pipe-changelog/
+    ├── pipe-commit/
+    ├── pipe-pr/
+    ├── pipe-tag/
+    ├── setup/                         # + templates workflow-config et hooks
+    ├── create-issue/
+    ├── worktree/
+    └── git-conventions/
 ```
 
 ## Fichiers projet-specifiques
 
-Le plugin ne contient aucune info specifique a un projet. Les fichiers suivants vivent dans le `.claude/skills/` du projet cible et sont crees par `/setup` :
+Le plugin ne contient aucune info specifique a un projet. La config vit dans le `.claude/skills/` du projet cible, creee par `/setup` :
 
 | Fichier | Role |
 |---------|------|
-| `workflow-config/SKILL.md` | Commandes lint/test/build, plateforme, notifications |
-| `tech-stack/SKILL.md` | Stack technique, conventions de code |
-| `ui-ux/SKILL.md` | Conventions UI/UX (cree par `/setup-ui-ux`) |
+| `workflow-config/SKILL.md` | Source unique : niveau de projet, plateforme, commandes, stack, conventions |
+
+Les projets configures avant la v2 peuvent garder leur `tech-stack/SKILL.md` (lu en fallback legacy) ; `/setup` propose la migration vers `workflow-config`.
 
 Ces fichiers ne sont jamais ecrases par une mise a jour du plugin.
