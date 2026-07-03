@@ -126,7 +126,7 @@ Cree le repertoire `.claude/plans/` si necessaire.
 ---
 Classification : [technique | metier | mixte]
 Plan ecrit dans `.claude/plans/plan-XX.md`.
-Ce plan te convient ? Tu veux que je lance `/pipe-code` pour implementer ?
+Ce plan te convient ? Tu veux que je lance `/pipe-ship` pour livrer (code → review → tests → changelog → PR en un geste), ou `/pipe-code` pour derouler etape par etape ?
 ```
 
 ---
