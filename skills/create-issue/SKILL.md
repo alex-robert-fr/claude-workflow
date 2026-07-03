@@ -1,7 +1,6 @@
 ---
 name: create-issue
 description: Creer des issues GitHub structurees avec decoupage intelligent, criteres d'acceptance et labels. Utiliser pour transformer une demande en issues actionnables.
-model: opus
 argument-hint: [description de ce qu'il faut faire]
 ---
 

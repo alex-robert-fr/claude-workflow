@@ -1,7 +1,6 @@
 ---
 name: pipe-review
 description: Review automatique du code via sub-agent. Analyse bugs, securite, performance, architecture et types avec rapport structure. Utiliser apres /pipe-code et avant /pipe-test.
-model: sonnet
 ---
 
 ## Etape 0 — Verifications

@@ -1,7 +1,6 @@
 ---
 name: pipe-plan
 description: Planifier l'implementation d'une issue ou d'un ticket. Detecte la plateforme git (GitHub, GitLab, Gitea) et supporte les trackers externes (JIRA, Linear). Analyse le code, classifie le ticket (technique/metier/mixte), decompose si necessaire, et produit un plan technique detaille. Utiliser avant /pipe-code.
-model: opus
 argument-hint: [numero issue, URL, cle JIRA ou texte]
 ---
 

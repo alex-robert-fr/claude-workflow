@@ -1,7 +1,6 @@
 ---
 name: pipe-pr
 description: Creer ou mettre a jour une Pull Request GitHub. Genere titre, description et commentaire d'iteration selon les conventions. Utiliser apres /pipe-code ou pour soumettre une branche.
-model: sonnet
 argument-hint: [rien — detecte automatiquement la branche courante]
 ---
 

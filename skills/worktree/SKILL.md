@@ -1,7 +1,6 @@
 ---
 name: worktree
 description: Creer et gerer des worktrees git pour travailler en parallele sur plusieurs branches. Utiliser pour isoler le travail sur une issue sans perdre le contexte courant.
-model: sonnet
 argument-hint: [create|list|remove|switch] [branche]
 allowed-tools: Read, Bash(git *)
 ---
