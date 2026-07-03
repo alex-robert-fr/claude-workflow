@@ -46,8 +46,8 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
    - `feat`, `fix`, `perf` → CHANGELOG
    - `refactor`, `docs`, `chore`, `test` → TECHNICAL par defaut ; CHANGELOG si impact consommateur avere (API publique modifiee, doc user-facing, config publique)
    - En cas de doute entre les deux fichiers, privilegier TECHNICAL et demander confirmation
-5. **Enrichir avec les references** — pour chaque commit retenu, trouver la PR associee :
-   - Utiliser `gh pr list --state merged --search "SHA" --json number --jq '.[0].number'` pour trouver la PR qui a merge ce commit.
+5. **Enrichir avec les references** — trouver la PR associee a chaque commit en **un seul appel batch** (jamais un appel `gh` par commit) :
+   - `gh pr list --state merged --limit 50 --json number,mergeCommit,headRefName` puis associer localement chaque commit a sa PR (via le merge commit ou la branche d'origine, `git log --format=%h` sur la plage concernee).
    - Si une PR est trouvee, c'est la reference de l'entree. Si pas de PR (commit direct), utiliser le SHA court en fallback.
    - Si `gh` echoue ou est indisponible, utiliser le SHA seul — ne pas bloquer la generation.
 6. **Reformuler** —
@@ -81,11 +81,13 @@ Changements detectes :
 [N] commits exclus (merges, fixups, typos...)
 ```
 
-Demande confirmation si le classement semble correct avant de continuer.
+Ne pas demander de confirmation ici — la confirmation unique a lieu a l'etape 4, sur le resultat final. Si un classement est ambigu, le signaler dans l'affichage (marqueur `⚠️`) pour que l'utilisateur puisse corriger a l'etape 4.
 
-## Etape 2.5 — Auditer la coherence historique
+## Etape 2.5 — Auditer la coherence historique (releases uniquement)
 
-Avant de toucher aux entrees, verifier que **CHANGELOG.md et TECHNICAL_CHANGES.md** ne contiennent pas d'entrees mal placees : une PR mergee apres la date d'un tag ne peut pas figurer sous la section de ce tag.
+**Executer cette etape uniquement si une version est publiee** (argument fourni a l'etape 1) **ou si l'utilisateur le demande explicitement.** En mode `[Unreleased]`, passer directement a l'etape 3 — l'audit systematique coutait plusieurs appels `gh` a chaque run pour un historique qui n'a pas bouge.
+
+Verifier que **CHANGELOG.md et TECHNICAL_CHANGES.md** ne contiennent pas d'entrees mal placees : une PR mergee apres la date d'un tag ne peut pas figurer sous la section de ce tag.
 
 Procedure (voir `reference.md` section "Coherence versions/dates") a appliquer **sur chacun des deux fichiers** :
 
@@ -108,7 +110,7 @@ TECHNICAL_CHANGES.md :
 - (aucune)
 ```
 
-Demander confirmation avant de reorganiser. Cette etape est rapide si les deux fichiers sont sains — la mentionner brievement et passer a l'etape suivante.
+Integrer la reorganisation proposee au recap de l'etape 4 — pas de confirmation separee ici. Cette etape est rapide si les deux fichiers sont sains — la mentionner brievement et passer a l'etape suivante.
 
 ## Etape 3 — Generer / mettre a jour les deux fichiers
 
