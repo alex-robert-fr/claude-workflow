@@ -9,7 +9,7 @@ argument-hint: [description du skill a creer]
 ## Contexte
 
 - Skills projet : utilise Glob avec pattern `*/SKILL.md` dans `.claude/skills/` (si le repertoire existe)
-- Skills plugin : utilise Glob avec pattern `*/SKILL.md` dans `${CLAUDE_SKILL_DIR}/../` pour lister les skills disponibles
+- Skills plugin : utilise Glob avec pattern `*/SKILL.md` dans `skills/` (repo du plugin)
 
 ---
 
