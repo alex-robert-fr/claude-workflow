@@ -10,7 +10,6 @@ Analyse l'etat actuel du projet et identifie ce qui manque :
 
 - [ ] `CLAUDE.md` existe a la racine
 - [ ] `.claude/skills/workflow-config/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
-- [ ] `.claude/skills/tech-stack/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
 - [ ] `.claude/settings.json` existe avec des hooks configures
 - [ ] `.claude/plans/` existe
 - [ ] Aucun autre fichier de `.claude/skills/` ne contient de placeholders `<!-- ... -->`
@@ -23,7 +22,6 @@ Affiche un recap :
 ✅ CLAUDE.md
 ❌ workflow-config (manquant)
 ❌ hooks (non configures)
-⚠️ tech-stack (placeholders non remplis)
 ...
 ```
 
@@ -45,24 +43,23 @@ Si `CLAUDE.md` existe deja, verifie qu'il contient une section Git avec les regl
 
 Si `.claude/skills/workflow-config/SKILL.md` n'existe pas, utilise Read pour charger `${CLAUDE_SKILL_DIR}/workflow-config-template.md` comme squelette. Si le fichier existe mais contient des placeholders, pose les questions pour le remplir :
 
-1. **Plateforme Git** : GitHub, GitLab ou Gitea ? (detecte depuis `git remote -v`)
-2. **Issue tracker** : GitHub Issues, Jira, Linear ? (detecte depuis les MCP configures)
-3. **Branche par defaut** : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`)
-4. **Commande lint** : biome check, eslint, etc. ? (detecte depuis package.json scripts)
-5. **Commande format** : biome format --write, prettier --write, etc. ?
-6. **Commande test** : vitest, jest, npm test, etc. ?
-7. **Commande build** : tsc --noEmit, npm run build, etc. ?
-8. **Notification** : canal Slack, aucun ?
+1. **Niveau de projet** : A (produit vivant, pipeline complet) ou B (script/outil, workflow leger) ?
+2. **Plateforme Git** : GitHub, GitLab ou Gitea ? (detecte depuis `git remote -v`)
+3. **Issue tracker** : GitHub Issues, Jira, Linear ? (detecte depuis les MCP configures)
+4. **Branche par defaut** : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`)
+5. **Commande lint** : biome check, eslint, etc. ? (detecte depuis package.json scripts)
+6. **Commande format** : biome format --write, prettier --write, etc. ?
+7. **Commande test** : vitest, jest, npm test, etc. ?
+8. **Commande build** : tsc --noEmit, npm run build, etc. ?
+9. **Notification** : canal Slack, aucun ?
 
-Propose des valeurs detectees automatiquement, demande confirmation, puis ecris le fichier.
+Les sections Stack technique, Architecture et Nommage du template se remplissent a partir de ce qui est detecte (package.json, structure des dossiers, configs). Propose des valeurs detectees automatiquement, demande confirmation, puis ecris le fichier.
 
-## Etape 3 — tech-stack
-
-Si `.claude/skills/tech-stack/SKILL.md` n'existe pas, utilise Read pour charger `${CLAUDE_SKILL_DIR}/tech-stack-template.md` comme squelette. Si le fichier contient des placeholders, propose de les remplir a partir de ce qui a ete detecte a l'etape 2.
+Si le projet a encore un `.claude/skills/tech-stack/SKILL.md` (config legacy), propose de fusionner son contenu dans `workflow-config` et de le supprimer.
 
 Meme mecanique pour tout autre fichier de `.claude/skills/` contenant des placeholders `<!-- ... -->` (detecte a l'etape 0) : proposer une valeur detectee automatiquement, poser une question courte si rien n'est detectable, confirmer, puis remplacer le placeholder. Ne jamais toucher aux champs deja remplis.
 
-## Etape 4 — Hooks
+## Etape 3 — Hooks
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md` pour les templates de hooks.
 
@@ -78,7 +75,7 @@ Si un `.claude/settings.json` existe deja, merge les hooks sans ecraser les perm
 
 Affiche la config generee et demande confirmation avant d'ecrire.
 
-## Etape 5 — Repertoires
+## Etape 4 — Repertoires
 
 Cree les repertoires manquants :
 
@@ -87,7 +84,7 @@ Cree les repertoires manquants :
 
 Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres).
 
-## Etape 6 — Recap final
+## Etape 5 — Recap final
 
 ```
 ## Setup termine — [nom du projet]

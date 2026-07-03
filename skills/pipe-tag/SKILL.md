@@ -15,7 +15,7 @@ argument-hint: "[v1.2.3]"
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` si le fichier existe, pour identifier la branche par defaut du projet. Si absent, utiliser `main` comme valeur par defaut.
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` si le fichier existe, pour identifier la branche par defaut du projet (si absent, essaie `.claude/skills/tech-stack/SKILL.md` — config legacy ; sinon utiliser `main` comme valeur par defaut).
 
 Avant de continuer, verifie :
 

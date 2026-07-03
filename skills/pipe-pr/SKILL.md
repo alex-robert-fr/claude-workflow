@@ -6,7 +6,7 @@ argument-hint: [rien — detecte automatiquement la branche courante]
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` puis verifie :
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` (si absent, utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` — config legacy). Puis verifie :
 
 - [ ] Le repo a un remote `origin` configure
 - [ ] La branche courante n'est pas la branche par defaut (on ne cree pas de PR depuis main/develop)
@@ -84,7 +84,7 @@ Une fois confirmation recue :
 
 **Nouvelle PR :**
 
-- Cree la PR via MCP GitHub (base: branche par defaut definie dans `tech-stack`, head: branche courante)
+- Cree la PR via MCP GitHub (base: branche par defaut definie dans `workflow-config`, head: branche courante)
 
 ```
 PR creee : [URL]

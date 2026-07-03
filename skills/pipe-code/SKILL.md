@@ -16,11 +16,11 @@ Le plan peut venir de trois sources (par ordre de priorite) :
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` puis verifie :
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` (si absent, utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` — config legacy). Puis verifie :
 
 - [ ] Le repo a un remote `origin` configure
 - [ ] Le working tree est propre (pas de changements non commites qui bloqueraient un checkout)
-- [ ] La branche par defaut definie dans `tech-stack` (section Git) existe localement ou sur le remote
+- [ ] La branche par defaut definie dans `workflow-config` (section Plateforme) existe localement ou sur le remote
 - [ ] Un plan est disponible (fichier, conversation ou issue a planifier)
 
 Si une verification echoue, signale-le clairement et arrete-toi. Ne tente pas de contourner.
@@ -29,7 +29,7 @@ Si une verification echoue, signale-le clairement et arrete-toi. Ne tente pas de
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` pour les conventions de branches et commits.
 
-Identifie la branche par defaut depuis le skill `tech-stack` (deja lu a l'etape 0, section Git, champ "Branche par defaut"). Stocke-la mentalement comme `BASE_BRANCH`.
+Identifie la branche par defaut depuis `workflow-config` (deja lu a l'etape 0, champ "Branche par defaut"). Stocke-la mentalement comme `BASE_BRANCH`.
 
 Execute exactement cette sequence :
 
@@ -39,7 +39,7 @@ Execute exactement cette sequence :
 
 Ou `<nouvelle-branche>` suit la convention definie dans `git-conventions`.
 
-Ne jamais hardcoder `main` ou `develop` — toujours lire la valeur depuis `tech-stack`.
+Ne jamais hardcoder `main` ou `develop` — toujours lire la valeur depuis `workflow-config`.
 
 Annonce la branche creee avant de commencer.
 
@@ -49,7 +49,7 @@ Suis les etapes du plan dans l'ordre. Pour chaque etape :
 
 ### Regles de code
 
-Respecte les conventions definies dans le skill `tech-stack` (deja lu).
+Respecte les conventions definies dans `workflow-config` (deja lu — stack, architecture, nommage).
 
 Ne fais PAS de verification de style ou de formatage — c'est le role des hooks PostToolUse (lint/format automatique apres chaque ecriture) et de `/pipe-review` (verification par sub-agent).
 
