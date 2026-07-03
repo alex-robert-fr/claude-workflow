@@ -16,7 +16,7 @@ Si une verification echoue, signale-le clairement et arrete-toi.
 
 Recupere les informations necessaires :
 
-1. **Dernier tag de version** — via `git tag --sort=-version:refSort -l 'v*' | head -1`. Si aucun tag, c'est la premiere version.
+1. **Dernier tag de version** — via `git tag --sort=-version:refname -l 'v*' | head -1`. Si aucun tag, c'est la premiere version.
 2. **URL du remote** — via `git remote get-url origin`, transforme en URL HTTPS pour les liens de comparaison (ex: `git@github.com:org/repo.git` → `https://github.com/org/repo`).
 3. **Phase de versioning** — si le dernier tag est `0.x.y`, on est en pre-v1.0.0. Sinon, post-v1.0.0.
 4. **Version cible** — si un argument est fourni (ex: `1.3.0`), c'est la version a publier. Sinon, on met a jour la section `[Unreleased]`.
