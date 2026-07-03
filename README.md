@@ -85,8 +85,8 @@ Travail sur l'issue #42 :
 Au moment de releaser :
 
 ```
-/workflow:pipe-changelog 2.1.0  # cree la section versionnee
-/workflow:pipe-tag v2.1.0       # tag git annote SemVer (apres merge)
+/workflow:pipe-changelog 1.5.0  # cree la section versionnee
+/workflow:pipe-tag v1.5.0       # tag git annote SemVer (apres merge)
 ```
 
 `pipe-plan`, `pipe-code` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
@@ -156,7 +156,7 @@ Le plugin ne contient aucune info specifique a un projet. La config vit dans le 
 |---------|------|
 | `workflow-config/SKILL.md` | Source unique : niveau de projet (A/B), plateforme, commandes, stack, conventions |
 
-Les projets configures avant la v2 peuvent garder leur `tech-stack/SKILL.md` (lu en fallback legacy) ; `/setup` propose la migration vers `workflow-config`.
+Les projets configures avant la 1.5.0 peuvent garder leur `tech-stack/SKILL.md` (lu en fallback legacy) ; `/setup` propose la migration vers `workflow-config`.
 
 Ces fichiers ne sont jamais ecrases par une mise a jour du plugin.
 

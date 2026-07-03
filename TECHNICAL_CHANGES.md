@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-07-03
+## [1.5.0] - 2026-07-03
 
 ### Refactor
 
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Docs
 
-- Aligne `README.md` et `CLAUDE.md` sur le pipeline v2 : decompte reel des skills, placeholders `<!-- ... -->` (et non `__PLACEHOLDER__`), retrait de la section tiers de modeles ([`1e2abfc`](https://github.com/ToolsForSaaS/claude-workflow/commit/1e2abfc))
+- Aligne `README.md` et `CLAUDE.md` sur le pipeline streamline : decompte reel des skills, placeholders `<!-- ... -->` (et non `__PLACEHOLDER__`), retrait de la section tiers de modeles ([`1e2abfc`](https://github.com/ToolsForSaaS/claude-workflow/commit/1e2abfc))
 - Corrige la doc create-skill avec le comportement documente du champ `model` (bascule reelle pour le reste du tour) et le budget reel des descriptions (troncature a 1 536 caracteres par skill) ([`d7af963`](https://github.com/ToolsForSaaS/claude-workflow/commit/d7af963))
 - Enrichit la regle de versioning de `CLAUDE.md` pour exiger la mise a jour simultanee de `plugin.json`, `marketplace.json` (deux champs `version`) et `CHANGELOG.md` a chaque release ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
 
@@ -129,8 +129,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renommer le plugin et ajouter `.gitignore` ([`3f0423a`](https://github.com/ToolsForSaaS/claude-workflow/commit/3f0423a))
 - Supprimer le tableau de routage des skills et le template d'index devenus obsoletes ([`88ef12c`](https://github.com/ToolsForSaaS/claude-workflow/commit/88ef12c))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v2.0.0
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v1.5.0
 [1.4.8]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...v1.4.6

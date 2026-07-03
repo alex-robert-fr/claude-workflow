@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-07-03
+## [1.5.0] - 2026-07-03
 
 ### Added
 
@@ -201,8 +201,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v2.0.0
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v1.5.0
 [1.4.8]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...v1.4.6
