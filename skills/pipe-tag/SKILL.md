@@ -24,6 +24,14 @@ Avant de continuer, verifie :
 
 Si une verification echoue, signale-le clairement et arrete-toi.
 
+Puis mets a jour la branche locale avant toute detection de version — on ne tague jamais un HEAD local en retard sur le remote :
+
+```
+git pull --ff-only origin <branche-par-defaut>
+```
+
+Si le pull echoue (divergence), signale-le et arrete-toi.
+
 ## Etape 1 — Determiner la version cible
 
 Utilise Read pour charger `reference.md` avant de valider le format.
