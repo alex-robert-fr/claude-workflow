@@ -7,8 +7,6 @@ argument-hint: "[v1.2.3]"
 
 ## Contexte
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
 - Branche courante : !`git branch --show-current`
 - Dernier tag : !`git describe --tags --abbrev=0`
 - Statut repo : !`git status --short`

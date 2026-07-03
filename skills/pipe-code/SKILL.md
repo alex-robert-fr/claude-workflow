@@ -5,12 +5,6 @@ model: opus
 argument-hint: [numero issue ou rien si plan deja present]
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ### Resolution du plan
 
 Le plan peut venir de trois sources (par ordre de priorite) :

@@ -5,12 +5,6 @@ model: sonnet
 argument-hint: [description optionnelle du changement]
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Analyser l'etat
 
 Verifie l'etat du repo :

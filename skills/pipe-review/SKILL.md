@@ -4,12 +4,6 @@ description: Review automatique du code via sub-agent. Analyse bugs, securite, p
 model: sonnet
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Verifications
 
 - [ ] La branche courante n'est pas la branche par defaut

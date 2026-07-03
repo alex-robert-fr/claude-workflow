@@ -4,12 +4,6 @@ description: Configurer un projet pour le workflow AI-Driven Development. Scaffo
 model: sonnet
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Diagnostic
 
 Analyse l'etat actuel du projet et identifie ce qui manque :

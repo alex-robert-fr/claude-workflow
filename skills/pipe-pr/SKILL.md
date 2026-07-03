@@ -5,12 +5,6 @@ model: sonnet
 argument-hint: [rien — detecte automatiquement la branche courante]
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Verifications
 
 Utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` puis verifie :

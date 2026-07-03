@@ -101,9 +101,6 @@ allowed-tools: Bash(git *), Bash(ls *)  # [SI contexte dynamique avec !`cmd`]
 - Info2 : !`commande2`
 # Chaque skill definit ses propres commandes selon ses besoins.
 # Commandes simples uniquement — pas de redirections (2>/dev/null), pipes (|), ni operateurs (||, &&), ni single quotes ('...').
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-                                      # [SI skill pipeline — pas expertise, pas fork]
 ---
 
 ## Etape 0 — Verifications            # [SI prerequis]
@@ -135,7 +132,7 @@ $ARGUMENTS
 | Tout skill | `model` avec le tier recommande (`opus`, `sonnet`, `haiku`) |
 | Accepte des arguments | `argument-hint` + `## Input utilisateur` + `$ARGUMENTS` |
 | Non-invocable (expertise) | `user-invocable: false`, pas d'etapes numerotees, `## Contexte` optionnel |
-| Isolation sub-agent | `context: fork`, pas de chargement persona |
+| Isolation sub-agent | `context: fork` |
 | Fork read-only | Ajouter `agent: Explore` ou `agent: Plan` |
 | A des prerequis | `## Etape 0 — Verifications` |
 | Pipeline sequentiel | Derniere etape = transition vers le skill suivant |
@@ -146,7 +143,7 @@ $ARGUMENTS
 
 - `## Contexte` avec `!`cmd`` en tete de chaque skill (optionnel pour expertise)
 - Commandes simples dans `!`cmd`` — pas de redirections, pipes, operateurs, ni single quotes
-- Ordre : contexte dynamique → persona (Read) → etapes
+- Ordre : contexte dynamique → etapes
 - Les donnees pre-chargees dans `## Contexte` ne doivent pas etre re-cherchees par les etapes. Claude peut utiliser des outils externes uniquement pour des donnees absentes du contexte pre-charge, et seulement si le skill le demande explicitement.
 - Frontmatter minimal : pas de `effort`, `paths` sauf besoin explicite
 - Chaque skill doit inclure `model` avec le tier recommande (`opus`, `sonnet`, `haiku`)

@@ -12,8 +12,6 @@ allowed-tools: Read, Bash(git *)
 - Branche courante : !`git branch --show-current`
 - Repertoire du repo : !`git rev-parse --show-toplevel`
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
 ---
 
 ## Convention d'emplacement

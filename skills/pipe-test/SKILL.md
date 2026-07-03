@@ -5,12 +5,6 @@ model: sonnet
 argument-hint: [rien ou fichier/pattern specifique]
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Verifications
 
 Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` pour identifier la commande de test du projet.

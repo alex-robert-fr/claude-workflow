@@ -5,12 +5,6 @@ model: opus
 argument-hint: [description de ce qu'il faut faire]
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Verifications
 
 - [ ] Le repo a un remote `origin` configure

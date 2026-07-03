@@ -5,12 +5,6 @@ model: opus
 argument-hint: [numero issue, URL, cle JIRA ou texte]
 ---
 
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
 ## Etape 0 — Detecter l'environnement
 
 ### Plateforme git
