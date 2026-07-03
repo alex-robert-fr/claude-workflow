@@ -19,7 +19,6 @@ Analyse l'etat actuel du projet et identifie ce qui manque :
 - [ ] `.claude/skills/tech-stack/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
 - [ ] `.claude/settings.json` existe avec des hooks configures
 - [ ] `.claude/plans/` existe
-- [ ] `.mcp.exemple.json` existe
 
 Affiche un recap :
 
@@ -91,11 +90,7 @@ Cree les repertoires manquants :
 
 Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres).
 
-## Etape 6 — MCP
-
-Si `.mcp.exemple.json` n'existe pas et que des MCP sont utilises dans les skills, propose de lancer la logique de `/setup-mcp`.
-
-## Etape 7 — Recap final
+## Etape 6 — Recap final
 
 ```
 ## Setup termine — [nom du projet]
@@ -108,10 +103,10 @@ Si `.mcp.exemple.json` n'existe pas et que des MCP sont utilises dans les skills
 - ✅ .claude/rules/
 
 ### Pipeline disponible
-/pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
+/pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
 
 ### Prochaine etape
-Lance `/pipe-hello` pour commencer ta session de travail.
+Lance `/pipe-plan [issue]` pour demarrer le travail.
 ```
 
 ---
