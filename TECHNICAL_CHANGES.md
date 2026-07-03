@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-03
+
+### Refactor
+
+- Extrait le protocole du reviewer de `/pipe-review` dans `reference.md`, charge directement par le sub-agent — le contexte principal ne porte plus les ~90 lignes de prompt, comportement de review inchange ([`091725e`](https://github.com/ToolsForSaaS/claude-workflow/commit/091725e))
+- Dedoublonne le template canonique de create-skill : `templates.md` supprime au profit de `guide.md`, les deux copies portaient des regles contradictoires sur le champ `model` ([`dd48610`](https://github.com/ToolsForSaaS/claude-workflow/commit/dd48610))
+
+### Docs
+
+- Aligne `README.md` et `CLAUDE.md` sur le pipeline v2 : decompte reel des skills, placeholders `<!-- ... -->` (et non `__PLACEHOLDER__`), retrait de la section tiers de modeles ([`1e2abfc`](https://github.com/ToolsForSaaS/claude-workflow/commit/1e2abfc))
+- Corrige la doc create-skill avec le comportement documente du champ `model` (bascule reelle pour le reste du tour) et le budget reel des descriptions (troncature a 1 536 caracteres par skill) ([`d7af963`](https://github.com/ToolsForSaaS/claude-workflow/commit/d7af963))
+
+### Chore
+
+- Versionne `.claude/skills/` du repo (outillage local) via une exception au `.gitignore` ([`dd48610`](https://github.com/ToolsForSaaS/claude-workflow/commit/dd48610))
+
 ## [1.4.8](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.8) - 2026-04-29
 
 ## [1.4.7](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.7) - 2026-04-27
@@ -112,7 +128,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renommer le plugin et ajouter `.gitignore` ([`3f0423a`](https://github.com/ToolsForSaaS/claude-workflow/commit/3f0423a))
 - Supprimer le tableau de routage des skills et le template d'index devenus obsoletes ([`88ef12c`](https://github.com/ToolsForSaaS/claude-workflow/commit/88ef12c))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v2.0.0
+[1.4.8]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...v1.4.6
 [1.4.2]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.1...v1.4.2
