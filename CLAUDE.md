@@ -35,7 +35,12 @@ Chemin nominal en 3 gestes — l'humain ne decide qu'aux vrais points de decisio
 
 ## Versioning
 
-Lors d'une release (`/pipe-changelog` avec version + `/pipe-tag`), toujours mettre a jour `version` dans `.claude-plugin/plugin.json` en meme temps que le CHANGELOG.
+Lors d'une release (`/pipe-changelog` avec version + `/pipe-tag`), toujours mettre a jour la version simultanement dans :
+- `.claude-plugin/plugin.json` (champ `version`)
+- `.claude-plugin/marketplace.json` (champs `metadata.version` ET `plugins[0].version`)
+- `CHANGELOG.md`
+
+Les trois doivent rester strictement synchronises sous peine de desynchroniser la version annoncee dans la marketplace publique.
 
 ## Git
 

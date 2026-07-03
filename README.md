@@ -2,9 +2,15 @@
 
 Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet de dev : setup, plan, ship (code → review → test → changelog → PR) et tag.
 
-**13 skills** distribues : le chemin nominal tient en 3 gestes (`/pipe-plan` → `/pipe-ship` → merge → `/pipe-tag`), chaque etape unitaire reste invocable independamment.
+## Pourquoi ce plugin ?
 
-Compatible **GitHub** et **Jira** — les skills de planification et d'implementation acceptent des issues des deux plateformes.
+Configurer un workflow AI-Driven Development de zero, c'est des dizaines d'heures de redaction de skills, hooks et conventions — et autant de risques de derive sur la duree. Ce plugin package un pipeline pret a l'emploi qui couvre tout le cycle, de la planification d'une issue jusqu'au tag de release.
+
+**Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (le chemin nominal tient en 3 gestes), une qualite garantie par les hooks et les sub-agents (pas par des instructions au LLM), et une coherence entre les sessions et entre les membres de l'equipe.
+
+**13 skills** distribues : `/pipe-ship` livre une issue en un seul geste, chaque etape unitaire reste invocable independamment.
+
+Lecture d'issues compatible **GitHub** et **Jira** (`pipe-plan`, `pipe-code`, `pipe-ship`) — la creation d'issues et de Pull Requests reste sur **GitHub** uniquement.
 
 ## Installation
 
@@ -61,62 +67,31 @@ Chaque etape reste invocable individuellement pour derouler pas a pas :
 /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr
 ```
 
-### Demarrage rapide
+## Une session type
 
-1. **Installer** le plugin (voir ci-dessus)
-2. **`/workflow:setup`** — configure le projet (CLAUDE.md, hooks, workflow-config) et remplit les placeholders detectes
-3. **`/workflow:pipe-plan #42`** — planifie une issue
-4. **`/workflow:pipe-ship`** — livre l'issue planifiee
-
-## Guide d'utilisation
-
-### 1. Configuration initiale (une seule fois)
+Configuration unique du projet :
 
 ```
-/workflow:setup
+/workflow:setup            # CLAUDE.md, hooks, workflow-config (+ placeholders)
 ```
 
-Scaffolde tout le necessaire :
-- `CLAUDE.md` avec les instructions du projet
-- `.claude/skills/workflow-config/SKILL.md` — **source unique de config projet** : niveau (A: pipeline complet / B: workflow leger), plateforme, commandes lint/test/build, stack, conventions
-- Hooks de qualite (PreToolUse, PostToolUse, Stop)
-- Remplissage des placeholders `<!-- ... -->` detectes dans `.claude/skills/`
-
-### 2. Planification
+Travail sur l'issue #42 :
 
 ```
-/workflow:pipe-plan #42
-/workflow:pipe-plan PROJ-123
-/workflow:pipe-plan https://myorg.atlassian.net/browse/PROJ-123
+/workflow:pipe-plan #42    # analyse l'issue, produit un plan technique persiste
+/workflow:pipe-ship        # implemente, review, teste, changelog, PR — 1 confirmation
 ```
 
-Analyse l'issue (GitHub ou Jira — numero, cle, URL ou texte libre), explore le code concerne et produit un plan technique persiste dans `.claude/plans/`.
-
-### 3. Livraison
+Au moment de releaser :
 
 ```
-/workflow:pipe-ship
+/workflow:pipe-changelog 2.1.0  # cree la section versionnee
+/workflow:pipe-tag v2.1.0       # tag git annote SemVer (apres merge)
 ```
 
-Implemente selon le plan, review par sub-agent, tests avec boucle corrective bornee, changelog, puis PR — une seule confirmation, avant push. Sur un projet **niveau B**, la route se reduit a code → tests → push.
+`pipe-plan`, `pipe-code` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
 
-### 4. Merge puis tag
-
-Apres le merge de la PR :
-
-```
-/workflow:pipe-tag v1.5.0
-```
-
-Cree et pousse un tag git annote SemVer (verifie la branche principale, `git pull --ff-only` avant de tagger, notes extraites du CHANGELOG).
-
-### A tout moment
-
-```
-/workflow:pipe-commit      # commit formate selon les conventions (sans friction)
-/workflow:create-issue     # transformer une demande en issues structurees
-/workflow:worktree         # travailler en parallele sur plusieurs branches
-```
+Sur un projet **niveau B** (script/outil declare dans `workflow-config`), `/pipe-ship` reduit sa route a code → tests → push, sans changelog ni review formelle.
 
 ## Skills
 
@@ -124,29 +99,33 @@ Cree et pousse un tag git annote SemVer (verifie la branche principale, `git pul
 
 | Skill | Description |
 |-------|-------------|
-| `pipe-plan` | Planifier l'implementation d'une issue |
-| `pipe-ship` | Livrer une issue en un geste (code → review → test → changelog → PR) |
-| `pipe-code` | Implementer a partir d'un plan ou d'une issue |
-| `pipe-review` | Review automatique via sub-agent |
-| `pipe-test` | Tests avec boucle corrective (max 3) |
-| `pipe-changelog` | Generer/maintenir CHANGELOG.md et TECHNICAL_CHANGES.md |
-| `pipe-commit` | Commit formate selon les conventions |
-| `pipe-pr` | Creer ou mettre a jour une PR |
-| `pipe-tag` | Creer et pousser un tag SemVer (slash-only) |
+| [`pipe-plan`](skills/pipe-plan/SKILL.md) | Planifier l'implementation d'une issue |
+| [`pipe-ship`](skills/pipe-ship/SKILL.md) | Livrer une issue en un geste (code → review → test → changelog → PR) |
+| [`pipe-code`](skills/pipe-code/SKILL.md) | Implementer a partir d'un plan ou d'une issue |
+| [`pipe-review`](skills/pipe-review/SKILL.md) | Review automatique via sub-agent |
+| [`pipe-test`](skills/pipe-test/SKILL.md) | Tests avec boucle corrective (max 3) |
+| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md et TECHNICAL_CHANGES.md |
+| [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour une PR |
+| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer (slash-only) |
 
-### Autres skills invocables
+### Utilitaires
 
-| Skill | Description |
-|-------|-------------|
-| `setup` | Configuration complete du projet, one-shot (slash-only) |
-| `create-issue` | Issues GitHub structurees avec decoupage |
-| `worktree` | Creer/gerer des worktrees git |
-
-### Conventions (non-invocables)
+Commandes invocables a tout moment, hors du flow principal du pipeline.
 
 | Skill | Description |
 |-------|-------------|
-| `git-conventions` | Branches, commits, PRs |
+| [`setup`](skills/setup/SKILL.md) | Configuration complete du projet, one-shot (slash-only) |
+| [`pipe-commit`](skills/pipe-commit/SKILL.md) | Commit formate selon les conventions git, sans friction |
+| [`create-issue`](skills/create-issue/SKILL.md) | Issues GitHub structurees avec decoupage |
+| [`worktree`](skills/worktree/SKILL.md) | Creer, lister, supprimer et basculer entre worktrees git |
+
+### Referentiels (consultables, non-invocables)
+
+Charges automatiquement par les skills du pipeline qui en dependent.
+
+| Skill | Description |
+|-------|-------------|
+| [`git-conventions`](skills/git-conventions/SKILL.md) | Branches, commits, Pull Requests |
 
 Les skills marques **slash-only** (`disable-model-invocation: true`) ne coutent aucun contexte en session : ils ne sont charges que quand tu les invoques.
 
@@ -155,26 +134,19 @@ Les skills marques **slash-only** (`disable-model-invocation: true`) ne coutent 
 ```
 claude-workflow/
 ├── .claude-plugin/
-│   └── plugin.json                    # manifest (name, version, author)
+│   ├── plugin.json          # manifest (name, version, author)
+│   └── marketplace.json     # vitrine pour la marketplace publique
 ├── .claude/skills/
-│   └── create-skill/                  # outillage local du repo (non distribue)
-├── CLAUDE.md                          # conventions du plugin
-├── CHANGELOG.md                       # historique des versions
+│   └── create-skill/        # outillage local du repo (non distribue)
+├── CLAUDE.md                # conventions du plugin
+├── CHANGELOG.md             # historique des versions
 └── skills/
-    ├── pipe-plan/
-    ├── pipe-ship/
-    ├── pipe-code/
-    ├── pipe-review/
-    ├── pipe-test/
-    ├── pipe-changelog/
-    ├── pipe-commit/
-    ├── pipe-pr/
-    ├── pipe-tag/
-    ├── setup/                         # + templates workflow-config et hooks
-    ├── create-issue/
-    ├── worktree/
-    └── git-conventions/
+    └── <nom>/               # 13 skills, un repertoire par skill
+        ├── SKILL.md         # point d'entree (frontmatter + flow)
+        └── reference.md     # referentiel detaille (optionnel)
 ```
+
+**Chargement progressif** : chaque `SKILL.md` reste concis et charge `reference.md` a la demande, uniquement quand le flow en a besoin. Cette decoupe maintient le contexte leger pour les cas simples tout en conservant la profondeur quand elle est utile (exemples : `pipe-changelog`, `pipe-plan`, `pipe-review`).
 
 ## Fichiers projet-specifiques
 
@@ -182,8 +154,14 @@ Le plugin ne contient aucune info specifique a un projet. La config vit dans le 
 
 | Fichier | Role |
 |---------|------|
-| `workflow-config/SKILL.md` | Source unique : niveau de projet, plateforme, commandes, stack, conventions |
+| `workflow-config/SKILL.md` | Source unique : niveau de projet (A/B), plateforme, commandes, stack, conventions |
 
 Les projets configures avant la v2 peuvent garder leur `tech-stack/SKILL.md` (lu en fallback legacy) ; `/setup` propose la migration vers `workflow-config`.
 
 Ces fichiers ne sont jamais ecrases par une mise a jour du plugin.
+
+## Ressources
+
+- [CHANGELOG.md](CHANGELOG.md) — historique des versions et evolutions du plugin
+- [Repository GitHub](https://github.com/ToolsForSaaS/claude-workflow)
+- [Conventions du plugin](CLAUDE.md) — regles internes pour contribuer

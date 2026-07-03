@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Retire le champ `model` du frontmatter de tous les skills : il bascule reellement le modele pour le reste du tour (auto-invocation comprise) et pouvait retrograder la session ([`d7af963`](https://github.com/ToolsForSaaS/claude-workflow/commit/d7af963))
 - Passe `/setup` et `/pipe-tag` en slash-only (`disable-model-invocation: true`) : leur description ne coute plus de contexte a chaque session ([`128de48`](https://github.com/ToolsForSaaS/claude-workflow/commit/128de48))
 - `/pipe-plan` propose `/pipe-ship` comme suite nominale du plan valide ([`3fcfa3c`](https://github.com/ToolsForSaaS/claude-workflow/commit/3fcfa3c))
+- Aligne les descriptions de `plugin.json` et `marketplace.json` pour inclure toutes les etapes du pipeline (les anciennes descriptions courtes omettaient `changelog` et `tag`) ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
+- Refond la presentation du `README.md` : nouvelle section "Pourquoi ce plugin ?" (probleme adresse, profils cibles), rubrique "Une session type", liens cliquables vers chaque `SKILL.md` et section "Ressources" ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- Explicite dans le `README.md` que la lecture d'issues est compatible GitHub et Jira mais que la creation d'issues et de Pull Requests reste sur GitHub uniquement ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
 
 ### Removed
 
@@ -34,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Corrige la detection du dernier tag dans `/pipe-changelog` : la spec de tri `version:refSort` etait invalide et faisait echouer la commande a chaque run (`--sort=-version:refname`) ([`a7573db`](https://github.com/ToolsForSaaS/claude-workflow/commit/a7573db))
 - `/pipe-tag` met a jour la branche locale (`git pull --ff-only`) avant de tagger, pour ne plus poser de tag sur une branche principale en retard sur le remote ([`47c4b5a`](https://github.com/ToolsForSaaS/claude-workflow/commit/47c4b5a))
+- Synchronise la version annoncee dans `marketplace.json` avec la version reelle du plugin (elle etait restee figee a `1.0.0`) ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
 
 ## [1.4.8](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.8) - 2026-04-29
 

@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Aligne `README.md` et `CLAUDE.md` sur le pipeline v2 : decompte reel des skills, placeholders `<!-- ... -->` (et non `__PLACEHOLDER__`), retrait de la section tiers de modeles ([`1e2abfc`](https://github.com/ToolsForSaaS/claude-workflow/commit/1e2abfc))
 - Corrige la doc create-skill avec le comportement documente du champ `model` (bascule reelle pour le reste du tour) et le budget reel des descriptions (troncature a 1 536 caracteres par skill) ([`d7af963`](https://github.com/ToolsForSaaS/claude-workflow/commit/d7af963))
+- Enrichit la regle de versioning de `CLAUDE.md` pour exiger la mise a jour simultanee de `plugin.json`, `marketplace.json` (deux champs `version`) et `CHANGELOG.md` a chaque release ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
 
 ### Chore
 
