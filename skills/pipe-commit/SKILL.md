@@ -1,14 +1,7 @@
 ---
 name: pipe-commit
-description: Committer les changements en cours avec un message formate selon les conventions git du projet. Utiliser pour creer un commit propre a tout moment.
-model: sonnet
+description: Decouper le travail en commits-changesets clairs qui servent de doc technique, selon les conventions git. En cycle (pilotage present), decoupe tout le travail valide en plusieurs commits ; hors cycle, committe proprement les changements en cours.
 argument-hint: [description optionnelle du changement]
----
-
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
 ---
 
 ## Etape 0 — Analyser l'etat
@@ -20,55 +13,74 @@ Verifie l'etat du repo :
 
 Si rien a committer → signale-le et arrete-toi.
 
-## Etape 1 — Stager les changements
-
-Si des fichiers ne sont pas stages :
-
-- Propose les fichiers a stager (pas de `git add .` aveugle)
-- Exclure les fichiers sensibles (.env, credentials, etc.)
-- Demande confirmation si necessaire
-
-## Etape 2 — Formater le message
-
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (section Commits).
 
-A partir des changements stages et de l'argument utilisateur (si fourni), determine :
+Cherche un fichier de pilotage `.claude/plans/plan-*.md` correspondant a la branche courante :
 
-- **Type** : feat, fix, refactor, perf, docs, chore
-- **Scope** : module metier concerne (obligatoire pour feat/fix/refactor/perf)
-- **Description** : en francais, concise
-- **Body** : obligatoire si le changement n'est pas trivial — c'est le corps du commit qui documente le detail technique (le CHANGELOG reste court et pointe vers le commit). Liste a puces : le pourquoi, l'approche choisie, les impacts non evidents depuis le diff.
+- Present avec `Code valide` coche → **mode decoupage** (fin de cycle)
+- Absent → **mode simple** (commit ponctuel)
 
-Format : `emoji type(scope): description`
+## Mode decoupage (fin de cycle)
 
-## Etape 3 — Confirmer et committer
+Chaque commit est un **changeset** : une unite logique qui se lit seule. La liste des commits de la branche est la doc technique de la feature — le nom de chaque commit doit etre limpide, et son body porte le detail.
 
-Affiche le recap :
+Des commits ont pu etre crees au fil du dev (`/pipe-code` committe les unites terminees) : ce mode s'applique au **travail restant non commite**. Affiche d'abord les commits deja presents sur la branche pour situer le decoupage.
+
+### Etape 1 — Construire le plan de decoupage
+
+- Lis l'ensemble des changements restants (diff du working tree + fichiers non trackes)
+- Regroupe par unite logique : modele + migration, service metier, composant UI, config... Les tests accompagnent le changeset du comportement qu'ils verifient — pas de commit fourre-tout `tests`
+- Ordre logique : dependances d'abord ; chaque commit laisse idealement le projet coherent
+- Granularite = le fichier (staging par chemin). Si un meme fichier melange deux changesets, rattache-le au changeset principal et documente-le dans le body
+- Pour chaque changeset, redige le message complet selon `git-conventions` : titre `emoji type(scope): description`, body en puces (le pourquoi, l'approche choisie, les impacts non evidents depuis le diff)
+
+### Etape 2 — Presenter puis committer
+
+Affiche le plan de decoupage complet (un bloc par commit : message, body, fichiers), puis committe changeset par changeset sans redemander — un commit local est reversible.
+
+- Stage par chemins explicites, jamais `git add .`
+- Exclus les fichiers sensibles (.env, credentials) et signale tout fichier sans rapport avec le cycle
+- A la fin, verifie que `git status` est propre (le pilotage, gitignore, n'y apparait pas)
+
+Coche `Commits crees` dans le pilotage.
+
+### Etape 3 — Proposer la suite
 
 ```
-Commit propose :
+---
+N commits crees. Phase suivante : `/pipe-pr [ticket]` pour creer la Pull Request.
+```
+
+## Mode simple (commit ponctuel)
+
+### Etape 1 — Stager les changements
+
+- Stage les fichiers pertinents par chemin explicite (pas de `git add .` aveugle)
+- Exclure les fichiers sensibles (.env, credentials, etc.)
+- Ne demande confirmation que si un fichier sensible ou sans rapport evident avec le changement est present
+
+### Etape 2 — Committer
+
+A partir des changements stages et de l'argument utilisateur (si fourni), determine type, scope, description et body selon `git-conventions` (le body est obligatoire des que le changement n'est pas trivial — c'est lui qui documente le detail technique).
+
+Committe directement, sans demander confirmation — un commit local est reversible (`git reset --soft HEAD~1`), la confirmation systematique est de la friction inutile.
+
+Affiche le recap apres coup :
+
+```
+Commit cree :
 
 emoji type(scope): description
 
 - [puce du body si present]
-- [puce du body si present]
 
 Fichiers :
 - chemin/fichier.ts
-- chemin/autre.ts
 ```
 
-Demande confirmation puis commit.
+### Etape 3 — Push (optionnel)
 
-## Etape 4 — Push (optionnel)
-
-Si la branche a un upstream, propose de push :
-
-```
-Push vers origin/branche-courante ?
-```
-
-Ne push que sur confirmation explicite.
+Si la branche a un upstream, propose de push. Ne push que sur confirmation explicite.
 
 ---
 

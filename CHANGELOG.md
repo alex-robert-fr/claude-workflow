@@ -9,6 +9,34 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-12
+
+### Added
+
+- Ajoute `/pipe-ship` qui livre une issue planifiee en un seul geste — enchaine code, review, tests, changelog et PR, ne s'arrete que sur bloquant (incoherence de plan, bloquant de review, tests rouges apres 3 tentatives) et ne demande qu'une confirmation avant push ([`3fcfa3c`](https://github.com/ToolsForSaaS/claude-workflow/commit/3fcfa3c))
+- Ajoute le champ `Niveau` (A : pipeline complet, B : workflow leger sans changelog ni review formelle) dans le template `workflow-config`, consulte par `/pipe-ship` pour adapter sa route ([`d8fa7f5`](https://github.com/ToolsForSaaS/claude-workflow/commit/d8fa7f5))
+
+### Changed
+
+- **BREAKING** — Fait de `workflow-config` la source unique de configuration projet (niveau, plateforme, commandes, stack, conventions de nommage) ; l'ancien `tech-stack` reste lu en fallback et `/setup` propose la migration ([`d8fa7f5`](https://github.com/ToolsForSaaS/claude-workflow/commit/d8fa7f5))
+- `/pipe-commit` committe directement sans confirmation systematique — seul le push reste soumis a confirmation ([`2e54e3f`](https://github.com/ToolsForSaaS/claude-workflow/commit/2e54e3f))
+- `/pipe-changelog` associe les PR aux commits en un seul appel `gh` batch, n'execute l'audit de coherence historique qu'en release (ou sur demande) et ne demande plus qu'une confirmation unique avant ecriture ([`b644459`](https://github.com/ToolsForSaaS/claude-workflow/commit/b644459))
+- Retire le champ `model` du frontmatter de tous les skills : il bascule reellement le modele pour le reste du tour (auto-invocation comprise) et pouvait retrograder la session ([`d7af963`](https://github.com/ToolsForSaaS/claude-workflow/commit/d7af963))
+- Passe `/setup` et `/pipe-tag` en slash-only (`disable-model-invocation: true`) : leur description ne coute plus de contexte a chaque session ([`128de48`](https://github.com/ToolsForSaaS/claude-workflow/commit/128de48))
+- `/pipe-plan` propose `/pipe-ship` comme suite nominale du plan valide ([`3fcfa3c`](https://github.com/ToolsForSaaS/claude-workflow/commit/3fcfa3c))
+
+### Removed
+
+- **BREAKING** — Supprime 7 skills sans usage mesure : `/pipe-hello`, `/setup-mcp`, `/setup-ui-ux`, `/audit-lint`, `/audit-naming`, `/audit-skills` et `frontend-code-conventions` ([`b5099f0`](https://github.com/ToolsForSaaS/claude-workflow/commit/b5099f0))
+- **BREAKING** — Supprime `/setup-templates` ; son remplissage de placeholders est integre au diagnostic de `/setup` ([`7c1697c`](https://github.com/ToolsForSaaS/claude-workflow/commit/7c1697c))
+- **BREAKING** — Supprime le skill interne `_workflow-persona` et son chargement systematique en tete de chaque skill ([`b3b567f`](https://github.com/ToolsForSaaS/claude-workflow/commit/b3b567f))
+- **BREAKING** — Retire `/create-skill` de la distribution du plugin — il devient outillage local du repo claude-workflow ([`dd48610`](https://github.com/ToolsForSaaS/claude-workflow/commit/dd48610))
+
+### Fixed
+
+- Corrige la detection du dernier tag dans `/pipe-changelog` : la spec de tri `version:refSort` etait invalide et faisait echouer la commande a chaque run (`--sort=-version:refname`) ([`a7573db`](https://github.com/ToolsForSaaS/claude-workflow/commit/a7573db))
+- `/pipe-tag` met a jour la branche locale (`git pull --ff-only`) avant de tagger, pour ne plus poser de tag sur une branche principale en retard sur le remote ([`47c4b5a`](https://github.com/ToolsForSaaS/claude-workflow/commit/47c4b5a))
+
 ## [1.4.9] - 2026-07-12
 
 ### Added
@@ -188,7 +216,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.9...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.9...v1.5.0
 [1.4.9]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v1.4.9
 [1.4.8]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...v1.4.7

@@ -1,14 +1,7 @@
 ---
 name: pipe-changelog
-description: Generer ou mettre a jour CHANGELOG.md depuis les commits/tags. Entrees courtes orientees consommateur — le detail technique vit dans les corps de commits, le CHANGELOG pointe vers eux. Respecte Keep a Changelog + SemVer. Utiliser apres /pipe-test et avant /pipe-pr.
-model: sonnet
+description: Generer ou mettre a jour CHANGELOG.md depuis les commits/tags. Entrees courtes orientees metier — le detail technique vit dans les corps de commits et les PRs, le CHANGELOG pointe vers eux. Respecte Keep a Changelog + SemVer. Utilise au moment d'une release par /pipe-release, ou seul.
 argument-hint: [version a tagger ou rien pour Unreleased]
----
-
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
 ---
 
 ## Philosophie
@@ -24,10 +17,11 @@ Les changements purement techniques (refactors internes, tests, CI, dependances,
 ## Etape 0 — Verifications
 
 - [ ] Le repo a un remote `origin` configure
-- [ ] La branche courante n'est pas la branche par defaut
-- [ ] Il y a au moins un commit d'avance sur la branche par defaut
+- [ ] Il y a des changements a documenter : commits depuis le dernier tag (`git log <dernier-tag>..HEAD`), ou section `[Unreleased]` non vide a publier
 
 Si une verification echoue, signale-le clairement et arrete-toi.
+
+Contexte nominal : ce skill est applique par `/pipe-release` depuis la branche d'integration, avec une version en argument. Il reste invocable seul (mode `[Unreleased]` sans argument).
 
 **Migration** : si un fichier `TECHNICAL_CHANGES.md` existe a la racine du projet, signaler qu'il est obsolete et proposer sa suppression — son contenu reste accessible dans l'historique git du fichier et dans les commits.
 
@@ -35,7 +29,7 @@ Si une verification echoue, signale-le clairement et arrete-toi.
 
 Recupere les informations necessaires :
 
-1. **Dernier tag de version** — via `git tag --sort=-version:refSort -l 'v*' | head -1`. Si aucun tag, c'est la premiere version.
+1. **Dernier tag de version** — via `git tag --sort=-version:refname -l 'v*' | head -1`. Si aucun tag, c'est la premiere version.
 2. **URL du remote** — via `git remote get-url origin`, transforme en URL HTTPS pour les liens de comparaison (ex: `git@github.com:org/repo.git` → `https://github.com/org/repo`).
 3. **Phase de versioning** — si le dernier tag est `0.x.y`, on est en pre-v1.0.0. Sinon, post-v1.0.0.
 4. **Version cible** — si un argument est fourni (ex: `1.3.0`), c'est la version a publier. Sinon, on met a jour la section `[Unreleased]`.
@@ -61,12 +55,12 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
 1. **Lister les commits** — `git log <dernier-tag>..HEAD --format="%h %s"` (ou `git log --format="%h %s"` si aucun tag). Le `%h` donne le SHA court de chaque commit.
 2. **Filtrer** — ne retenir que les commits a impact consommateur ou deploiement, selon la section "Mapping prefixe de commit → type" et la section "Exclusions" du referentiel :
    - `feat`, `fix`, `perf` → retenus
-   - `refactor`, `docs`, `chore`, `test` → exclus par defaut ; retenus uniquement si impact consommateur avere (API publique modifiee, doc user-facing, config publique, variable d'environnement requise). En cas de doute, exclure et demander confirmation.
+   - `refactor`, `docs`, `chore`, `test` → exclus par defaut ; retenus uniquement si impact consommateur avere (API publique modifiee, doc user-facing, config publique, variable d'environnement requise). En cas de doute, exclure et signaler l'ambiguite (marqueur `⚠️`) dans l'affichage.
    - Exclusions systematiques : merges, fixups, typos purs, reverts annules.
 3. **Detecter les changesets** — si `.changeset/` existe et contient des fichiers `.md`, les utiliser comme source primaire au lieu des commits.
 4. **Classer par type** — pour chaque commit retenu, determiner le type Keep a Changelog (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`) selon le mapping du referentiel.
-5. **Enrichir avec les references** — pour chaque commit retenu, trouver la PR associee :
-   - Utiliser `gh pr list --state merged --search "SHA" --json number --jq '.[0].number'` pour trouver la PR qui a merge ce commit.
+5. **Enrichir avec les references** — trouver la PR associee a chaque commit en **un seul appel batch** (jamais un appel `gh` par commit) :
+   - `gh pr list --state merged --limit 50 --json number,mergeCommit,headRefName` puis associer localement chaque commit a sa PR (via le merge commit ou la branche d'origine, `git log --format=%h` sur la plage concernee).
    - Si une PR est trouvee, c'est la reference de l'entree. Si pas de PR (commit direct), utiliser le SHA court en fallback.
    - Si `gh` echoue ou est indisponible, utiliser le SHA seul — ne pas bloquer la generation.
 6. **Reformuler court** — appliquer la section "Rediger pour le consommateur" de `reference.md` et sa sous-section "Regles de redaction". Le **template mental** `[Verbe actif present] [feature publique] [effet visible utilisateur]` aide a structurer la formulation.
@@ -89,11 +83,13 @@ Changements detectes :
 [N] commits exclus (techniques, merges, fixups...)
 ```
 
-Demande confirmation si le classement semble correct avant de continuer.
+Ne pas demander de confirmation ici — la confirmation unique a lieu a l'etape 4, sur le resultat final. Si un classement est ambigu, le signaler dans l'affichage (marqueur `⚠️`) pour que l'utilisateur puisse corriger a l'etape 4.
 
-## Etape 2.5 — Auditer la coherence historique
+## Etape 2.5 — Auditer la coherence historique (releases uniquement)
 
-Avant de toucher aux entrees, verifier que le CHANGELOG existant ne contient pas d'entrees mal placees : une PR mergee apres la date d'un tag ne peut pas figurer sous la section de ce tag.
+**Executer cette etape uniquement si une version est publiee** (argument fourni a l'etape 1) **ou si l'utilisateur le demande explicitement.** En mode `[Unreleased]`, passer directement a l'etape 3 — l'audit systematique coutait plusieurs appels `gh` a chaque run pour un historique qui n'a pas bouge.
+
+Verifier que le CHANGELOG existant ne contient pas d'entrees mal placees : une PR mergee apres la date d'un tag ne peut pas figurer sous la section de ce tag.
 
 Procedure (voir `reference.md` section "Coherence versions/dates") :
 
@@ -112,7 +108,7 @@ Entrees mal placees (a deplacer vers [Unreleased]) :
   - PR #N (mergee le YYYY-MM-DD) : "texte de l'entree"
 ```
 
-Demander confirmation avant de reorganiser. Cette etape est rapide si le fichier est sain — la mentionner brievement et passer a l'etape suivante.
+Integrer la reorganisation proposee au recap de l'etape 4 — pas de confirmation separee ici. Cette etape est rapide si le fichier est sain — la mentionner brievement et passer a l'etape suivante.
 
 ## Etape 3 — Generer / mettre a jour le CHANGELOG
 
@@ -159,7 +155,7 @@ Une fois confirme :
 
 ```
 ---
-CHANGELOG mis a jour. Prochaine etape : `/pipe-pr` pour soumettre la branche.
+CHANGELOG mis a jour. En contexte release : retour a `/pipe-release` (PR vers la branche de production).
 ```
 
 ---

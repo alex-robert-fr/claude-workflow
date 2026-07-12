@@ -1,13 +1,7 @@
 ---
 name: setup
-description: Configurer un projet pour le workflow AI-Driven Development. Scaffolde CLAUDE.md, workflow-config, hooks, plans et rules en une seule passe. Utiliser sur un nouveau projet ou pour completer une config existante.
-model: sonnet
----
-
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
+description: Configurer un projet pour le workflow AI-Driven Development. Scaffolde CLAUDE.md, workflow-config, hooks, plans et rules en une seule passe, et remplit les placeholders des templates projet. Utiliser sur un nouveau projet ou pour completer une config existante.
+disable-model-invocation: true
 ---
 
 ## Etape 0 — Diagnostic
@@ -16,10 +10,9 @@ Analyse l'etat actuel du projet et identifie ce qui manque :
 
 - [ ] `CLAUDE.md` existe a la racine
 - [ ] `.claude/skills/workflow-config/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
-- [ ] `.claude/skills/tech-stack/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
 - [ ] `.claude/settings.json` existe avec des hooks configures
 - [ ] `.claude/plans/` existe
-- [ ] `.mcp.exemple.json` existe
+- [ ] Aucun autre fichier de `.claude/skills/` ne contient de placeholders `<!-- ... -->`
 
 Affiche un recap :
 
@@ -29,7 +22,6 @@ Affiche un recap :
 ✅ CLAUDE.md
 ❌ workflow-config (manquant)
 ❌ hooks (non configures)
-⚠️ tech-stack (placeholders non remplis)
 ...
 ```
 
@@ -53,20 +45,20 @@ Si `.claude/skills/workflow-config/SKILL.md` n'existe pas, utilise Read pour cha
 
 1. **Plateforme Git** : GitHub, GitLab ou Gitea ? (detecte depuis `git remote -v`)
 2. **Issue tracker** : GitHub Issues, Jira, Linear ? (detecte depuis les MCP configures)
-3. **Branche par defaut** : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`)
+3. **Branche par defaut** (base des features) : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`) — et **branche de production** (cible des releases) si le projet en a une distincte (ex: develop → main)
 4. **Commande lint** : biome check, eslint, etc. ? (detecte depuis package.json scripts)
 5. **Commande format** : biome format --write, prettier --write, etc. ?
 6. **Commande test** : vitest, jest, npm test, etc. ?
 7. **Commande build** : tsc --noEmit, npm run build, etc. ?
 8. **Notification** : canal Slack, aucun ?
 
-Propose des valeurs detectees automatiquement, demande confirmation, puis ecris le fichier.
+Les sections Stack technique, Architecture et Nommage du template se remplissent a partir de ce qui est detecte (package.json, structure des dossiers, configs). Propose des valeurs detectees automatiquement, demande confirmation, puis ecris le fichier.
 
-## Etape 3 — tech-stack
+Si le projet a encore un `.claude/skills/tech-stack/SKILL.md` (config legacy), propose de fusionner son contenu dans `workflow-config` et de le supprimer.
 
-Si `.claude/skills/tech-stack/SKILL.md` n'existe pas, utilise Read pour charger `${CLAUDE_SKILL_DIR}/tech-stack-template.md` comme squelette. Si le fichier contient des placeholders, propose de les remplir a partir de ce qui a ete detecte a l'etape 2.
+Meme mecanique pour tout autre fichier de `.claude/skills/` contenant des placeholders `<!-- ... -->` (detecte a l'etape 0) : proposer une valeur detectee automatiquement, poser une question courte si rien n'est detectable, confirmer, puis remplacer le placeholder. Ne jamais toucher aux champs deja remplis.
 
-## Etape 4 — Hooks
+## Etape 3 — Hooks
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md` pour les templates de hooks.
 
@@ -82,7 +74,7 @@ Si un `.claude/settings.json` existe deja, merge les hooks sans ecraser les perm
 
 Affiche la config generee et demande confirmation avant d'ecrire.
 
-## Etape 5 — Repertoires
+## Etape 4 — Repertoires
 
 Cree les repertoires manquants :
 
@@ -91,11 +83,7 @@ Cree les repertoires manquants :
 
 Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres).
 
-## Etape 6 — MCP
-
-Si `.mcp.exemple.json` n'existe pas et que des MCP sont utilises dans les skills, propose de lancer la logique de `/setup-mcp`.
-
-## Etape 7 — Recap final
+## Etape 5 — Recap final
 
 ```
 ## Setup termine — [nom du projet]
@@ -108,10 +96,12 @@ Si `.mcp.exemple.json` n'existe pas et que des MCP sont utilises dans les skills
 - ✅ .claude/rules/
 
 ### Pipeline disponible
-/pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
+Cycle : /pipe-plan → /pipe-test → [review humaine des tests] → /pipe-code (session neuve) → /pipe-review (session neuve, review humaine) → /pipe-commit → /pipe-pr
+Reprise a tout moment : /pipe-ship [ticket]
+Release : /pipe-release → [merge + deploiement] → /pipe-tag
 
 ### Prochaine etape
-Lance `/pipe-hello` pour commencer ta session de travail.
+Lance `/pipe-plan [ticket]` pour demarrer un cycle.
 ```
 
 ---

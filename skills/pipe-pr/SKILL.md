@@ -1,19 +1,12 @@
 ---
 name: pipe-pr
-description: Creer ou mettre a jour une Pull Request GitHub. Genere titre, description et commentaire d'iteration selon les conventions. Utiliser apres /pipe-code ou pour soumettre une branche.
-model: sonnet
+description: Creer ou mettre a jour une Pull Request. Genere titre, description et commentaire d'iteration selon les conventions, avec les infos du ticket (JIRA ou issue), la version cible et les changesets. Utiliser apres /pipe-commit ou pour soumettre une branche.
 argument-hint: [rien — detecte automatiquement la branche courante]
----
-
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
 ---
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` puis verifie :
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` (si absent, utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` — config legacy). Puis verifie :
 
 - [ ] Le repo a un remote `origin` configure
 - [ ] La branche courante n'est pas la branche par defaut (on ne cree pas de PR depuis main/develop)
@@ -36,8 +29,10 @@ Confirme avant de push si c'est le premier push de cette branche.
 Rassemble les informations necessaires :
 
 - **Branche courante** — detectee automatiquement
-- **Issue liee** — recupere-la via MCP GitHub (depuis le numero dans le nom de branche, ex: `feat/42-...` → issue #42)
-- **Diff** — analyse les fichiers crees et modifies pour comprendre ce qui a reellement ete implemente
+- **Pilotage** — si un fichier `.claude/plans/plan-*.md` correspond a la branche, lis-le : ticket (cle JIRA ou issue), version cible, decisions — c'est la source principale du contexte
+- **Ticket lie** — depuis le pilotage, ou l'identifiant dans le nom de branche (`feat/42-...` → issue #42 via MCP GitHub ; `feat/PROJ-42-...` → ticket JIRA via MCP Atlassian)
+- **Commits** — la liste des commits de la branche : ce sont les changesets, ils structurent la partie technique du body
+- **Diff** — analyse les fichiers crees et modifies pour verifier que la description reflete ce qui a reellement ete implemente
 
 ## Etape 2 — Verifier si une PR existe deja
 
@@ -49,14 +44,18 @@ Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (sec
 
 Que ce soit pour une nouvelle PR ou une mise a jour, la description suit le format defini dans git-conventions et doit toujours refleter l'etat actuel complet de la PR — jamais de mention "ajoute", "mis a jour" ou "nouveau". C'est le role du commentaire d'iteration (etape 4).
 
-### Auto-close des issues (obligatoire)
+### Reference au ticket (obligatoire)
 
-Le body de la PR doit **toujours** contenir `Closes #XX` dans la section Contexte pour chaque issue liee. Cela ferme automatiquement les issues au merge.
+Chaque PR reference son ticket dans la section Contexte, selon le tracker :
 
-- Une issue : `Closes #42`
-- Plusieurs issues : `Closes #12, Closes #15`
+- **Issue native de la plateforme git** : `Closes #42` (ferme automatiquement l'issue au merge ; plusieurs issues → `Closes #12, Closes #15`)
+- **Ticket JIRA** : pas d'auto-close — reference la cle avec son lien (`Ticket : [PROJ-42](url)`), et si le pilotage indique une version cible, ajoute `Version cible : 0.5.2`
 
-Si aucune issue n'est identifiable depuis le nom de branche, demande le numero a l'utilisateur avant de continuer — ne jamais omettre cette ligne.
+Si aucun ticket n'est identifiable, demande-le a l'utilisateur avant de continuer — ne jamais omettre cette reference.
+
+### Changesets
+
+Le body liste les commits de la branche (titre de chaque commit) — c'est le sommaire technique de la PR : le lecteur qui veut le detail ouvre le commit correspondant.
 
 ## Etape 4 — Rediger le commentaire d'iteration (mise a jour uniquement)
 
@@ -91,7 +90,7 @@ Une fois confirmation recue :
 
 **Nouvelle PR :**
 
-- Cree la PR via MCP GitHub (base: branche par defaut definie dans `tech-stack`, head: branche courante)
+- Cree la PR via MCP GitHub (base: branche par defaut definie dans `workflow-config`, head: branche courante)
 
 ```
 PR creee : [URL]
@@ -105,12 +104,17 @@ PR creee : [URL]
 PR mise a jour : [URL]
 ```
 
+### Fin de cycle
+
+Si un fichier de pilotage existe pour cette branche, **supprime-le** apres la creation de la PR (c'etait un document de travail — le cycle du ticket est termine) et signale-le en une ligne.
+
 Propose la suite :
 
 ```
 ---
-PR soumise. Prochaine etape :
-- Apres merge sur main : `/pipe-tag [vX.Y.Z]` pour creer le tag de release.
+PR soumise vers [branche par defaut]. Cycle du ticket termine.
+Quand assez de features sont mergees : `/pipe-release` pour preparer la release
+vers la branche de production, puis `/pipe-tag` apres merge et deploiement.
 ```
 
 ---
