@@ -1,86 +1,81 @@
 ---
 name: pipe-test
-description: Executer les tests du projet avec boucle corrective bornee (max 3 tentatives). Utiliser apres /pipe-review et avant /pipe-changelog.
-argument-hint: [rien ou fichier/pattern specifique]
+description: Ecrire les tests unitaires d'une fonctionnalite avant son implementation, depuis le plan du fichier de pilotage. Assez de tests pour couvrir le comportement, pas plus. S'arrete pour la review humaine des tests — ils deviennent le contrat du dev. Utiliser apres /pipe-plan.
+argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` pour identifier la commande de test du projet.
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md`, puis localise le fichier de pilotage :
 
+- Argument fourni → `.claude/plans/plan-<identifiant>.md`
+- Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
+
+Verifie :
+
+- [ ] Le pilotage existe (sinon → lancer `/pipe-plan` d'abord)
+- [ ] `Plan valide` est coche dans son etat
 - [ ] Une commande de test est configuree dans `workflow-config`
-- [ ] La commande de test est executable (`which` ou `--version` sur l'outil)
 
-Si pas de commande de test configuree → signale-le et arrete-toi :
+Si une verification echoue, signale-le clairement et arrete-toi.
 
-```
-Pas de commande de test configuree dans workflow-config.
-Configure la section "Test" de `.claude/skills/workflow-config/SKILL.md` puis relance /pipe-test.
-```
+## Etape 1 — Creer la branche
 
-## Etape 1 — Executer les tests
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (conventions de branches).
 
-Lance la commande de test definie dans `workflow-config`.
+Si le pilotage indique deja une branche (reprise), fais simplement un checkout dessus. Sinon, identifie la branche par defaut depuis `workflow-config` (`BASE_BRANCH`) et execute exactement :
 
-Si un argument est passe (fichier ou pattern), restreins les tests a ce scope si la commande le supporte.
+1. `git checkout <BASE_BRANCH>`
+2. `git pull origin <BASE_BRANCH>`
+3. `git checkout -b <nouvelle-branche>`
 
-## Etape 2 — Boucle corrective (max 3 tentatives)
+Ne jamais hardcoder `main` ou `develop` — toujours lire la valeur depuis `workflow-config`.
 
-Si tous les tests passent → va directement a l'etape 3.
+Note la branche dans la section Branche du pilotage et annonce-la.
 
-Si des tests echouent, pour chaque tentative (max 3) :
+## Etape 2 — Ecrire les tests
 
-1. **Analyse l'erreur** — lis le output du test, identifie la cause root
-2. **Classifie le probleme** :
-   - **Corrigeable** : typo, import manquant, assertion a mettre a jour, mock incomplet, type incorrect
-   - **Structurel** : logique metier fausse, architecture incompatible, dependance externe cassee, test obsolete qui ne correspond plus au besoin
-3. **Si corrigeable** → corrige, commite la correction (`🐛 fix(scope): correction test — [description]`), relance les tests
-4. **Si structurel** → signale et arrete-toi immediatement :
+Ecris les tests unitaires depuis le plan (comportement attendu, cas limites, section Tests) :
 
-```
-⚠️ Probleme structurel detecte — intervention humaine requise.
+- **La regle de couverture** : si tous ces tests passent, la fonctionnalite est bonne. Chaque test verifie un comportement qui compte — cas nominal, cas limites identifies au plan, cas d'erreur. Pas de tests pour gonfler le compteur.
+- Framework et conventions de test du projet (`workflow-config`)
+- **N'implemente pas la fonctionnalite** : uniquement les tests, plus le squelette minimal si la suite en a besoin pour s'executer (signatures vides, types — aucune logique)
 
-Fichier(s) : [fichiers concernes]
-Erreur : [description precise]
-Cause probable : [analyse]
+## Etape 3 — Verifier que les tests sont rouges
 
-Ce probleme ne peut pas etre corrige automatiquement parce que [raison].
-```
+Lance la commande de test. Les nouveaux tests **doivent echouer** — la fonctionnalite n'existe pas encore, c'est le principe. Verifie deux choses :
 
-Apres 3 tentatives sans succes :
+- Ils echouent pour la **bonne raison** (assertion fausse, module a creer), pas a cause d'une erreur d'ecriture dans les tests eux-memes
+- Les tests existants du projet continuent, eux, de passer
+
+## Etape 4 — Review humaine des tests (pause)
+
+Presente les tests en langage metier, un comportement par ligne :
 
 ```
-⚠️ Tests en echec apres 3 tentatives de correction.
+## Tests proposes — [ticket]
 
-Tentative 1 : [ce qui a ete tente] → [resultat]
-Tentative 2 : [ce qui a ete tente] → [resultat]
-Tentative 3 : [ce qui a ete tente] → [resultat]
-
-Probleme persistant : [description]
-Action requise : intervention humaine necessaire.
+`chemin/fichier.spec.ts`
+- quand [situation], alors [comportement attendu]
+- quand [cas limite], alors [comportement attendu]
 ```
 
-## Etape 3 — Rapport
+C'est le moment des echanges : ajuste, ajoute ou supprime selon les retours de l'utilisateur, jusqu'a sa validation explicite. Ces tests deviennent le **contrat** de l'implementation — ils ne seront plus modifies sans accord humain.
 
-```
-## Tests — [branche]
+Une fois valides :
 
-### Statut : ✅ Tous passent / ❌ Echecs
+- Coche `Tests ecrits` et `Tests valides` dans le pilotage
+- Liste les fichiers de tests dans sa section Tests (un comportement couvert par ligne)
+- Consigne dans Decisions les choix faits pendant la review
 
-Commande : [commande executee]
-Tests executes : N
-Tests passes : N
-Tests echoues : N
+## Etape 5 — Proposer la suite
 
-### Corrections appliquees (si applicable)
-- Tentative N : `fichier.ts` — [description de la correction]
-```
-
-Si tous les tests passent, propose la suite :
+Le dev se fait dans une session neuve, avec un contexte propre — le pilotage et les tests suffisent a la reprise.
 
 ```
 ---
-Tests OK. Prochaine etape : `/pipe-changelog` pour mettre a jour le CHANGELOG.
+Tests valides. Phase suivante : le dev, dans une NOUVELLE session :
+ouvre une session et lance `/pipe-ship [ticket]` (ou `/pipe-code [ticket]`).
 ```
 
 ---
