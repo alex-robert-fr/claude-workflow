@@ -5,20 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Les détails techniques de chaque changement sont documentés dans les commits et pull requests liés.
+
 ## [Unreleased]
+
+## [1.4.9] - 2026-07-12
+
+### Added
+
+- Le référentiel changelog gagne une section « Notes de déploiement » : BREAKING en blockquote sous l'en-tête de version, variables d'environnement requises et dépendances inter-services (`Requiert <service> ≥ x.y.z`) ([`a726e2a`](https://github.com/ToolsForSaaS/claude-workflow/commit/a726e2a))
 
 ### Changed
 
-- Aligne les descriptions de `plugin.json` et `marketplace.json` pour inclure toutes les etapes du pipeline (les anciennes descriptions courtes omettaient `changelog` et `tag`) ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
-- Refond la presentation du `README.md` autour d'une nouvelle section "Pourquoi ce plugin ?" qui resume le probleme adresse et les profils cibles (devs solo, equipes) ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
-- Reorganise les categories de skills dans le `README.md` : nouvelle categorie "Utilitaires" pour `pipe-commit` et `worktree`, et scission de "Conventions" en "Referentiels" et "Interne" ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
-- Transforme chaque skill liste dans le `README.md` en lien cliquable vers son fichier `SKILL.md` correspondant ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
-- Explicite dans le `README.md` que la lecture d'issues est compatible GitHub et Jira mais que la creation d'issues et de Pull Requests reste sur GitHub uniquement ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
-- Ajoute une section "Ressources" au `README.md` avec liens vers `CHANGELOG.md`, le repo GitHub et `CLAUDE.md` ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- `/pipe-changelog` génère désormais un CHANGELOG unique, court et orienté consommateur : `TECHNICAL_CHANGES.md` est abandonné, le détail technique vit dans les corps de commits vers lesquels chaque entrée pointe, et le skill propose la suppression du fichier obsolète dans les projets qui en ont un ([`a726e2a`](https://github.com/ToolsForSaaS/claude-workflow/commit/a726e2a))
+- Le corps de commit devient obligatoire pour tout changement non trivial (`git-conventions`, `/pipe-commit`) — c'est lui qui documente le détail technique ([`a726e2a`](https://github.com/ToolsForSaaS/claude-workflow/commit/a726e2a))
+- Refond le `README.md` : nouvelle section « Pourquoi ce plugin ? », catégories de skills réorganisées, liens cliquables vers chaque skill, compatibilité GitHub/Jira explicitée et section « Ressources » ([`ef20049`](https://github.com/ToolsForSaaS/claude-workflow/commit/ef20049))
+- Aligne les descriptions de `plugin.json` et `marketplace.json` sur toutes les étapes du pipeline ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
 
 ### Fixed
 
-- Synchronise la version annoncee dans `marketplace.json` (passe de `1.0.0` a `1.4.8`) pour aligner la version visible sur la marketplace publique avec la version reelle du plugin ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
+- Synchronise la version annoncée dans `marketplace.json` avec la version réelle du plugin ([`e6cfb84`](https://github.com/ToolsForSaaS/claude-workflow/commit/e6cfb84))
 
 ## [1.4.8](https://github.com/ToolsForSaaS/claude-workflow/releases/tag/v1.4.8) - 2026-04-29
 
@@ -182,7 +188,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.9...HEAD
+[1.4.9]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v1.4.9
+[1.4.8]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.5...v1.4.6
 [1.4.5]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.4...v1.4.5
