@@ -1,79 +1,32 @@
 ---
 name: pipe-code
-description: Implementer du code a partir d'un plan ou d'une issue. Cree la branche, ecrit le code, commit chaque etape. Utiliser apres /pipe-plan ou avec un numero d'issue.
-model: opus
-argument-hint: [numero issue ou rien si plan deja present]
----
-
-## Contexte
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
-
----
-
-### Resolution du plan
-
-Le plan peut venir de trois sources (par ordre de priorite) :
-
-1. **Fichier de plan** — cherche dans `.claude/plans/` un fichier correspondant a l'issue ou au contexte. Si trouve, lis-le et utilise-le.
-2. **Conversation courante** — si `/pipe-plan` a ete lance dans cette session, le plan est dans la conversation.
-3. **Argument issue** — si un numero d'issue est passe et qu'aucun plan n'existe, lance `/pipe-plan` d'abord.
-
+description: Implementer une fonctionnalite en session dediee, guidee par les tests valides et le plan du fichier de pilotage. Code jusqu'a tests verts, en committant par changesets propres au fil de l'eau. Utiliser dans une nouvelle session apres /pipe-test.
+argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` puis verifie :
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md`, puis localise le fichier de pilotage :
 
-- [ ] Le repo a un remote `origin` configure
-- [ ] Le working tree est propre (pas de changements non commites qui bloqueraient un checkout)
-- [ ] La branche par defaut definie dans `tech-stack` (section Git) existe localement ou sur le remote
-- [ ] Un plan est disponible (fichier, conversation ou issue a planifier)
+- Argument fourni → `.claude/plans/plan-<identifiant>.md`
+- Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
 
-Si une verification echoue, signale-le clairement et arrete-toi. Ne tente pas de contourner.
+Verifie :
 
-## Etape 1 — Creer la branche
+- [ ] Le pilotage existe et `Tests valides` est coche (sinon → `/pipe-test` d'abord)
+- [ ] La branche courante est celle du pilotage (sinon `git checkout` dessus)
+- [ ] Les fichiers de tests listes dans le pilotage existent
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` pour les conventions de branches et commits.
+Lis le pilotage en entier : plan, decisions, notes de reprise — c'est tout le contexte de la session.
 
-Identifie la branche par defaut depuis le skill `tech-stack` (deja lu a l'etape 0, section Git, champ "Branche par defaut"). Stocke-la mentalement comme `BASE_BRANCH`.
+## Etape 1 — Implementer
 
-Execute exactement cette sequence :
+Suis le plan, guide par les tests :
 
-1. `git checkout <BASE_BRANCH>`
-2. `git pull origin <BASE_BRANCH>`
-3. `git checkout -b <nouvelle-branche>`
-
-Ou `<nouvelle-branche>` suit la convention definie dans `git-conventions`.
-
-Ne jamais hardcoder `main` ou `develop` — toujours lire la valeur depuis `tech-stack`.
-
-Annonce la branche creee avant de commencer.
-
-## Etape 2 — Implementer
-
-Suis les etapes du plan dans l'ordre. Pour chaque etape :
-
-### Regles de code
-
-Respecte les conventions definies dans le skill `tech-stack` (deja lu).
-
-Ne fais PAS de verification de style ou de formatage — c'est le role des hooks PostToolUse (lint/format automatique apres chaque ecriture) et de `/pipe-review` (verification par sub-agent).
-
-### Commits atomiques
-
-Chaque etape du plan terminee = un commit. Suis le format defini dans `git-conventions` (section Commits, deja charge).
-
-### Progression
-
-Apres chaque etape completee et committee, affiche :
-
-```
-Etape [N/total] — [Nom de l'etape]
-Commit : emoji type(scope): description
-Fichiers modifies :
-- chemin/vers/fichier.ts
-```
+- **Les tests valides sont le contrat.** Interdiction de les modifier pour les faire passer. Si un test semble faux, contradictoire ou impossible a satisfaire, stoppe et signale-le — c'est une decision humaine.
+- Boucle : coder → lancer les tests (commande de `workflow-config`) → corriger. L'implementation est terminee quand **tous** les tests passent — les nouveaux et les existants.
+- **Commits au fil de l'eau, uniquement par changesets propres.** Tu peux committer quand une unite logique est terminee et que les tests qui la couvrent passent — chaque commit suit `git-conventions` (utilise Read pour le charger) : titre limpide, body detaille, c'est de la doc technique. Ce qui ne forme pas encore une unite coherente reste dans le working tree — `/pipe-commit` decoupera le reste en fin de cycle. Jamais de commit fourre-tout ou "wip".
+- Respecte les conventions de `workflow-config` (stack, architecture, nommage). Pas de verification de style manuelle — c'est le role des hooks PostToolUse.
 
 Si une etape revele un probleme non anticipe dans le plan (fichier manquant, dependance absente, incoherence), **stoppe et signale-le** avant de continuer :
 
@@ -84,29 +37,35 @@ Option B : [approche]
 Comment tu veux proceder ?
 ```
 
-## Etape 3 — Recap final
+Consigne la decision prise dans la section Decisions du pilotage.
 
-Une fois tout le code ecrit, affiche le recap :
+## Etape 2 — Cloture
+
+Une fois tous les tests verts :
+
+- Coche `Dev termine` dans le pilotage
+- Note dans Notes de reprise les ecarts au plan et tout contexte utile a la review
+- Affiche le recap :
 
 ```
-## Implementation terminee — #XX
+## Implementation terminee — [ticket]
+
+Tests : ✅ N passent (dont M nouveaux)
+
+### Commits crees (le reste attend /pipe-commit)
+- emoji type(scope): description
 
 ### Fichiers crees
 - chemin/fichier.ts
 
 ### Fichiers modifies
 - chemin/fichier.ts
-
-### Commits
-- emoji type(scope): description
-- emoji type(scope): description
 ```
-
-Propose la suite du pipeline :
 
 ```
 ---
-Code termine. Prochaine etape : `/pipe-review` pour la review automatique.
+Phase suivante : la review, dans une NOUVELLE session :
+ouvre une session et lance `/pipe-ship [ticket]` (ou `/pipe-review [ticket]`).
 ```
 
 ---

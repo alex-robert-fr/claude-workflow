@@ -1,5 +1,52 @@
 # Pipe Plan — References
 
+## Fichier de pilotage
+
+Le fichier `.claude/plans/plan-<identifiant>.md` pilote tout le cycle d'un ticket. Il est gitignore (document de travail), mis a jour par chaque skill du pipeline, et supprime par `/pipe-pr` a la creation de la PR. C'est lui qui permet la reprise dans une session neuve.
+
+```markdown
+# Pilotage — [PROJ-42] Titre du ticket
+
+## Ticket
+- **Source** : JIRA PROJ-42 | GitHub #42 — [lien]
+- **Version cible** : 0.5.2 (ticket parent, si connue)
+- **Epic** : nom de l'epic, si connue
+- **Classification** : technique | metier | mixte
+
+## Etat
+- [ ] Plan valide
+- [ ] Tests ecrits
+- [ ] Tests valides (review humaine)
+- [ ] Dev termine (tests verts)
+- [ ] Code valide (review agent + humaine)
+- [ ] Commits crees
+- [ ] PR creee
+
+## Branche
+`feat/PROJ-42-titre-court` (creee par /pipe-test)
+
+## Decisions
+- [plan] Decision prise pendant le Q/R, avec sa raison en une ligne
+- [tests] Decision prise pendant la review humaine des tests
+- [dev] Decision prise face a un probleme non anticipe
+- [review] Decision prise pendant la review humaine du code
+
+## Plan
+[le plan technique — template ci-dessous]
+
+## Tests
+- `chemin/fichier.spec.ts` — comportements couverts, en une ligne
+
+## Notes de reprise
+- Ecarts au plan, points ouverts, contexte utile pour la session suivante
+```
+
+Regles :
+
+- Chaque skill coche les cases de l'etat **en fin de phase**, jamais en avance
+- Les cases de review humaine (`Tests valides`, `Code valide`) ne se cochent qu'apres validation explicite de l'utilisateur
+- La section Decisions est un journal : on ajoute, on ne reecrit pas
+
 ## Template de plan technique
 
 ```markdown

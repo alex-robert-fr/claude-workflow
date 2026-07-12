@@ -1,7 +1,6 @@
 ---
 name: worktree
 description: Creer et gerer des worktrees git pour travailler en parallele sur plusieurs branches. Utiliser pour isoler le travail sur une issue sans perdre le contexte courant.
-model: sonnet
 argument-hint: [create|list|remove|switch] [branche]
 allowed-tools: Read, Bash(git *)
 ---
@@ -11,8 +10,6 @@ allowed-tools: Read, Bash(git *)
 - Worktrees actifs : !`git worktree list`
 - Branche courante : !`git branch --show-current`
 - Repertoire du repo : !`git rev-parse --show-toplevel`
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../_workflow-persona/SKILL.md` avant de commencer.
 
 ---
 

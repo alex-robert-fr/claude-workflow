@@ -1,6 +1,6 @@
 # claude-workflow
 
-Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : setup, plan, code, review, test, PR.
+Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : plan co-construit, tests d'abord, dev guide par les tests, review, commits-changesets, PR, release.
 
 ## Plugin
 
@@ -14,18 +14,26 @@ Structure : `.claude-plugin/plugin.json` (manifest), `skills/nom/SKILL.md` (skil
 
 ## Pipeline
 
-Le workflow suit un pipeline sequentiel avec des gates de validation entre chaque etape. L'humain decide quand passer a l'etape suivante.
+Cycle d'une demande metier (ticket JIRA ou issue), pilote par un **fichier de pilotage** dans `.claude/plans/` du projet cible (gitignore, supprime a la PR). L'humain intervient a deux pauses : la review des tests et la review du code. Le dev et la review se font chacun dans une session neuve — le pilotage porte le contexte de reprise.
 
 ```
-/setup → /pipe-hello → /pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
+/pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
+→ session neuve : /pipe-code (guide par les tests, changesets au fil de l'eau)
+→ session neuve : /pipe-review (format/lint/tests outilles + agent haute valeur + review humaine)
+→ /pipe-commit (decoupage en changesets) → /pipe-pr (vers la branche d'integration)
 ```
 
-Chaque skill guide vers le skill suivant. Pas de skill monolithique — chaque etape est invocable independamment.
+`/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Les skills unitaires restent invocables independamment.
+
+Release, quand assez de features sont mergees sur la branche d'integration : `/pipe-release` (CHANGELOG oriente metier + PR integration → production) → [merge + deploiement] → `/pipe-tag`.
+
+Voie rapide : les changements sans comportement a tester (typo, libelle, bump mineur) passent par `/pipe-commit` sans ticket ni pilotage. Les tickets techniques (refactor, migration) suivent le cycle complet avec les tests existants comme contrat (+ caracterisation si zone mal couverte).
 
 ## Regles
 
 - Les fichiers dans `skills/` sont **partages** — distribues via le plugin
-- Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`
+- `.claude/skills/` contient l'outillage local du repo (create-skill) — jamais distribue
+- Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
 - La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM
@@ -34,7 +42,7 @@ Chaque skill guide vers le skill suivant. Pas de skill monolithique — chaque e
 
 ## Versioning
 
-Lors d'une release (`/pipe-changelog` avec version + `/pipe-tag`), toujours mettre a jour la version simultanement dans :
+Lors d'une release (`/pipe-release` puis `/pipe-tag`), toujours mettre a jour la version simultanement dans :
 - `.claude-plugin/plugin.json` (champ `version`)
 - `.claude-plugin/marketplace.json` (champs `metadata.version` ET `plugins[0].version`)
 - `CHANGELOG.md`
@@ -51,5 +59,5 @@ Les conventions git (commits, branches, PRs) sont definies dans `skills/git-conv
 - Skills invocables : `user-invocable: true` (defaut)
 - Skills expertise : `user-invocable: false`
 - `$ARGUMENTS` toujours en fin de skill invocable
-- Prefixes : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits), `*-conventions` (expertise), `_*` (interne)
-- Chaque skill declare un `model` dans son frontmatter : `opus` (complexe), `sonnet` (standard), `haiku` (simple). Voir `skills/create-skill/reference.md` section `model` pour la grille complete.
+- Prefixes : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `*-conventions` (expertise)
+- Pas de champ `model` dans le frontmatter des skills : il bascule reellement le modele pour le reste du tour (auto-invocation comprise) et peut retrograder la session. Voir `.claude/skills/create-skill/reference.md` section `model`.

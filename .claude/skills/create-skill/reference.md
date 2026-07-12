@@ -80,41 +80,13 @@ Si omis : `general-purpose` par defaut.
 
 ---
 
-## model — tiers de modele
+## model — bascule reelle de modele
 
-Indique le tier de modele recommande pour l'execution du skill. Permet d'optimiser les couts en adaptant la puissance du modele a la complexite de la tache.
+**Comportement verifie (doc officielle)** : le champ `model` bascule reellement le modele quand le skill est actif, **pour le reste du tour courant** — y compris quand Claude auto-invoque le skill via le tool Skill. L'override n'est pas persiste : le modele de session reprend au prompt suivant.
 
-### Valeurs possibles
+**Consequence** : ce n'est pas une "recommandation". Un `model: haiku` sur un skill d'expertise auto-invocable peut retrograder le reste d'un tour d'implementation vers Haiku ; un `model: opus` peut retrograder une session qui tourne sur un modele superieur.
 
-| Valeur | Modele | Usage |
-|--------|--------|-------|
-| `opus` | Claude Opus | Raisonnement complexe, multi-etapes, generation de code |
-| `sonnet` | Claude Sonnet | Taches structurees, reviews, configuration |
-| `haiku` | Claude Haiku | Taches simples, affichage, reference pure |
-
-Si omis : pas de recommandation (le modele de la session est utilise).
-
-### Comportement
-
-- **Skills inline** (sans `context: fork`) : le champ sert de **recommandation** pour l'utilisateur. Claude Code ne force pas le modele automatiquement — l'utilisateur choisit de switcher avant d'invoquer.
-- **Skills avec `context: fork`** : le champ controle le modele du sub-agent. Note : le type d'agent (`Explore`, `Plan`) peut fixer son propre modele (ex. `Explore` utilise Haiku). Dans ce cas, le type d'agent a la precedence sur `model`.
-- **Sub-agents lances par le skill** (via Agent tool) : le skill peut passer `model: "sonnet"` ou `model: "haiku"` dans l'appel Agent pour controler le cout des sous-taches.
-
-### Criteres de choix
-
-| Tier | Criteres | Exemples |
-|------|----------|----------|
-| `opus` | Raisonnement multi-etapes, generation de code, analyse d'issues, planification technique | `pipe-code`, `pipe-plan`, `create-issue`, `create-skill` |
-| `sonnet` | Taches structurees, reviews, generation de texte formate, configuration, audits | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `setup`, `audit-*` |
-| `haiku` | Affichage simple, formatage, reference pure | `pipe-hello`, `*-conventions` |
-
-### Grille de categorisation (21 skills)
-
-| Tier | Skills |
-|------|--------|
-| `opus` | `pipe-code`, `pipe-plan`, `create-issue`, `create-skill` |
-| `sonnet` | `pipe-review`, `pipe-pr`, `pipe-changelog`, `pipe-test`, `pipe-commit`, `pipe-tag`, `worktree`, `setup`, `setup-templates`, `setup-ui-ux`, `setup-mcp`, `audit-skills`, `audit-lint`, `audit-naming` |
-| `haiku` | `pipe-hello`, `git-conventions`, `frontend-code-conventions`, `_workflow-persona` |
+**Regle du plugin** : ne pas declarer `model` dans les skills — le modele de la session est le choix de l'utilisateur. Pour controler le cout des sous-taches, passer `model` dans les appels au tool **Agent** (sub-agents), pas dans le frontmatter.
 
 ---
 
@@ -154,21 +126,14 @@ Charge les skills depuis `../shared-config/.claude/skills/`.
 
 ## Budget des descriptions
 
-Les descriptions sont chargees dans le contexte pour que Claude sache quels skills existent.
+Les descriptions sont chargees dans le contexte pour que Claude sache quels skills existent — dans **chaque session de chaque projet** ou le plugin est actif.
 
-- **Budget dynamique** : 2% de la fenetre de contexte
-- **Minimum** : 16 000 caracteres
-- **Si depasse** : les skills les moins prioritaires sont exclus
-
-### Override
-
-```bash
-SLASH_COMMAND_TOOL_CHAR_BUDGET=50000 claude
-```
+- La combinaison `description` + `when_to_use` est **tronquee a 1 536 caracteres** par skill dans le listing (doc officielle, v2.1.196+)
+- Un skill jamais utilise coute donc son entree de listing a chaque session, pour zero benefice
 
 ### Verification
 
-Lancer `/context` pour voir les avertissements si des skills sont exclus.
+Lancer `/context` : la ligne Skills affiche la taille reelle du listing tel que recu par le modele.
 
 ### Optimisation
 
