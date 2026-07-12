@@ -104,7 +104,7 @@ Sur un projet **niveau B** (script/outil declare dans `workflow-config`), `/pipe
 | [`pipe-code`](skills/pipe-code/SKILL.md) | Implementer a partir d'un plan ou d'une issue |
 | [`pipe-review`](skills/pipe-review/SKILL.md) | Review automatique via sub-agent |
 | [`pipe-test`](skills/pipe-test/SKILL.md) | Tests avec boucle corrective (max 3) |
-| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md et TECHNICAL_CHANGES.md |
+| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente consommateur) |
 | [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour une PR |
 | [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer (slash-only) |
 

@@ -30,7 +30,7 @@ A partir des changements stages et de l'argument utilisateur (si fourni), determ
 - **Type** : feat, fix, refactor, perf, docs, chore
 - **Scope** : module metier concerne (obligatoire pour feat/fix/refactor/perf)
 - **Description** : en francais, concise
-- **Body** : optionnel, si le changement n'est pas evident
+- **Body** : obligatoire si le changement n'est pas trivial — c'est le corps du commit qui documente le detail technique (le CHANGELOG reste court et pointe vers le commit). Liste a puces : le pourquoi, l'approche choisie, les impacts non evidents depuis le diff.
 
 Format : `emoji type(scope): description`
 
@@ -44,6 +44,9 @@ Affiche le recap apres coup :
 Commit cree :
 
 emoji type(scope): description
+
+- [puce du body si present]
+- [puce du body si present]
 
 Fichiers :
 - chemin/fichier.ts

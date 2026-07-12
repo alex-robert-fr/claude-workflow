@@ -4,6 +4,21 @@
 
 **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/)** + **[Semantic Versioning](https://semver.org/spec/v2.0.0.html)**
 
+## Repartition CHANGELOG / commits
+
+Le CHANGELOG et l'historique git se partagent le travail :
+
+| Question du lecteur | Ou est la reponse |
+|---|---|
+| Qu'est-ce qui change pour moi ? | CHANGELOG — une phrase courte par changement |
+| Dois-je adapter mon code / mon deploiement ? | CHANGELOG — `**BREAKING**`, notes de deploiement |
+| Comment c'est implemente, et pourquoi comme ca ? | Corps du commit ou de la PR, via la reference en fin d'entree |
+| Qu'est-ce qui a change en interne (refactor, tests, CI, deps) ? | Historique git uniquement — pas d'entree CHANGELOG |
+
+Consequence : **pas de fichier technique separe** (`TECHNICAL_CHANGES.md` ou equivalent). Un tel fichier duplique l'historique git, coute de la maintenance et derive. Si un projet en possede un, proposer sa suppression.
+
+Ce partage ne fonctionne que si les corps de commits sont reellement rediges — voir `git-conventions` (section Body) : tout commit non trivial documente ses decisions techniques dans son corps.
+
 ## Structure globale du CHANGELOG
 
 ```markdown
@@ -13,6 +28,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Les details techniques de chaque changement sont documentes dans les commits et pull requests lies.
 
 ## [Unreleased]
 
@@ -41,26 +58,21 @@ Les types doivent toujours apparaitre dans cet ordre. Ne pas inclure les types s
 
 Pas de types custom (`Improved`, `Refactored`, `Chore`, etc.).
 
-## Mapping prefixe de commit → fichier + type
+## Mapping prefixe de commit → type
 
-Le classement se fait en deux fichiers : `CHANGELOG.md` (consommateur) et `TECHNICAL_CHANGES.md` (contributeur). Chaque commit retenu va dans **un seul** des deux.
-
-| Prefixe commit | Defaut | Exception (impact consommateur) |
+| Prefixe commit | Defaut | Exception |
 |---|---|---|
-| `feat` | CHANGELOG → `Added` | — |
-| `fix` | CHANGELOG → `Fixed` | — |
-| `perf` | CHANGELOG → `Changed` | — |
-| `refactor` | TECHNICAL → `Refactor` | CHANGELOG → `Changed` si l'API publique change |
-| `docs` | TECHNICAL → `Docs` | CHANGELOG → `Added`/`Changed` si doc user-facing (README public, doc API consommee) |
-| `chore` | TECHNICAL → `Chore`, `Dependencies` ou `CI` (voir ci-dessous) | CHANGELOG → `Changed` si config publique (`.mcp.json` exemple, manifest consomme) |
-| `test` | TECHNICAL → `Tests` | — |
+| `feat` | `Added` | `Removed` si suppression explicite, `Deprecated` si deprecation |
+| `fix` | `Fixed` | `Security` si patch de securite |
+| `perf` | `Changed` | — |
+| `refactor` | **exclu** | `Changed` si l'API publique change |
+| `docs` | **exclu** | `Added`/`Changed` si doc user-facing (README public, doc d'API consommee) |
+| `chore` | **exclu** | `Changed` si config publique ou variable d'environnement requise (note de deploiement) |
+| `test` | **exclu** | — |
 
-Sous-classement des `chore` dans TECHNICAL :
-- Bump de dependance → `Dependencies`
-- Modification d'un workflow CI, d'un hook git, d'un script de build → `CI`
-- Tout le reste (config interne, meta, scripts divers) → `Chore`
+Un commit exclu n'est pas perdu : il reste dans l'historique git, avec son corps comme documentation. En cas de doute entre exclure et inclure, exclure et demander confirmation.
 
-Cas speciaux CHANGELOG (detectes par le contenu du commit, pas par le prefixe seul) :
+Cas speciaux (detectes par le contenu du commit, pas par le prefixe seul) :
 - Suppression explicite d'une fonctionnalite → `Removed`
 - Deprecation explicite → `Deprecated`
 - Patch de securite → `Security`
@@ -68,8 +80,8 @@ Cas speciaux CHANGELOG (detectes par le contenu du commit, pas par le prefixe se
 
 ## Regles de contenu
 
-- Une entree = **une seule information user-facing distincte**. Si un changement couvre plusieurs aspects distincts (nouveau champ + nouveau filtre + nouvel endpoint), decouper en autant d'entrees separees plutot que de tout fusionner sur une ligne.
-- Redigee pour le lecteur, pas pour le dev — pas de detail d'implementation interne
+- Une entree = **une phrase courte** decrivant un effet observable. Pas de detail d'implementation — le lecteur qui veut le detail suit la reference vers le commit ou la PR.
+- Redigee pour le lecteur qui consomme le projet, pas pour le dev qui l'a ecrit
 - Chaque entree tient sur **une seule ligne** — pas de retour a la ligne manuel au milieu d'une phrase. Les editeurs gerent le wrap, pas l'auteur.
 - Chaque entree inclut ses references tracables en fin de ligne (voir section "References dans les entrees")
 - Breaking changes marques : `**BREAKING**` en prefixe de l'entree
@@ -85,30 +97,27 @@ Checklist a appliquer a chaque entree avant de la valider :
 
 1. **Ecrire pour le consommateur, pas pour le dev** — decrire l'effet observable cote utilisateur (endpoint, option, comportement), pas l'implementation interne (decorateur, hook, refactor).
 2. **Verbe a la voix active, au present** — `Ajoute`, `Corrige`, `Supprime`, `Renvoie`, `Inclut`. Pas `a ete ajoute`, pas `ajout de`, pas de formulation nominale.
-3. **Une information user-facing distincte par entree** — une entree porte un et un seul changement observable (voir principe #3 ci-dessous pour la fusion vs decoupage). La contrainte de format "une seule ligne physique" est traitee dans la section "Regles de contenu".
-4. **Preciser l'API publique impactee** — nom de l'endpoint, du parametre, de l'option ou du fichier de config concerne, entre backticks.
+3. **Court** — une phrase. Si l'entree depasse deux lignes affichees, elle porte du detail qui appartient au corps du commit.
+4. **Preciser la feature publique impactee** — nom de l'endpoint, du parametre, de l'option ou du fichier de config concerne, entre backticks. Les valeurs actionnables restent explicites ("minimum 12 caracteres", pas "politique renforcee") tant que la phrase reste courte.
 5. **Marquer explicitement les breaking changes** — prefixe `**BREAKING**` en debut d'entree, avec mention de la migration requise.
 
 ### Template mental
 
 ```
-[Verbe actif present] [symbole/feature publique] [effet visible utilisateur] [migration si breaking]
+[Verbe actif present] [feature publique] [effet visible utilisateur]
 ```
 
 Exemple d'application :
 
 > Ajoute le filtre `?type=base|composed` sur `GET /recipes` pour limiter les resultats par categorie.
 
-(verbe actif present `Ajoute` + symbole public `?type=...` sur `GET /recipes` + effet `limiter les resultats par categorie` ; pas de migration car non-breaking)
-
 ### Principes
 
-1. **Exposer l'effet observable** — codes HTTP, parametres accessibles, exigences cote client, comportement visible. Pas les noms de fonctions internes, decorateurs, hooks, ou refactors qui ne changent rien a l'usage.
-2. **Expliciter les valeurs concretes** — remplacer les formulations vagues par les contraintes reelles. "politique renforcee" → "minimum 12 caracteres avec majuscule, chiffre et symbole". "nouveau filtre" → "filtre `category_id` sur `GET /api/recipes`".
-3. **Fusionner les entrees liees, mais decouper les aspects distincts** — la regle : si le lecteur peut consommer un aspect sans connaitre les autres, c'est qu'il merite sa propre ligne. La fusion ne s'applique qu'aux commits/PRs qui decrivent **le meme evenement vu du consommateur** :
-   - ✅ **Fusion OK** : ajout du cookie HttpOnly + marquage BREAKING + CORS credentials → un seul evenement auth, donc une seule entree.
-   - ❌ **Fusion abusive** : nouveau champ obligatoire + nouveau filtre + nouvel endpoint + inclusion dans un GET → ce sont autant d'informations user-facing distinctes, chacune doit etre sa propre entree.
-4. **Indiquer l'impact client quand il existe** — si le consommateur doit adapter son code (headers, options fetch, configuration), le dire explicitement dans l'entree.
+1. **Exposer l'effet observable** — parametres accessibles, exigences cote client, comportement visible. Pas les noms de fonctions internes, decorateurs, hooks, ou refactors qui ne changent rien a l'usage.
+2. **Fusionner les entrees liees** — les commits/PRs qui composent **le meme evenement vu du consommateur** donnent une seule entree, avec plusieurs references si necessaire :
+   - ✅ **Fusion OK** : page de connexion + protection des routes + redirection a l'expiration de session → un seul evenement "authentification", une entree.
+   - ❌ **Fusion abusive** : nouveau champ obligatoire + nouveau filtre + nouvel endpoint → autant d'informations user-facing distinctes, chacune sa propre entree. La regle : si le lecteur peut consommer un aspect sans connaitre les autres, il merite sa propre ligne.
+3. **Indiquer l'impact client quand il existe** — si le consommateur doit adapter son code (headers, options fetch, configuration), le dire explicitement dans l'entree.
 
 ### Avant / apres
 
@@ -116,14 +125,12 @@ Exemple d'application :
 ❌ Ajout du decorateur @Public() et desactivation du guard JWT sur les GET
 ✅ Expose les endpoints `GET` des ressources metier publiquement, sans authentification requise
 
+❌ Ajoute le champ optionnel `source_url` sur `POST /recipes` et `PATCH /recipes/:id` — un lien `http`/`https` cliquable pour la source, expose dans `GET /recipes/:id` ; il exige un libelle `source` non vide, sinon `400 Bad Request`
+✅ Ajoute un lien de source optionnel (`source_url`) sur les recettes
+   (les contraintes de validation vivent dans le corps du commit lie)
+
 ❌ Refactor de find_by_email pour masquer l'existence des comptes
-✅ Renvoie `404 Not Found` au lieu de `403 Forbidden` lors de la consultation d'une recette privee par un utilisateur non autorise, pour ne pas divulguer l'existence de la ressource
-
-❌ Ajout du cookie HttpOnly, BREAKING, CORS credentials (3 entrees)
-✅ **BREAKING** — Pose le JWT dans un cookie `HttpOnly`, `SameSite=strict`, `Secure` (en production) au lieu du corps JSON sur `POST /auth/register` et `POST /auth/login`. Les clients doivent utiliser `credentials: 'include'` sur leurs requetes HTTP. (1 entree fusionnee)
-
-❌ Politique de mot de passe renforcee a l'inscription
-✅ Renforce la politique de mot de passe a l'inscription : minimum 12 caracteres avec au moins une majuscule, un chiffre et un symbole
+✅ Renvoie 404 au lieu de 403 lors de la consultation d'une recette privee sans autorisation, pour ne pas divulguer son existence
 ```
 
 #### Decoupage : plusieurs aspects user-facing distincts
@@ -131,113 +138,51 @@ Exemple d'application :
 ```
 ❌ Ajout du champ `type` obligatoire sur POST, nouveau filtre `?type=` sur GET, nouvel endpoint `PATCH /pricing` et inclusion de `pricing` dans `GET /:id` (1 entree fourre-tout)
 
-✅ 4 entrees distinctes :
+✅ 3 entrees distinctes :
    - **BREAKING** — Rend le champ `type` obligatoire sur `POST /recipes` (`'base'` ou `'composed'`)
    - Ajoute le filtre `?type=base|composed` sur `GET /recipes`
-   - Inclut un objet `pricing` dans `GET /recipes/:id` quand les informations tarifaires sont renseignees
-   - Ajoute l'endpoint `PATCH /recipes/:id/pricing` (admin) pour creer ou mettre a jour le pricing
+   - Pricing des recettes : consultation dans le detail et mise a jour dediee ([#108], [#110])
 ```
 
 ### Consolider en etat final
 
-Quand plusieurs commits successifs touchent le **meme artefact** (fichier, endpoint, fonction publique, option de config, dependance...) **au sein de la meme release**, n'ecrire qu'une seule entree decrivant l'**etat final** du point de vue du consommateur. Les etats intermediaires n'ont jamais ete livres, ils ne doivent pas apparaitre.
+Quand plusieurs commits successifs touchent le **meme artefact** (fichier, endpoint, fonction publique, option de config...) **au sein de la meme release**, n'ecrire qu'une seule entree decrivant l'**etat final** du point de vue du consommateur. Les etats intermediaires n'ont jamais ete livres, ils ne doivent pas apparaitre.
 
-Cette regle s'applique aux **deux fichiers** : `CHANGELOG.md` et `TECHNICAL_CHANGES.md`. Le scope est la release en cours (`[Unreleased]` ou la section en preparation), jamais entre deux versions deja taggees.
+Le scope est la release en cours (`[Unreleased]` ou la section en preparation), jamais entre deux versions deja taggees.
 
 Cas typiques :
 
 - **Ajout puis suppression** dans la meme release → ne rien ecrire (l'artefact n'a jamais existe pour le consommateur)
 - **Ajout puis renommage/deplacement** dans la meme release → une seule entree avec le nom final
 - **Modification puis re-modification** successive → une seule entree decrivant le comportement final
-- **Ajout puis depreciation/breaking** dans la meme release → une seule entree decrivant l'etat final (et son impact)
 
-Distinction avec le principe #3 (fusion vs decoupage) : le principe #3 traite les **aspects distincts simultanes** (a decouper si independants). La consolidation traite les **succession sur le meme artefact** (a fusionner sur l'etat final). Les deux sont compatibles.
-
-#### Avant / apres
-
-```
-Commits de la PR : "Ajoute le fichier config/legacy.json" → "Renomme legacy.json en deprecated.json" → "Supprime deprecated.json"
-❌ 3 entrees (Added, Changed, Removed) — l'utilisateur lit l'historique d'un fichier qui n'a jamais existe pour lui
-✅ Aucune entree — le fichier n'a jamais ete livre
-
-Commits de la PR : "Ajoute l'endpoint POST /export" → "Renomme POST /export en POST /reports/export"
-❌ 2 entrees (Added /export, Changed → /reports/export)
-✅ 1 entree (Added) : Ajoute l'endpoint `POST /reports/export` pour declencher la generation d'un rapport
-```
+Distinction avec le principe #2 (fusion vs decoupage) : le principe #2 traite les **aspects distincts simultanes** (a decouper si independants). La consolidation traite les **successions sur le meme artefact** (a fusionner sur l'etat final). Les deux sont compatibles.
 
 En cas de doute sur la detection d'une succession (chemin renomme, identifiant ambigu), demander confirmation a l'utilisateur plutot que de consolider silencieusement.
 
 ### Heuristique rapide
 
-Si l'entree reformulee ne permet **pas** a un consommateur de repondre a l'une de ces questions, elle manque probablement de contenu :
+Si l'entree reformulee ne permet **pas** a un consommateur de repondre a l'une de ces questions, elle manque de contenu :
 
 - Qu'est-ce qui change concretement pour moi ?
 - Est-ce que je dois adapter mon code ?
-- Quelle est la nouvelle valeur / le nouveau comportement ?
 
-## TECHNICAL_CHANGES.md — journal technique
+Et dans l'autre sens : si l'entree explique **comment** le changement est implemente, elle en dit trop — ce detail appartient au corps du commit.
 
-`TECHNICAL_CHANGES.md` est le pendant de `CHANGELOG.md` pour les contributeurs. Il capture les changements internes qui n'affectent pas le consommateur mais qui interessent un developpeur qui ouvre le repo : refactors, docs internes, tests, CI, bumps de deps, maintenance.
+## Notes de deploiement
 
-### Symetrie avec CHANGELOG.md
+Le CHANGELOG est court, mais tout ce qui est **actionnable au deploiement** doit y rester — celui qui deploie ne fouille pas les commits pour decouvrir que son deploiement va casser :
 
-- Meme format Keep a Changelog + SemVer
-- Memes versions et memes dates (un tag git = une release, une seule date)
-- Meme mecanisme de liens de comparaison en bas de fichier
-- Meme regle de liens inline sur les en-tetes `## [X.Y.Z](tag-url) - YYYY-MM-DD` quand le tag existe
+- **Breaking change de release** : si la release entiere impose une migration (changement de contrat d'API, format de donnees), la remonter en blockquote juste sous l'en-tete de version, avant les sections de types :
 
-### Types d'entrees (ordre impose)
+  ```markdown
+  ## [0.3.0] - 2026-07-07
 
-| Type | Usage |
-|---|---|
-| `Refactor` | Restructuration de code sans impact utilisateur (renommages internes, extraction de services, reorganisation de modules) |
-| `Docs` | Documentation interne (ADR, CONTRIBUTING, commentaires, README contributeur) |
-| `Tests` | Ajout, modification ou suppression de tests |
-| `CI` | Workflows, hooks git, pipelines de build, scripts d'automatisation |
-| `Dependencies` | Bumps de dependances (dev et runtime) |
-| `Chore` | Maintenance et config interne ne relevant d'aucune autre categorie |
+  > **BREAKING** : le format des recettes change — le tableau `ingredients` devient `lines`. Les clients doivent adapter leurs requetes ([`77e733e`](url/commit/77e733e))
+  ```
 
-Pas de types custom hors de cette liste. Ne pas inclure les types sans entrees.
-
-### Structure globale
-
-```markdown
-# Technical Changes
-
-All notable technical changes targeted at contributors will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-## [1.2.0](https://github.com/org/repo/releases/tag/v1.2.0) - 2026-03-29
-
-### Refactor
-
-- Extraction du service de detection de plateforme git dans `platform-detector` ([#18](https://github.com/org/repo/pull/18))
-
-### Dependencies
-
-- Bump `typescript` 5.3.0 → 5.4.2 ([`a1b2c3d`](https://github.com/org/repo/commit/a1b2c3d))
-
-[Unreleased]: https://github.com/org/repo/compare/v1.2.0...HEAD
-[1.2.0]: https://github.com/org/repo/compare/v1.1.0...v1.2.0
-```
-
-### Regles de contenu
-
-- Une entree = un changement technique notable **pour un contributeur** (pas pour l'utilisateur final)
-- Redigee de facon concise, orientee "ce qui a change dans le repo"
-- Chaque entree tient sur **une seule ligne** et inclut sa reference tracable (meme regle que CHANGELOG)
-- Ne jamais dupliquer une entree du CHANGELOG dans le TECHNICAL_CHANGES : un changement va **dans un seul** des deux fichiers
-- Les bumps de deps peuvent etre groupes : `Bump des dependances dev (typescript, vitest, biome) ([#N](url))` si la PR couvre plusieurs bumps liees
-
-### Cas limites
-
-- **Commit refactor qui prepare une feature user-facing** : l'entree va dans le CHANGELOG uniquement quand la feature est livree. Le refactor intermediaire, s'il est livre seul sans impact visible, va dans TECHNICAL.
-- **Docs qui impactent le consommateur** (ex: nouveau guide d'utilisation publique, doc d'API) : CHANGELOG, pas TECHNICAL.
-- **Update de doc contributeur** (CONTRIBUTING, ADR, README interne) : TECHNICAL, pas CHANGELOG.
+- **Variable d'environnement requise** : une entree `Changed` ou `Security` qui nomme la variable et la consequence ("`CORS_ORIGIN` est obligatoire au demarrage").
+- **Dependance inter-services** : quand une version consomme un nouveau contrat d'un service partenaire, une blockquote sous l'en-tete de version du type `> Requiert [backend-index](url) ≥ 0.3.2 (colonne \`source_url\` dans l'import CSV)`.
 
 ## Coherence versions/dates
 
@@ -252,25 +197,23 @@ Lors de la generation ou de l'audit d'un CHANGELOG existant :
 3. Pour les entrees referencees par SHA, utiliser la date du commit : `git log -1 --format=%aI <sha>`.
 4. Si la reference est **posterieure** a la date du tag, deplacer l'entree vers `[Unreleased]`.
 
-Cas typique : un CHANGELOG cree tardivement apres un premier tag, qui a absorbe par erreur des changements mergees plus tard. L'audit doit etre systematique a chaque passage de `/pipe-changelog`.
-
-Le meme audit s'applique a `TECHNICAL_CHANGES.md` : chaque entree sous une section versionnee doit referencer un commit/PR mergee avant la date du tag. Les deux fichiers sont audites a chaque passage du skill.
+Cas typique : un CHANGELOG cree tardivement apres un premier tag, qui a absorbe par erreur des changements merges plus tard. L'audit doit etre systematique a chaque passage de `/pipe-changelog`.
 
 ## References dans les entrees
 
-Chaque entree de changelog inclut une reference tracable entre parentheses en fin de ligne. Cela permet de remonter a l'origine d'un changement.
+Chaque entree de changelog inclut une reference tracable entre parentheses en fin de ligne. C'est le pont vers le detail technique : le corps du commit ou la PR documente l'implementation que le CHANGELOG ne porte plus.
 
 ### Regle
 
 - **Si une PR existe** : lier la PR. C'est la reference principale — elle contient le contexte, les commits et les issues liees.
 - **Si pas de PR** (commit direct) : lier le SHA court en fallback.
-
-Une seule reference par entree. Pas besoin de doublonner PR + SHA + issue.
+- Une entree fusionnee (plusieurs commits pour le meme evenement consommateur) peut porter plusieurs references, separees par des virgules.
 
 ### Format
 
 ```
 - Texte reformule ([#N](url))
+- Texte d'une entree fusionnee ([#N](url), [`abc1234`](url/commit/abc1234))
 ```
 
 **Important** : GitHub n'auto-link pas les references dans les fichiers `.md` du depot. Il faut systematiquement utiliser des liens Markdown explicites `[texte](url)`. L'URL du remote est detectee a l'etape 1 du skill.
@@ -278,12 +221,12 @@ Une seule reference par entree. Pas besoin de doublonner PR + SHA + issue.
 ### Exemples
 
 ```markdown
-- Ajouter le support multi-langue ([#15](https://github.com/org/repo/pull/15))
+- Ajoute le support multi-langue ([#15](https://github.com/org/repo/pull/15))
 ```
 PR #15 — le lecteur y trouvera les commits, l'issue liee et le contexte.
 
 ```markdown
-- Corriger le parsing des dates ([`def5678`](https://github.com/org/repo/commit/def5678))
+- Corrige le parsing des dates ([`def5678`](https://github.com/org/repo/commit/def5678))
 ```
 Commit direct, pas de PR — SHA court en fallback.
 
@@ -336,21 +279,20 @@ Format :
 
 ## Exclusions
 
-Exclus des deux fichiers (CHANGELOG et TECHNICAL) :
+Exclus du CHANGELOG :
 
+- Les commits purement techniques sans impact consommateur ni deploiement : refactors internes, tests, CI/CD, bumps de dependances, docs contributeur, config interne. Ils restent documentes par l'historique git et les corps de commits.
 - Les merges (`Merge branch...`, `Merge pull request...`)
 - Les rebases et fixups (`fixup!`, `squash!`)
 - Les typos purs (commentaires, fautes de frappe dans la doc)
 - Les commits de revert immediatement suivis du recommit
 - Le contenu des commits verbatim (toujours reformuler)
 
-Les changements CI/CD, les bumps de deps et les docs internes ne sont **pas** exclus : ils vont dans `TECHNICAL_CHANGES.md` (sections `CI`, `Dependencies`, `Docs`).
-
 ## Changesets (Turborepo) — optionnel
 
 Si le projet utilise Changesets :
 
 - Un fichier `.changeset/*.md` par PR avec le bon bump (`major` / `minor` / `patch`)
-- Le summary dans le changeset = ce qui apparaitra dans le CHANGELOG → redige pour le consommateur
+- Le summary dans le changeset = ce qui apparaitra dans le CHANGELOG → redige court, pour le consommateur
 - Ne pas editer manuellement le CHANGELOG genere — editer les changesets en amont
 - Si des changesets existent, les utiliser comme source primaire au lieu des commits

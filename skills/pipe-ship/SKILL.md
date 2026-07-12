@@ -78,7 +78,7 @@ Affiche le recap complet :
 - ✅ N tests passent (ou : non configures)
 
 ### Changelog
-- CHANGELOG.md / TECHNICAL_CHANGES.md : [mis a jour | inchange | non applicable (niveau B)]
+- CHANGELOG.md : [mis a jour | inchange | non applicable (niveau B)]
 
 ---
 Je pousse `[branche]` et je [cree | mets a jour] la PR ?
