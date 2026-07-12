@@ -1,101 +1,56 @@
 ---
 name: pipe-ship
-description: Livrer une issue planifiee en un seul geste : enchaine implementation, review, tests, changelog et Pull Request en ne s'arretant que sur probleme bloquant. Utiliser apres /pipe-plan a la place des etapes unitaires du pipeline. Adapte son perimetre au niveau du projet.
-argument-hint: [numero issue ou rien si plan deja present]
+description: Reprendre le cycle en cours d'un ticket : lit le fichier de pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Le seul geste a retenir dans chaque nouvelle session. Utiliser a tout moment du cycle.
+argument-hint: [cle du ticket ou rien pour detecter le cycle en cours]
 ---
 
-Ce skill enchaine les etapes du pipeline en reutilisant les skills unitaires — il ne duplique pas leur logique. Chaque etape indique quel skill charger et quelles adaptations appliquer. Les skills unitaires restent invocables individuellement.
+Ce skill n'a pas de logique propre : il localise le pilotage, identifie la phase courante et applique le skill unitaire correspondant. Les skills unitaires restent invocables directement.
 
-## Points d'arret (gates)
+## Etape 0 — Localiser le pilotage
 
-`/pipe-ship` ne s'arrete que dans ces quatre cas — tout le reste s'enchaine sans confirmation :
+- Argument fourni → `.claude/plans/plan-<identifiant>.md`
+- Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
+- Aucun pilotage → pas de cycle en cours : propose `/pipe-plan [ticket]` pour en demarrer un, et arrete-toi
 
-1. **Probleme non anticipe dans le plan** pendant l'implementation (fichier manquant, incoherence)
-2. **Bloquant de review** (bug, faille, regression detectee par le sub-agent)
-3. **Tests rouges** apres 3 tentatives de correction, ou probleme structurel
-4. **Confirmation finale unique** avant push + creation de la PR
+## Etape 1 — Identifier la phase courante
 
-Si le flux s'arrete, afficher ou on en est et comment reprendre. Relancer `/pipe-ship` reprend la ou le flux s'est arrete : detecter l'etat via git (branche deja creee, commits presents, changelog modifie) et sauter les etapes deja faites.
+Lis le pilotage en entier. Dans la section Etat, la **premiere case non cochee** donne la phase courante. Annonce en une ligne : ticket, branche, phase courante, ce qui va se passer.
 
-## Etape 0 — Contexte et niveau de projet
+## Etape 2 — Derouler
 
-Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` (si absent, utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` — config legacy).
+| Premiere case non cochee | Phase a executer | Skill a charger (Read) | Session |
+|---|---|---|---|
+| `Plan valide` | co-construction du plan | `${CLAUDE_SKILL_DIR}/../pipe-plan/SKILL.md` | courante |
+| `Tests ecrits` ou `Tests valides` | ecriture + review humaine des tests | `${CLAUDE_SKILL_DIR}/../pipe-test/SKILL.md` | courante |
+| `Dev termine` | implementation guidee par les tests | `${CLAUDE_SKILL_DIR}/../pipe-code/SKILL.md` | **neuve obligatoire** |
+| `Code valide` | checks outilles + review agent + review humaine | `${CLAUDE_SKILL_DIR}/../pipe-review/SKILL.md` | **neuve obligatoire** |
+| `Commits crees` | decoupage en changesets | `${CLAUDE_SKILL_DIR}/../pipe-commit/SKILL.md` | courante |
+| `PR creee` | creation de la Pull Request | `${CLAUDE_SKILL_DIR}/../pipe-pr/SKILL.md` | courante |
 
-Determine le **niveau** du projet (champ "Niveau", section Projet) :
+Toutes cochees → le cycle est termine (le pilotage aurait du etre supprime par `/pipe-pr`) : signale-le et propose de le supprimer.
 
-- **Niveau A** (ou champ absent) : code → review → tests → changelog → PR
-- **Niveau B** : code → tests → push (pas de changelog, pas de review formelle)
+### Frontieres de session
 
-Annonce la route retenue en une ligne avant de commencer.
+Le dev et la review se font chacun dans une session neuve, avec un contexte propre — le pilotage suffit a la reprise.
 
-## Etape 1 — Implementer
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-code/SKILL.md` et applique toutes ses etapes (resolution du plan, verifications, branche, implementation, commits atomiques).
-
-Adaptation : a la fin, ne pas proposer `/pipe-review` — enchainer directement sur l'etape suivante de ce skill.
-
-Gate : si une etape revele un probleme non anticipe dans le plan, stopper et presenter les options comme le prevoit pipe-code.
-
-## Etape 2 — Review (niveau A uniquement)
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-review/SKILL.md` et applique ses etapes 0 a 4 (collecte, sub-agent avec le protocole de sa `reference.md`, rapport).
-
-Adaptations :
-
-- **Aucun bloquant** → afficher la synthese (compteurs par severite), memoriser avertissements et suggestions pour le recap final, enchainer sans question.
-- **Au moins un bloquant** → gate : afficher les bloquants au format Question/Reponse de pipe-review et traiter chacun (corriger / adapter / ignorer) avec l'utilisateur avant de continuer. Committer les corrections.
-
-## Etape 3 — Tests
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-test/SKILL.md` et applique-le tel quel (boucle corrective bornee a 3 tentatives).
-
-Adaptation : si tous les tests passent, enchainer sans proposer `/pipe-changelog`.
-
-Gate : probleme structurel ou echec apres 3 tentatives → stopper comme le prevoit pipe-test.
-
-Si aucune commande de test n'est configuree dans `workflow-config`, le signaler en une ligne et continuer — ne pas bloquer le flux.
-
-## Etape 4 — Changelog (niveau A uniquement)
-
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-changelog/SKILL.md` et applique-le en mode `[Unreleased]` (sans argument de version).
-
-Adaptation : ne pas demander la confirmation de l'etape 4 de pipe-changelog — ecrire les fichiers et committer directement. Le resultat est presente dans le recap final, et un commit local reste reversible.
-
-## Etape 5 — Recap et confirmation unique, puis PR
-
-Affiche le recap complet :
+- Si la phase a executer exige une session neuve **et** qu'une autre phase vient d'etre executee dans cette conversation, ne pas enchainer. Afficher :
 
 ```
-## Ship — [branche]
-
-### Commits
-- emoji type(scope): description (un par ligne)
-
-### Review
-- X bloquant(s) traite(s), Y avertissement(s), Z suggestion(s) — [details si non vide]
-
-### Tests
-- ✅ N tests passent (ou : non configures)
-
-### Changelog
-- CHANGELOG.md : [mis a jour | inchange | non applicable (niveau B)]
-
----
-Je pousse `[branche]` et je [cree | mets a jour] la PR ?
+Phase suivante : [dev | review] — a lancer dans une NOUVELLE session :
+ouvre une session et lance `/pipe-ship [ticket]`.
 ```
 
-C'est la **seule confirmation** du flux nominal. Une fois recue :
+- Si `/pipe-ship` est lance en debut de session (rien d'autre execute avant), executer la phase courante directement, quelle qu'elle soit.
 
-- **Niveau A** : utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-pr/SKILL.md` et applique-le sans redemander ses confirmations internes (push et soumission couverts par la confirmation ci-dessus). La regle `Closes #XX` reste obligatoire — si aucune issue n'est identifiable, demander le numero.
-- **Niveau B** : pousser la branche. Ne creer une PR que si l'utilisateur le demande ou si le projet en utilise habituellement (PRs existantes sur le repo) ; sinon proposer un merge direct.
+### Enchainement
 
-Cloture :
+Tant qu'on ne franchit pas une frontiere de session, enchaine les phases : charge le skill unitaire, applique toutes ses etapes, puis reviens a la table ci-dessus. Les pauses humaines (review des tests, review du code) sont gerees par les skills unitaires eux-memes — la validation de l'utilisateur dans la session permet de continuer.
 
-```
----
-PR soumise : [URL]
-Apres merge : `/pipe-tag [vX.Y.Z]` pour publier une release (niveau A).
-```
+Adaptation en enchainement : ignorer les blocs "Proposer la suite" des skills unitaires — c'est ce skill qui pilote la suite.
+
+## Etape 3 — Fin de tour
+
+Quel que soit le point d'arret (pause humaine, frontiere de session, fin de cycle), termine par une ligne : ou on en est, et le prochain geste.
 
 ---
 
