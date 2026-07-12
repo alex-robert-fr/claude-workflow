@@ -59,7 +59,13 @@ Le scope correspond au module metier / DDD (`auth`, `billing`, `user`...).
 
 ### Body
 
-Optionnel, uniquement si le changement n'est pas evident depuis le titre. Sous forme de liste a puces.
+Le corps du commit est le **journal technique** du projet : le CHANGELOG reste court et non technique et pointe vers les commits — c'est donc ici que vit le detail.
+
+- **Obligatoire** des que le changement n'est pas trivial : plusieurs fichiers, decision d'implementation, comportement modifie, contrainte non evidente
+- Optionnel uniquement pour les changements evidents depuis le titre (typo, bump de version, formatage)
+- Sous forme de liste a puces
+- Documente ce que le diff ne montre pas : le **pourquoi**, l'approche choisie, les alternatives ecartees, les impacts sur les autres modules, les contraintes de validation ou de migration
+- Un commit pousse est immuable — se relire avant de committer, une erreur dans le corps ne se corrige pas apres coup
 
 ### Regles
 
