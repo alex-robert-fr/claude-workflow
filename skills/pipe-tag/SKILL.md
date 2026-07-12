@@ -1,6 +1,6 @@
 ---
 name: pipe-tag
-description: Creer et pousser un tag git annote pour une release. Verifie la branche principale, detecte la version depuis CHANGELOG.md ou argument, cree un tag annote semantique. Utiliser apres merge de la PR sur main.
+description: Creer et pousser un tag git annote pour une release. Verifie la branche de production, detecte la version depuis CHANGELOG.md ou argument, cree un tag annote semantique. Utiliser apres merge de la PR de release et deploiement.
 disable-model-invocation: true
 argument-hint: "[v1.2.3]"
 ---
@@ -15,12 +15,12 @@ argument-hint: "[v1.2.3]"
 
 ## Etape 0 — Verifications
 
-Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` si le fichier existe, pour identifier la branche par defaut du projet (si absent, essaie `.claude/skills/tech-stack/SKILL.md` — config legacy ; sinon utiliser `main` comme valeur par defaut).
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` si le fichier existe, pour identifier la branche a tagger : champ "Branche de production" s'il est rempli, sinon "Branche par defaut" (si le fichier est absent, essaie `.claude/skills/tech-stack/SKILL.md` — config legacy ; sinon utiliser `main`).
 
 Avant de continuer, verifie :
 
 - [ ] Le repo a un remote `origin` configure (`git remote get-url origin`)
-- [ ] La branche courante est la branche par defaut du projet — on ne tague jamais une feature branch
+- [ ] La branche courante est la branche identifiee ci-dessus — on ne tague jamais une feature branch ni la branche d'integration
 - [ ] Il n'y a pas de changements non commites (`git status --short` vide)
 
 Si une verification echoue, signale-le clairement et arrete-toi.

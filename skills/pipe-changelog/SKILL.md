@@ -1,6 +1,6 @@
 ---
 name: pipe-changelog
-description: Generer ou mettre a jour CHANGELOG.md depuis les commits/tags. Entrees courtes orientees consommateur — le detail technique vit dans les corps de commits, le CHANGELOG pointe vers eux. Respecte Keep a Changelog + SemVer. Utiliser apres /pipe-test et avant /pipe-pr.
+description: Generer ou mettre a jour CHANGELOG.md depuis les commits/tags. Entrees courtes orientees metier — le detail technique vit dans les corps de commits et les PRs, le CHANGELOG pointe vers eux. Respecte Keep a Changelog + SemVer. Utilise au moment d'une release par /pipe-release, ou seul.
 argument-hint: [version a tagger ou rien pour Unreleased]
 ---
 
@@ -17,10 +17,11 @@ Les changements purement techniques (refactors internes, tests, CI, dependances,
 ## Etape 0 — Verifications
 
 - [ ] Le repo a un remote `origin` configure
-- [ ] La branche courante n'est pas la branche par defaut
-- [ ] Il y a au moins un commit d'avance sur la branche par defaut
+- [ ] Il y a des changements a documenter : commits depuis le dernier tag (`git log <dernier-tag>..HEAD`), ou section `[Unreleased]` non vide a publier
 
 Si une verification echoue, signale-le clairement et arrete-toi.
+
+Contexte nominal : ce skill est applique par `/pipe-release` depuis la branche d'integration, avec une version en argument. Il reste invocable seul (mode `[Unreleased]` sans argument).
 
 **Migration** : si un fichier `TECHNICAL_CHANGES.md` existe a la racine du projet, signaler qu'il est obsolete et proposer sa suppression — son contenu reste accessible dans l'historique git du fichier et dans les commits.
 
@@ -154,7 +155,7 @@ Une fois confirme :
 
 ```
 ---
-CHANGELOG mis a jour. Prochaine etape : `/pipe-pr` pour soumettre la branche.
+CHANGELOG mis a jour. En contexte release : retour a `/pipe-release` (PR vers la branche de production).
 ```
 
 ---
