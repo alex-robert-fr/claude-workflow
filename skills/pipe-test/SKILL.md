@@ -41,9 +41,16 @@ Ecris les tests unitaires depuis le plan (comportement attendu, cas limites, sec
 - Framework et conventions de test du projet (`workflow-config`)
 - **N'implemente pas la fonctionnalite** : uniquement les tests, plus le squelette minimal si la suite en a besoin pour s'executer (signatures vides, types — aucune logique)
 
+### Cas particulier — ticket technique (refactor, migration)
+
+Un refactor ne cree pas de comportement nouveau : le contrat, ce sont les **tests existants** qui doivent rester verts a travers le changement.
+
+- Evalue la couverture de la zone touchee. Si elle est insuffisante, ecris des **tests de caracterisation** qui capturent le comportement actuel — eux doivent etre **verts** avant le dev, contrairement aux tests d'une nouvelle fonctionnalite
+- Si la couverture existante suffit, ne rajoute rien et dis-le : la review humaine (etape 4) porte alors sur la question "cette couverture suffit-elle pour refactorer sans risque ?"
+
 ## Etape 3 — Verifier que les tests sont rouges
 
-Lance la commande de test. Les nouveaux tests **doivent echouer** — la fonctionnalite n'existe pas encore, c'est le principe. Verifie deux choses :
+Lance la commande de test. Les nouveaux tests **doivent echouer** — la fonctionnalite n'existe pas encore, c'est le principe. Exception : les tests de caracterisation d'un ticket technique doivent etre **verts** (ils capturent l'existant). Verifie deux choses :
 
 - Ils echouent pour la **bonne raison** (assertion fausse, module a creer), pas a cause d'une erreur d'ecriture dans les tests eux-memes
 - Les tests existants du projet continuent, eux, de passer

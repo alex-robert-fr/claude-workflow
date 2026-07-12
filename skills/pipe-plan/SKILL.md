@@ -78,6 +78,8 @@ Annonce la classification a l'utilisateur — elle oriente le plan.
 
 Evalue si le ticket est implementable en un seul cycle (tests → dev → review). Consulte les criteres de decomposition dans `reference.md`.
 
+**Si le ticket est trop petit pour le cycle** — aucun comportement a tester (typo, libelle, casse, config triviale, bump mineur de dependance) : propose la **voie rapide** au lieu du cycle. Correction directe + `/pipe-commit` (mode simple), micro-PR ou push direct selon la protection de branche — pas de pilotage, pas de tests dedies. Si l'utilisateur confirme, applique la correction et arrete-toi la.
+
 **Si le ticket est trop large :**
 
 1. Propose un decoupage en sous-tickets (voir guide dans `reference.md`)

@@ -102,6 +102,14 @@ Au moment de releaser :
 
 `pipe-plan` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
 
+## Voie rapide et tickets techniques
+
+Le cycle complet se justifie quand il y a un **comportement a valider**. Regle de tri : comportement a valider → ticket + cycle ; rien a tester → voie rapide.
+
+**Voie rapide** — typo, libelle, casse, config triviale, bump mineur de dependance : ni ticket, ni pilotage. Correction directe + `/pipe-commit` (mode simple), puis micro-PR groupee ou push direct selon la protection de branche. Une correction reperee pendant un cycle se fait sur la branche du ticket mais dans un **commit separe**, jamais melangee aux changesets de la feature. `pipe-plan` detecte les tickets trop petits et propose lui-meme cette voie.
+
+**Tickets techniques** (changement d'architecture, migration, mise a jour majeure avec breaking changes) : cycle complet. `pipe-plan` les classifie `technique` (questions orientees architecture), et le contrat de `pipe-test` devient **les tests existants qui doivent rester verts**, completes de tests de caracterisation si la zone est mal couverte. Cote tracker, rattache-les au ticket de version comme les demandes metier (avec un label `tech`) — le CHANGELOG les exclut deja par defaut, sauf impact consommateur.
+
 ## Skills
 
 ### Pipeline (`pipe-*`)

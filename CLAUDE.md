@@ -27,6 +27,8 @@ Cycle d'une demande metier (ticket JIRA ou issue), pilote par un **fichier de pi
 
 Release, quand assez de features sont mergees sur la branche d'integration : `/pipe-release` (CHANGELOG oriente metier + PR integration → production) → [merge + deploiement] → `/pipe-tag`.
 
+Voie rapide : les changements sans comportement a tester (typo, libelle, bump mineur) passent par `/pipe-commit` sans ticket ni pilotage. Les tickets techniques (refactor, migration) suivent le cycle complet avec les tests existants comme contrat (+ caracterisation si zone mal couverte).
+
 ## Regles
 
 - Les fichiers dans `skills/` sont **partages** — distribues via le plugin
