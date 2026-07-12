@@ -1,6 +1,6 @@
 # claude-workflow
 
-Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : setup, plan, code, review, test, PR.
+Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : plan co-construit, tests d'abord, dev guide par les tests, review, commits-changesets, PR, release.
 
 ## Plugin
 
@@ -14,19 +14,24 @@ Structure : `.claude-plugin/plugin.json` (manifest), `skills/nom/SKILL.md` (skil
 
 ## Pipeline
 
-Chemin nominal en 3 gestes — l'humain ne decide qu'aux vrais points de decision :
+Cycle d'une demande metier (ticket JIRA ou issue), pilote par un **fichier de pilotage** dans `.claude/plans/` du projet cible (gitignore, supprime a la PR). L'humain intervient a deux pauses : la review des tests et la review du code. Le dev et la review se font chacun dans une session neuve — le pilotage porte le contexte de reprise.
 
 ```
-/setup (une fois) → /pipe-plan → /pipe-ship → [merge] → /pipe-tag
+/pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
+→ session neuve : /pipe-code (guide par les tests, changesets au fil de l'eau)
+→ session neuve : /pipe-review (format/lint/tests outilles + agent haute valeur + review humaine)
+→ /pipe-commit (decoupage en changesets) → /pipe-pr (vers la branche d'integration)
 ```
 
-`/pipe-ship` enchaine code → review → test → changelog → PR avec arret uniquement sur bloquant, en reutilisant les skills unitaires (`/pipe-code`, `/pipe-review`, `/pipe-test`, `/pipe-changelog`, `/pipe-pr`) qui restent invocables independamment pour derouler pas a pas.
+`/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Les skills unitaires restent invocables independamment.
+
+Release, quand assez de features sont mergees sur la branche d'integration : `/pipe-release` (CHANGELOG oriente metier + PR integration → production) → [merge + deploiement] → `/pipe-tag`.
 
 ## Regles
 
 - Les fichiers dans `skills/` sont **partages** — distribues via le plugin
 - `.claude/skills/` contient l'outillage local du repo (create-skill) — jamais distribue
-- Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (niveau A/B, plateforme, commandes, stack)
+- Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
 - La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM
@@ -35,7 +40,7 @@ Chemin nominal en 3 gestes — l'humain ne decide qu'aux vrais points de decisio
 
 ## Versioning
 
-Lors d'une release (`/pipe-changelog` avec version + `/pipe-tag`), toujours mettre a jour la version simultanement dans :
+Lors d'une release (`/pipe-release` puis `/pipe-tag`), toujours mettre a jour la version simultanement dans :
 - `.claude-plugin/plugin.json` (champ `version`)
 - `.claude-plugin/marketplace.json` (champs `metadata.version` ET `plugins[0].version`)
 - `CHANGELOG.md`

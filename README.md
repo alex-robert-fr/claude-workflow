@@ -1,16 +1,16 @@
 # claude-workflow
 
-Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet de dev : setup, plan, ship (code → review → test → changelog → PR) et tag.
+Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet de dev : plan co-construit, tests d'abord, dev guide par les tests, review a deux niveaux, commits-changesets, PR et release.
 
 ## Pourquoi ce plugin ?
 
 Configurer un workflow AI-Driven Development de zero, c'est des dizaines d'heures de redaction de skills, hooks et conventions — et autant de risques de derive sur la duree. Ce plugin package un pipeline pret a l'emploi qui couvre tout le cycle, de la planification d'une issue jusqu'au tag de release.
 
-**Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (le chemin nominal tient en 3 gestes), une qualite garantie par les hooks et les sub-agents (pas par des instructions au LLM), et une coherence entre les sessions et entre les membres de l'equipe.
+**Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (un seul geste a retenir : `/pipe-ship <ticket>` reprend le cycle ou il en est), l'humain qui n'intervient qu'aux vrais points de decision (le plan, les tests, le code), une qualite garantie par les vrais outils et les hooks (pas par des instructions au LLM), et une coherence entre les sessions et les projets menes en parallele.
 
-**13 skills** distribues : `/pipe-ship` livre une issue en un seul geste, chaque etape unitaire reste invocable independamment.
+**14 skills** distribues : chaque etape du cycle est un skill invocable independamment, et `/pipe-ship` les enchaine depuis le fichier de pilotage.
 
-Lecture d'issues compatible **GitHub** et **Jira** (`pipe-plan`, `pipe-code`, `pipe-ship`) — la creation d'issues et de Pull Requests reste sur **GitHub** uniquement.
+Lecture de tickets compatible **GitHub** et **Jira** (hierarchie epic → version → demande) — la creation d'issues et de Pull Requests reste sur **GitHub** uniquement.
 
 ## Installation
 
@@ -53,18 +53,21 @@ Les skills sont accessibles avec le namespace `workflow:` (ex: `/workflow:pipe-s
 
 ## Pipeline
 
-Chemin nominal — 3 gestes, l'humain ne decide qu'aux vrais points de decision (quoi faire, le code est-il bon, on publie) :
+Le cycle d'une demande metier est pilote par un **fichier de pilotage** (`.claude/plans/`, gitignore, supprime a la PR) qui porte le plan, les decisions et l'etat d'avancement — c'est lui qui permet de reprendre dans une session neuve. L'humain intervient a deux pauses : la **review des tests** (le contrat de la fonctionnalite) et la **review du code**.
 
 ```
-/setup (une fois) → /pipe-plan → /pipe-ship → [merge] → /pipe-tag
+/pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
+→ session neuve : /pipe-code (guide par les tests)
+→ session neuve : /pipe-review (outils + agent + review humaine)
+→ /pipe-commit (changesets) → /pipe-pr (vers develop)
 ```
 
-`/pipe-ship` enchaine code → review → tests → changelog → PR et ne s'arrete que sur probleme bloquant (incoherence de plan, bloquant de review, tests rouges apres 3 tentatives) puis demande une seule confirmation avant push + PR.
+`/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Chaque etape reste invocable individuellement.
 
-Chaque etape reste invocable individuellement pour derouler pas a pas :
+Quand assez de features sont mergees sur la branche d'integration :
 
 ```
-/pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr
+/pipe-release (CHANGELOG metier + PR develop → main) → [merge + deploiement] → /pipe-tag
 ```
 
 ## Une session type
@@ -75,23 +78,29 @@ Configuration unique du projet :
 /workflow:setup            # CLAUDE.md, hooks, workflow-config (+ placeholders)
 ```
 
-Travail sur l'issue #42 :
+Cycle du ticket PROJ-42 — session 1 (plan + tests) :
 
 ```
-/workflow:pipe-plan #42    # analyse l'issue, produit un plan technique persiste
-/workflow:pipe-ship        # implemente, review, teste, changelog, PR — 1 confirmation
+/workflow:pipe-plan PROJ-42   # lit le ticket Jira (et sa version cible), Q/R, plan + pilotage
+/workflow:pipe-ship PROJ-42   # ecrit les tests, s'arrete pour ta review des tests
+```
+
+Session 2 (dev) puis session 3 (review → PR) :
+
+```
+/workflow:pipe-ship PROJ-42   # session neuve : implemente jusqu'a tests verts
+/workflow:pipe-ship PROJ-42   # session neuve : format/lint/tests, review agent,
+                              # ta review du code, puis commits-changesets et PR
 ```
 
 Au moment de releaser :
 
 ```
-/workflow:pipe-changelog 1.5.0  # cree la section versionnee
-/workflow:pipe-tag v1.5.0       # tag git annote SemVer (apres merge)
+/workflow:pipe-release 0.5.2  # CHANGELOG metier + PR develop → main
+/workflow:pipe-tag v0.5.2     # tag git annote SemVer (apres merge + deploiement)
 ```
 
-`pipe-plan`, `pipe-code` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
-
-Sur un projet **niveau B** (script/outil declare dans `workflow-config`), `/pipe-ship` reduit sa route a code → tests → push, sans changelog ni review formelle.
+`pipe-plan` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
 
 ## Skills
 
@@ -99,14 +108,16 @@ Sur un projet **niveau B** (script/outil declare dans `workflow-config`), `/pipe
 
 | Skill | Description |
 |-------|-------------|
-| [`pipe-plan`](skills/pipe-plan/SKILL.md) | Planifier l'implementation d'une issue |
-| [`pipe-ship`](skills/pipe-ship/SKILL.md) | Livrer une issue en un geste (code → review → test → changelog → PR) |
-| [`pipe-code`](skills/pipe-code/SKILL.md) | Implementer a partir d'un plan ou d'une issue |
-| [`pipe-review`](skills/pipe-review/SKILL.md) | Review automatique via sub-agent |
-| [`pipe-test`](skills/pipe-test/SKILL.md) | Tests avec boucle corrective (max 3) |
-| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente consommateur) |
-| [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour une PR |
-| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer (slash-only) |
+| [`pipe-ship`](skills/pipe-ship/SKILL.md) | Reprendre le cycle d'un ticket : detecte la phase et deroule jusqu'a la prochaine pause |
+| [`pipe-plan`](skills/pipe-plan/SKILL.md) | Co-construire le plan par Q/R (metier + architecture), creer le fichier de pilotage |
+| [`pipe-test`](skills/pipe-test/SKILL.md) | Ecrire les tests avant le dev, review humaine — ils deviennent le contrat |
+| [`pipe-code`](skills/pipe-code/SKILL.md) | Implementer en session dediee, guide par les tests, jusqu'a tests verts |
+| [`pipe-review`](skills/pipe-review/SKILL.md) | Checks outilles + review agent haute valeur + review humaine du code |
+| [`pipe-commit`](skills/pipe-commit/SKILL.md) | Decouper le travail en commits-changesets qui servent de doc technique |
+| [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour la PR (ticket, version cible, changesets) |
+| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG metier + PR develop → main (slash-only) |
+| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente metier) |
+| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer apres merge + deploiement (slash-only) |
 
 ### Utilitaires
 
@@ -115,7 +126,6 @@ Commandes invocables a tout moment, hors du flow principal du pipeline.
 | Skill | Description |
 |-------|-------------|
 | [`setup`](skills/setup/SKILL.md) | Configuration complete du projet, one-shot (slash-only) |
-| [`pipe-commit`](skills/pipe-commit/SKILL.md) | Commit formate selon les conventions git, sans friction |
 | [`create-issue`](skills/create-issue/SKILL.md) | Issues GitHub structurees avec decoupage |
 | [`worktree`](skills/worktree/SKILL.md) | Creer, lister, supprimer et basculer entre worktrees git |
 
@@ -141,7 +151,7 @@ claude-workflow/
 ├── CLAUDE.md                # conventions du plugin
 ├── CHANGELOG.md             # historique des versions
 └── skills/
-    └── <nom>/               # 13 skills, un repertoire par skill
+    └── <nom>/               # 14 skills, un repertoire par skill
         ├── SKILL.md         # point d'entree (frontmatter + flow)
         └── reference.md     # referentiel detaille (optionnel)
 ```
@@ -154,7 +164,7 @@ Le plugin ne contient aucune info specifique a un projet. La config vit dans le 
 
 | Fichier | Role |
 |---------|------|
-| `workflow-config/SKILL.md` | Source unique : niveau de projet (A/B), plateforme, commandes, stack, conventions |
+| `workflow-config/SKILL.md` | Source unique : plateforme, branches, commandes, stack, conventions |
 
 Les projets configures avant la 1.5.0 peuvent garder leur `tech-stack/SKILL.md` (lu en fallback legacy) ; `/setup` propose la migration vers `workflow-config`.
 
