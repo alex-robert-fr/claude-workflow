@@ -43,15 +43,14 @@ Si `CLAUDE.md` existe deja, verifie qu'il contient une section Git avec les regl
 
 Si `.claude/skills/workflow-config/SKILL.md` n'existe pas, utilise Read pour charger `${CLAUDE_SKILL_DIR}/workflow-config-template.md` comme squelette. Si le fichier existe mais contient des placeholders, pose les questions pour le remplir :
 
-1. **Niveau de projet** : A (produit vivant, pipeline complet) ou B (script/outil, workflow leger) ?
-2. **Plateforme Git** : GitHub, GitLab ou Gitea ? (detecte depuis `git remote -v`)
-3. **Issue tracker** : GitHub Issues, Jira, Linear ? (detecte depuis les MCP configures)
-4. **Branche par defaut** : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`)
-5. **Commande lint** : biome check, eslint, etc. ? (detecte depuis package.json scripts)
-6. **Commande format** : biome format --write, prettier --write, etc. ?
-7. **Commande test** : vitest, jest, npm test, etc. ?
-8. **Commande build** : tsc --noEmit, npm run build, etc. ?
-9. **Notification** : canal Slack, aucun ?
+1. **Plateforme Git** : GitHub, GitLab ou Gitea ? (detecte depuis `git remote -v`)
+2. **Issue tracker** : GitHub Issues, Jira, Linear ? (detecte depuis les MCP configures)
+3. **Branche par defaut** (base des features) : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`) — et **branche de production** (cible des releases) si le projet en a une distincte (ex: develop → main)
+4. **Commande lint** : biome check, eslint, etc. ? (detecte depuis package.json scripts)
+5. **Commande format** : biome format --write, prettier --write, etc. ?
+6. **Commande test** : vitest, jest, npm test, etc. ?
+7. **Commande build** : tsc --noEmit, npm run build, etc. ?
+8. **Notification** : canal Slack, aucun ?
 
 Les sections Stack technique, Architecture et Nommage du template se remplissent a partir de ce qui est detecte (package.json, structure des dossiers, configs). Propose des valeurs detectees automatiquement, demande confirmation, puis ecris le fichier.
 
@@ -97,10 +96,12 @@ Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont
 - ✅ .claude/rules/
 
 ### Pipeline disponible
-/pipe-plan → /pipe-code → /pipe-review → /pipe-test → /pipe-changelog → /pipe-pr → [merge] → /pipe-tag
+Cycle : /pipe-plan → /pipe-test → [review humaine des tests] → /pipe-code (session neuve) → /pipe-review (session neuve, review humaine) → /pipe-commit → /pipe-pr
+Reprise a tout moment : /pipe-ship [ticket]
+Release : /pipe-release → [merge + deploiement] → /pipe-tag
 
 ### Prochaine etape
-Lance `/pipe-plan [issue]` pour demarrer le travail.
+Lance `/pipe-plan [ticket]` pour demarrer un cycle.
 ```
 
 ---

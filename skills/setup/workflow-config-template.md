@@ -4,15 +4,12 @@ description: Configuration du workflow AI-Driven Development pour ce projet. Con
 user-invocable: false
 ---
 
-## Projet
-
-- **Niveau** : <!-- A (produit vivant : pipeline complet) | B (script/outil : code, tests, commit — pas de changelog ni review formelle) -->
-
 ## Plateforme
 
 - **Git hosting** : <!-- ex: GitHub, GitLab, Gitea -->
 - **Issue tracker** : <!-- ex: GitHub Issues, Jira, Linear -->
-- **Branche par defaut** : <!-- ex: main, develop -->
+- **Branche par defaut** : <!-- base du travail et cible des PRs de feature, ex: develop -->
+- **Branche de production** : <!-- cible des PRs de release, ex: main — vide si identique a la branche par defaut -->
 
 ## Commandes
 

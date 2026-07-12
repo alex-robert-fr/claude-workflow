@@ -9,7 +9,7 @@ user-invocable: false
 ### Format
 
 ```
-type/numero-titre-court
+type/identifiant-titre-court
 ```
 
 ### Mapping des prefixes
@@ -26,7 +26,7 @@ type/numero-titre-court
 ### Regles
 
 - Le titre court est en **kebab-case**, en **anglais**, **max 5 mots**
-- Le numero correspond au numero de l'issue associee
+- L'identifiant correspond au numero de l'issue (`feat/42-add-export`) ou a la cle du ticket externe (`feat/PROJ-42-add-export`)
 
 ---
 
@@ -82,9 +82,14 @@ Format : `[Type] Titre de l'issue (#numero)`
 
 Pour rediger le body ou un commentaire d'iteration, utilise Read pour charger `reference.md` et suivre les templates.
 
-### Auto-close des issues (obligatoire)
+### Reference au ticket (obligatoire)
 
-Le body de chaque PR doit contenir `Closes #XX` pour chaque issue liee. Cela ferme automatiquement les issues au merge. Si plusieurs issues sont concernees : `Closes #12, Closes #15`. Ne jamais omettre cette ligne.
+Le body de chaque PR reference son ticket :
+
+- **Issue native de la plateforme git** : `Closes #XX` pour chaque issue liee (ferme automatiquement au merge ; plusieurs issues : `Closes #12, Closes #15`)
+- **Ticket externe (JIRA...)** : cle avec lien (`Ticket : [PROJ-42](url)`), pas d'auto-close
+
+Ne jamais omettre cette reference.
 
 ### Regles de formatage MCP GitHub
 
