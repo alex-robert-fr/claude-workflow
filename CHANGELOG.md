@@ -11,19 +11,27 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [1.5.0] - 2026-07-12
 
+> **BREAKING** : cette version refond le pipeline (v2). Les projets configurés doivent repasser par `/setup` pour migrer `tech-stack` vers `workflow-config` et adopter le nouveau cycle.
+
 ### Added
 
-- Ajoute `/pipe-ship` qui livre une issue planifiee en un seul geste — enchaine code, review, tests, changelog et PR, ne s'arrete que sur bloquant (incoherence de plan, bloquant de review, tests rouges apres 3 tentatives) et ne demande qu'une confirmation avant push ([`3fcfa3c`](https://github.com/ToolsForSaaS/claude-workflow/commit/3fcfa3c))
-- Ajoute le champ `Niveau` (A : pipeline complet, B : workflow leger sans changelog ni review formelle) dans le template `workflow-config`, consulte par `/pipe-ship` pour adapter sa route ([`d8fa7f5`](https://github.com/ToolsForSaaS/claude-workflow/commit/d8fa7f5))
+- Ajoute `/pipe-ship <ticket>`, la commande de reprise du cycle : elle lit le fichier de pilotage, détecte la phase courante et déroule jusqu'à la prochaine pause humaine ou frontière de session ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52), [`3fcfa3c`](https://github.com/ToolsForSaaS/claude-workflow/commit/3fcfa3c))
+- Ajoute `/pipe-release` : écrit le CHANGELOG orienté métier au moment de livrer, puis crée la PR de la branche d'intégration vers la branche de production ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- Ajoute la voie rapide : les changements sans comportement à tester (typo, libellé, bump mineur) passent par `/pipe-commit` sans ticket ni pilotage ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- Ajoute le contrat des tickets techniques (refactor, migration) : les tests existants doivent rester verts, complétés de tests de caractérisation si la zone touchée est mal couverte ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
 
 ### Changed
 
-- **BREAKING** — Fait de `workflow-config` la source unique de configuration projet (niveau, plateforme, commandes, stack, conventions de nommage) ; l'ancien `tech-stack` reste lu en fallback et `/setup` propose la migration ([`d8fa7f5`](https://github.com/ToolsForSaaS/claude-workflow/commit/d8fa7f5))
-- `/pipe-commit` committe directement sans confirmation systematique — seul le push reste soumis a confirmation ([`2e54e3f`](https://github.com/ToolsForSaaS/claude-workflow/commit/2e54e3f))
+- **BREAKING** — Refond le cycle d'un ticket en TDD piloté : plan co-construit par Q/R (`/pipe-plan`), tests écrits et validés par review humaine avant le dev (`/pipe-test`), dev puis review en sessions dédiées (`/pipe-code`, `/pipe-review`), le tout porté par un fichier de pilotage dans `.claude/plans/` ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- **BREAKING** — Fait de `workflow-config` la source unique de configuration projet (plateforme, commandes, stack, branche de production, clés JIRA) ; l'ancien `tech-stack` reste lu en fallback et `/setup` propose la migration ([`d8fa7f5`](https://github.com/ToolsForSaaS/claude-workflow/commit/d8fa7f5), [#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- Le CHANGELOG s'écrit au moment de la release, plus après chaque feature — le détail technique vit dans les corps de commits vers lesquels chaque entrée pointe ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- `/pipe-review` lance format, lint et tests via les commandes du projet avant l'agent de review, qui applique une barre de valeur explicite — un rapport vide est un résultat valide ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- `/pipe-commit` gagne le mode découpage en commits-changesets en fin de cycle ; le mode simple committe directement sans confirmation systématique, seul le push reste confirmé ([`2e54e3f`](https://github.com/ToolsForSaaS/claude-workflow/commit/2e54e3f), [#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- `/pipe-pr` clôt le cycle : le body porte le ticket, la version cible et les changesets depuis le pilotage, qui est supprimé à la création de la PR ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
+- Les branches et PRs acceptent les clés de tickets externes (`feat/PROJ-42-...`) en plus des numéros d'issues ([#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
 - `/pipe-changelog` associe les PR aux commits en un seul appel `gh` batch, n'execute l'audit de coherence historique qu'en release (ou sur demande) et ne demande plus qu'une confirmation unique avant ecriture ([`b644459`](https://github.com/ToolsForSaaS/claude-workflow/commit/b644459))
 - Retire le champ `model` du frontmatter de tous les skills : il bascule reellement le modele pour le reste du tour (auto-invocation comprise) et pouvait retrograder la session ([`d7af963`](https://github.com/ToolsForSaaS/claude-workflow/commit/d7af963))
-- Passe `/setup` et `/pipe-tag` en slash-only (`disable-model-invocation: true`) : leur description ne coute plus de contexte a chaque session ([`128de48`](https://github.com/ToolsForSaaS/claude-workflow/commit/128de48))
-- `/pipe-plan` propose `/pipe-ship` comme suite nominale du plan valide ([`3fcfa3c`](https://github.com/ToolsForSaaS/claude-workflow/commit/3fcfa3c))
+- Passe `/setup`, `/pipe-tag` et `/pipe-release` en slash-only (`disable-model-invocation: true`) : leur description ne coute plus de contexte a chaque session ([`128de48`](https://github.com/ToolsForSaaS/claude-workflow/commit/128de48), [#52](https://github.com/ToolsForSaaS/claude-workflow/pull/52))
 
 ### Removed
 
