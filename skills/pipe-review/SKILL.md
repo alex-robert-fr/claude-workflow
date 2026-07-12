@@ -1,32 +1,52 @@
 ---
 name: pipe-review
-description: Review automatique du code via sub-agent. Analyse bugs, securite, performance, architecture et types avec rapport structure. Utiliser apres /pipe-code et avant /pipe-test.
+description: Review du code en session dediee : checks outilles (format, lint, tests), review par agent a haute valeur, puis pause pour la review humaine du code. Ne remonte que ce qui compte — un rapport vide est un resultat valide. Utiliser dans une nouvelle session apres /pipe-code.
+argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
 ## Etape 0 — Verifications
 
-- [ ] La branche courante n'est pas la branche par defaut
-- [ ] Il y a au moins un commit d'avance sur la branche par defaut
+Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md`, puis localise le fichier de pilotage :
 
-Si rien a reviewer, signale-le et arrete-toi.
+- Argument fourni → `.claude/plans/plan-<identifiant>.md`
+- Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
 
-## Etape 1 — Charger le contexte projet
+**Avec pilotage** : verifie que `Dev termine` est coche, place-toi sur la branche du pilotage, lis plan + decisions + notes de reprise.
 
-- Utilise Read pour charger `CLAUDE.md` a la racine du repo (si absent, continue sans)
-- Utilise Read pour charger `.claude/_review-persona.md` (si present — personnalisation projet-specifique du style de review)
+**Sans pilotage** (usage autonome) : verifie que la branche courante n'est pas la branche par defaut.
+
+S'il n'y a aucun changement a reviewer (ni commits d'avance, ni working tree modifie), signale-le et arrete-toi.
+
+## Etape 1 — Checks outilles
+
+La qualite mecanique passe par les vrais outils, pas par un agent. Lance dans l'ordre, avec les commandes de `workflow-config` :
+
+1. **Format** — applique le formatage
+2. **Lint**
+3. **Tests**
+
+Si le lint ou les tests echouent : corrige (max 3 tentatives), en respectant la regle du contrat — **ne jamais modifier un test valide** pour le faire passer ; si le probleme semble venir d'un test, stoppe et signale-le. Apres 3 tentatives sans succes, stoppe avec le detail de ce qui a ete tente.
+
+Affiche un recap une ligne :
+
+```
+Format : ✅ | Lint : ✅ | Tests : ✅ N passent
+```
+
+Si une commande n'est pas configuree dans `workflow-config`, signale-le en une ligne et continue.
 
 ## Etape 2 — Collecter le contexte
 
 Rassemble les informations necessaires :
 
-- **Diff complet** de la branche vs branche par defaut (`git diff <branche-defaut>...HEAD`)
+- **Diff complet** vs branche par defaut, **y compris le travail non commite** : `git diff <branche-defaut>` + fichiers non trackes (`git status`)
 - **Liste des fichiers** modifies et crees
 - **Contenu integral** de chaque fichier modifie via Read (pas seulement le diff — le reviewer a besoin du contexte complet)
-- **Issue liee** (depuis le numero dans le nom de branche, ex: `feat/42-...` → issue #42)
+- **Ticket lie** (depuis le pilotage, ou le nom de branche)
 
 ## Etape 3 — Lancer la review en sub-agent
 
-Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Le protocole complet du reviewer (7 champs structures, categories d'analyse, style) est dans `reference.md` — **ne le charge pas dans le contexte principal**, c'est le sub-agent qui le lit.
+Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Le protocole complet du reviewer (barre de valeur, 7 champs structures, categories d'analyse, style) est dans `reference.md` — **ne le charge pas dans le contexte principal**, c'est le sub-agent qui le lit.
 
 Prompt du sub-agent :
 
@@ -34,7 +54,7 @@ Prompt du sub-agent :
 Utilise Read pour charger `[chemin absolu de ${CLAUDE_SKILL_DIR}/reference.md]` et applique la section "Protocole du reviewer".
 
 Contexte de la review :
-- Branche : [branche courante] (diff vs [branche par defaut])
+- Branche : [branche courante] (diff vs [branche par defaut], travail non commite inclus)
 - Fichiers modifies : [liste des fichiers]
 - CLAUDE.md du projet : [chemin, ou "absent"]
 - Persona de review projet : [chemin de .claude/_review-persona.md, ou "absent"]
@@ -48,12 +68,20 @@ Remplace les crochets par les valeurs reelles avant de lancer le sub-agent.
 
 ## Etape 4 — Afficher le rapport
 
-Affiche le rapport du sub-agent dans ce format :
+**Si le statut est OK** (rien a signaler), affiche une seule ligne — c'est un resultat valide, pas un echec de la review :
 
 ```
 ## Review — [branche]
 
-### Statut : OK / Avertissements / Bloquant
+Rien a signaler : pas de bug detecte, l'organisation du projet est respectee.
+```
+
+Sinon, affiche le rapport du sub-agent dans ce format (ne pas afficher les sections vides) :
+
+```
+## Review — [branche]
+
+### Statut : Avertissements / Bloquant
 
 ### Problemes bloquants (a corriger avant de continuer)
 - `fichier.ts:42` <probleme_une_phrase>
@@ -71,41 +99,22 @@ Affiche le rapport du sub-agent dans ce format :
   → <correction>
 ```
 
-Si aucun probleme dans une categorie, ne pas afficher la section (pas de liste vide).
+## Etape 5 — Review humaine du code (pause)
 
-## Etape 5 — Synthese et revue interactive
-
-### Phase 1 — Synthese rapide
-
-Apres l'affichage du rapport (etape 4), produis un recap condense :
+C'est la pause du cycle : l'utilisateur relit le code lui-meme, avec le rapport comme guide. Presente-lui de quoi demarrer :
 
 ```
-### Synthese
+### A relire
 
-- X bloquant(s)
-- Y avertissement(s)
-- Z suggestion(s)
+- `chemin/fichier.ts` — [ce que le fichier apporte, une ligne]
+
+Checks : Format ✅ | Lint ✅ | Tests ✅ N passent
+Rapport : X bloquant(s), Y avertissement(s), Z suggestion(s) — ou "rien a signaler"
 ```
 
-Ne rien corriger a ce stade.
+Puis traite les retours, dans l'ordre :
 
-**Si statut OK** (aucun probleme) → propose directement `/pipe-test`. Fin du skill.
-
-**Si des problemes sont trouves** → demande a l'utilisateur :
-
-```
-Tu veux passer en revue les problemes un par un ? (oui / non — si non, on passe directement a `/pipe-test`)
-```
-
-Si l'utilisateur decline, propose `/pipe-test` et termine.
-
-### Phase 2 — Revue interactive
-
-Parcours chaque probleme dans l'ordre de severite (bloquants d'abord, puis avertissements, puis suggestions).
-
-`N/Total` = position du probleme dans la liste globale triee par severite, sur le nombre total de problemes toutes severites confondues (ex: si 2 bloquants + 1 suggestion, le premier bloquant est `1/3`, la suggestion est `3/3`).
-
-Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique suivant**, en te basant sur les 7 champs produits par le sub-agent a l'etape 3.
+- **Problemes du rapport** : parcours-les par severite (bloquants d'abord) au format Question/Reponse pedagogique, en te basant sur les 7 champs produits par le sub-agent :
 
 ```
 [Severite N/Total] — <fichier>:<ligne>
@@ -121,7 +130,6 @@ Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique s
 
 ❓ D'ou ca vient ?
    <cause>
-   [extrait de code pertinent si necessaire]
 
 ❓ Comment on corrige ?
    <correction>
@@ -129,41 +137,25 @@ Pour chaque probleme, **affiche-le dans le format Question/Reponse pedagogique s
 → corriger / adapter / ignorer ?
 ```
 
-Puis **attends la decision de l'utilisateur** :
+Attends la decision pour chaque probleme : **corriger** (relis le fichier via Read avant d'appliquer), **adapter** (demande la modification souhaitee puis applique), **ignorer** (passe au suivant). Si besoin d'un exemple complet de rendu, utilise Read pour charger `reference.md` (section "Exemple de rendu Question/Reponse").
 
-- **corriger** → relis d'abord le fichier via Read (les corrections precedentes ont pu modifier les lignes), puis applique la correction
-- **adapter** → demande la modification souhaitee a l'utilisateur, relis le fichier via Read, puis applique
-- **ignorer** → passe au probleme suivant sans rien modifier
+- **Retours de l'utilisateur** sur le code qu'il relit : applique-les de la meme facon.
+- Apres toute correction : relance les tests (et le lint) pour verifier que rien ne casse.
+- Ne jamais corriger sans validation explicite de l'utilisateur.
 
-Ne jamais corriger automatiquement sans validation explicite de l'utilisateur.
-
-Si besoin d'un exemple complet de rendu, utilise Read pour charger `reference.md` (section "Exemple de rendu Question/Reponse").
-
-### Cloture
-
-Si au moins un probleme a ete traite en phase 2, affiche un recap des actions :
-
-```
-### Recap review interactive
-
-- X probleme(s) corrige(s)
-- Y probleme(s) ignore(s)
-- Z probleme(s) adapte(s)
-```
-
-Si l'utilisateur a decline la revue (phase 2 non executee), saute le recap.
-
-Si des bloquants ont ete ignores, signale-le explicitement avant de proposer `/pipe-test` :
+Si des bloquants ont ete ignores, signale-le explicitement :
 
 ```
 ⚠️ Attention : X bloquant(s) ont ete ignores. Ces problemes peuvent causer des bugs ou regressions.
 ```
 
-Puis propose la suite :
+Quand l'utilisateur valide le code : coche `Code valide` dans le pilotage et consigne les decisions notables dans sa section Decisions.
+
+## Etape 6 — Proposer la suite
 
 ```
 ---
-Review terminee. Prochaine etape : `/pipe-test` pour verifier que tout passe.
+Code valide. Phase suivante : `/pipe-commit [ticket]` pour decouper le travail en commits (meme session).
 ```
 
 ---
