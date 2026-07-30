@@ -57,6 +57,12 @@ Le CHANGELOG parle au metier : entrees courtes, effet visible pour l'utilisateur
 
 Committe le CHANGELOG sur la branche d'integration.
 
+### Figer les decisions des specs
+
+Dans `docs/specs/`, les journaux de decisions portent la version de livraison. Celles de la release en cours y sont notees `X.Y.Z (a venir)` : retire la mention `(a venir)` pour la version qu'on livre — la decision est desormais publiee.
+
+Recherche `(a venir)` dans `docs/specs/` et ne touche qu'aux lignes de la version cible ; celles d'une version ulterieure restent en l'etat. Aucune occurrence, ou projet sans `docs/specs/` → passe a la suite sans rien signaler. Committe ces corrections avec le CHANGELOG.
+
 ## Etape 4 — PR de release
 
 Affiche le recap complet (version, PRs incluses, extrait du CHANGELOG) puis demande **une confirmation unique** avant de :

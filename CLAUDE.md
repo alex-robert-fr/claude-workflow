@@ -14,26 +14,46 @@ Structure : `.claude-plugin/plugin.json` (manifest), `skills/nom/SKILL.md` (skil
 
 ## Pipeline
 
-Cycle d'une demande metier (ticket JIRA ou issue), pilote par un **fichier de pilotage** dans `.claude/plans/` du projet cible (gitignore, supprime a la PR). L'humain intervient a deux pauses : la review des tests et la review du code. Le dev et la review se font chacun dans une session neuve — le pilotage porte le contexte de reprise.
+Cycle d'une demande metier (ticket JIRA ou issue), pilote par un **fichier de pilotage** dans `.claude/plans/` du projet cible (gitignore, ouvert par `/pipe-spec` des le cadrage, supprime a la PR). L'humain intervient a trois pauses : la validation de la spec, la review des tests et la review du code. Le dev et la review se font chacun dans une session neuve — le pilotage porte le contexte de reprise.
 
 ```
-/pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
+/pipe-spec (cadrage de la feature + validation humaine)
+→ /pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
 → session neuve : /pipe-code (guide par les tests, changesets au fil de l'eau)
-→ session neuve : /pipe-review (format/lint/tests outilles + agent haute valeur + review humaine)
+→ session neuve : /pipe-review (format/lint/tests outilles + agent haute valeur + review humaine + fraicheur de la spec)
 → /pipe-commit (decoupage en changesets) → /pipe-pr (vers la branche d'integration)
 ```
+
+## Specs
+
+Deux documents, deux durees de vie — ne jamais les confondre :
+
+- **Spec** (`docs/specs/<feature>.md`, versionnee) : ce que la feature **est**. Intention, philosophie, comportement attendu, hors-scope, dependances, decisions, points d'entree techniques. Une spec par feature, alimentee par N tickets, ecrite au present. Elle survit au cycle et sert de contexte de reference aux sessions suivantes — on la lit au lieu de parcourir le code.
+- **Pilotage** (`.claude/plans/plan-<ticket>.md`, gitignore) : ce qu'on **fait** sur ce ticket. Ephemere, supprime a la PR.
+
+Sur un projet existant, `/pipe-spec` sans argument inventorie les features deja livrees et les classe par valeur (frequence de modification), pour rattraper l'existant une feature a la fois — jamais en masse : chaque spec exige son cadrage humain.
+
+Deux garde-fous outilles, conformement a la regle du projet — la qualite ne repose pas sur des instructions au LLM :
+
+- Un hook `SessionStart` injecte l'index `docs/specs/README.md` dans le contexte de chaque session : la lecture des specs ne depend pas de la bonne volonte du modele
+- `.claude/scripts/check-specs.sh`, lance par `/pipe-review` avec le format et les tests, detecte les points d'entree morts et les specs hors index
+
+Les deux sont deployes par `/setup`.
+
+Regle : si une phrase devient fausse une fois le ticket merge, elle n'a rien a faire dans une spec. Aucune etape d'implementation, aucun bloc de code, aucun TODO. Le detail est dans `skills/pipe-spec/reference.md`.
 
 `/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Les skills unitaires restent invocables independamment.
 
 Release, quand assez de features sont mergees sur la branche d'integration : `/pipe-release` (CHANGELOG oriente metier + PR integration → production) → [merge + deploiement] → `/pipe-tag`.
 
-Voie rapide : les changements sans comportement a tester (typo, libelle, bump mineur) passent par `/pipe-commit` sans ticket ni pilotage. Les tickets techniques (refactor, migration) suivent le cycle complet avec les tests existants comme contrat (+ caracterisation si zone mal couverte).
+Voie rapide : les changements sans comportement a tester (typo, libelle, bump mineur) passent par `/pipe-commit` sans ticket, ni pilotage, ni spec. Les tickets techniques (refactor, migration) suivent le cycle complet avec les tests existants comme contrat (+ caracterisation si zone mal couverte) ; ils ne creent pas de spec mais peuvent en mettre une a jour.
 
 ## Regles
 
 - Les fichiers dans `skills/` sont **partages** — distribues via le plugin
 - `.claude/skills/` contient l'outillage local du repo (create-skill) — jamais distribue
 - Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
+- **Un script est un fichier, jamais un bloc de code dans un markdown.** Les scripts sans variable projet (hooks universels, checks) vivent dans `skills/setup/scripts/*.sh` et sont **copies** par `/setup` (`cp` + `chmod +x`). Faire recopier un script par le LLM depuis un markdown, c'est lui confier un travail deterministe — avec le risque d'erreur d'echappement en prime. Les markdown ne gardent que les templates reellement variables (commandes de lint, format, test) et l'explication des scripts, pas leur code
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
 - La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM

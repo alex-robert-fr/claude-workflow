@@ -19,6 +19,8 @@ Verifie :
 
 Lis le pilotage en entier : plan, decisions, notes de reprise — c'est tout le contexte de la session.
 
+Si le pilotage reference une spec (`docs/specs/<feature>.md`), lis-la aussi : intention, philosophie, hors-scope, dependances et pieges. C'est le contexte global de la feature, celui qui evite de reparcourir le code et de reprendre une direction ecartee volontairement.
+
 ## Etape 1 — Implementer
 
 Suis le plan, guide par les tests :

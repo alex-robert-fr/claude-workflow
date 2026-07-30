@@ -37,6 +37,7 @@ Note la branche dans la section Branche du pilotage et annonce-la.
 
 Ecris les tests unitaires depuis le plan (comportement attendu, cas limites, section Tests) :
 
+- **Si le pilotage reference une spec** (`docs/specs/<feature>.md`), lis-la : sa section « Comportement attendu » enonce les garanties de la feature — ce sont des tests. Son « Hors scope » delimite ce qu'il ne faut **pas** tester. Le plan reste la source pour le perimetre du ticket courant ; la spec dit ce que la feature doit continuer a garantir.
 - **La regle de couverture** : si tous ces tests passent, la fonctionnalite est bonne. Chaque test verifie un comportement qui compte — cas nominal, cas limites identifies au plan, cas d'erreur. Pas de tests pour gonfler le compteur.
 - Framework et conventions de test du projet (`workflow-config`)
 - **N'implemente pas la fonctionnalite** : uniquement les tests, plus le squelette minimal si la suite en a besoin pour s'executer (signatures vides, types — aucune logique)

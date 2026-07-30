@@ -1,8 +1,66 @@
 # Pipe Plan — References
 
+## Detection de l'environnement et recuperation du ticket
+
+Section commune a `/pipe-plan` et `/pipe-spec`.
+
+### Plateforme git
+
+Recupere l'URL du remote origin (`git remote get-url origin`) et deduis la plateforme :
+
+| Domaine | Plateforme | MCP |
+|---------|-----------|-----|
+| `github.com` | GitHub | `mcp__github__` |
+| `gitlab.com` ou `gitlab.*` | GitLab | `mcp__gitlab__` |
+| Autre | Gitea | `mcp__gitea__` |
+
+Si `.claude/skills/workflow-config/SKILL.md` existe, sa configuration a priorite sur la detection automatique.
+
+### Tracker externe (optionnel)
+
+Si l'argument ressemble a une cle de projet externe ou si le workflow-config mentionne un tracker, utilise le MCP correspondant :
+
+| Pattern | Tracker | MCP |
+|---------|---------|-----|
+| `ABC-123` (lettres majuscules-chiffres) | JIRA | `mcp__atlassian__` |
+| URL `*.atlassian.net/*` | JIRA | `mcp__atlassian__` |
+| URL `linear.app/*` | Linear | MCP Linear si disponible |
+
+Si aucun tracker externe n'est detecte, le ticket vient de la plateforme git.
+
+### Verifications
+
+- [ ] Le repo a un remote `origin` configure
+- [ ] L'argument permet d'identifier un ticket (numero, URL, cle ou texte)
+- [ ] Le MCP necessaire est disponible (sinon, signale-le et propose des alternatives)
+
+Si une verification echoue, signale-le clairement et arrete-toi.
+
+### Formes de l'argument
+
+- `42` ou `#42` → issue sur la plateforme git detectee, via le MCP correspondant
+- `https://github.com/org/repo/issues/42` → extrais plateforme, org, repo, numero depuis l'URL
+- `https://gitlab.com/org/repo/-/issues/42` → idem pour GitLab
+- `https://org.atlassian.net/browse/PROJ-42` → ticket JIRA via MCP Atlassian
+- `PROJ-42` → cle JIRA, utilise le MCP Atlassian
+- Texte libre → recherche dans les issues ouvertes du repo, confirme avec l'utilisateur si ambigu
+
+Recupere le ticket complet (titre, body, labels/tags, commentaires pertinents).
+
+### Hierarchie JIRA
+
+Les tickets JIRA sont souvent organises en epic → ticket de version (ex: `0.5.2`) → demandes metier. Si le tracker est JIRA, remonte la hierarchie du ticket :
+
+- **Version cible** : le ticket parent, si son nom ressemble a une version
+- **Epic** : l'epic de rattachement, si elle existe
+
+Ces deux informations vont dans le fichier de pilotage et serviront a la PR.
+
 ## Fichier de pilotage
 
 Le fichier `.claude/plans/plan-<identifiant>.md` pilote tout le cycle d'un ticket. Il est gitignore (document de travail), mis a jour par chaque skill du pipeline, et supprime par `/pipe-pr` a la creation de la PR. C'est lui qui permet la reprise dans une session neuve.
+
+Il est **ouvert par `/pipe-spec`** des que la feature est identifiee — avant meme le cadrage, pour que cette phase soit elle aussi reprenable par `/pipe-ship`. A ce stade, seul l'en-tete est rempli (ticket, spec visee, etat vierge). `/pipe-plan` le complete ensuite, ou le cree lui-meme si le ticket ne passe pas par une spec.
 
 ```markdown
 # Pilotage — [PROJ-42] Titre du ticket
@@ -13,7 +71,11 @@ Le fichier `.claude/plans/plan-<identifiant>.md` pilote tout le cycle d'un ticke
 - **Epic** : nom de l'epic, si connue
 - **Classification** : technique | metier | mixte
 
+## Spec
+`docs/specs/<feature>.md` — creee | mise a jour | sans objet (aucune feature concernee)
+
 ## Etat
+- [ ] Spec a jour
 - [ ] Plan valide
 - [ ] Tests ecrits
 - [ ] Tests valides (review humaine)
@@ -26,6 +88,7 @@ Le fichier `.claude/plans/plan-<identifiant>.md` pilote tout le cycle d'un ticke
 `feat/PROJ-42-titre-court` (creee par /pipe-test)
 
 ## Decisions
+- [spec] Arbitrage de cadrage — reporte dans la section Decisions de la spec
 - [plan] Decision prise pendant le Q/R, avec sa raison en une ligne
 - [tests] Decision prise pendant la review humaine des tests
 - [dev] Decision prise face a un probleme non anticipe
@@ -41,11 +104,15 @@ Le fichier `.claude/plans/plan-<identifiant>.md` pilote tout le cycle d'un ticke
 - Ecarts au plan, points ouverts, contexte utile pour la session suivante
 ```
 
+Nommage : issue git → `plan-42.md` ; ticket JIRA → `plan-PROJ-42.md` ; texte libre → `plan-<slug>.md`.
+
 Regles :
 
 - Chaque skill coche les cases de l'etat **en fin de phase**, jamais en avance
 - Les cases de review humaine (`Tests valides`, `Code valide`) ne se cochent qu'apres validation explicite de l'utilisateur
 - La section Decisions est un journal : on ajoute, on ne reecrit pas
+- `Spec a jour` est cochee par `/pipe-spec` apres validation humaine de la spec, ou par `/pipe-plan` quand le ticket ne concerne aucune feature (`sans objet`). Le contenu de la spec vit dans `docs/specs/`, jamais recopie ici — le pilotage n'en porte que le chemin
+- Un pilotage ouvert par `/pipe-spec` est **supprime** si `/pipe-plan` bascule ensuite le ticket en voie rapide : pas de cycle, pas de pilotage
 
 ## Template de plan technique
 
