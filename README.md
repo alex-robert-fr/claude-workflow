@@ -79,6 +79,8 @@ Deux benefices : les attentes sont alignees **avant** la premiere ligne de code,
 
 Pour que ce contexte soit reellement utilise et non simplement disponible, `/setup` installe un hook **SessionStart** qui injecte l'index des specs au demarrage de chaque session : la doc de tes features est presente d'office, sans dependre de la bonne volonte du modele. Cout : l'index seul, une ligne par feature.
 
+Une spec qui ment etant pire que pas de spec, la fraicheur est verifiee a deux niveaux : un script (`check-specs.sh`) lance par `/pipe-review` avec le format et les tests, qui detecte les points d'entree pointant vers des fichiers disparus et les specs oubliees de l'index ; et la review elle-meme, qui juge si le comportement decrit correspond encore au code livre.
+
 **Projet existant ?** `/pipe-spec` sans argument inventorie les features deja livrees, les classe par valeur (les zones les plus retouchees du `git log` sont celles qu'on relira le plus) et en cadre une par passe. Sans ce rattrapage, les specs n'arriveraient qu'au rythme des futurs tickets — donc jamais pour le code deja ecrit.
 
 `/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Chaque etape reste invocable individuellement.
@@ -181,10 +183,13 @@ claude-workflow/
 ├── CLAUDE.md                # conventions du plugin
 ├── CHANGELOG.md             # historique des versions
 └── skills/
-    └── <nom>/               # 15 skills, un repertoire par skill
-        ├── SKILL.md         # point d'entree (frontmatter + flow)
-        └── reference.md     # referentiel detaille (optionnel)
+    ├── <nom>/               # 15 skills, un repertoire par skill
+    │   ├── SKILL.md         # point d'entree (frontmatter + flow)
+    │   └── reference.md     # referentiel detaille (optionnel)
+    └── setup/scripts/       # scripts universels, copies tels quels par /setup
 ```
+
+Les scripts (hooks, checks) sont de **vrais fichiers** versionnes, pas des blocs de code dans un markdown : `/setup` les copie (`cp` + `chmod +x`) au lieu de les faire recopier par le modele. Seuls les templates reellement variables — commandes de lint, format et test — restent dans les markdown, avec les valeurs du projet.
 
 **Chargement progressif** : chaque `SKILL.md` reste concis et charge `reference.md` a la demande, uniquement quand le flow en a besoin. Cette decoupe maintient le contexte leger pour les cas simples tout en conservant la profondeur quand elle est utile (exemples : `pipe-changelog`, `pipe-plan`, `pipe-review`).
 

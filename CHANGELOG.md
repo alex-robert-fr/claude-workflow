@@ -14,8 +14,12 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Ajoute le mode inventaire de `/pipe-spec` (appel sans argument) : il repère les features déjà livrées d'un projet existant, les classe par valeur et en cadre une par passe — sans quoi les specs n'arriveraient qu'au rythme des futurs tickets
 - Ajoute `/pipe-spec`, l'étape de cadrage en tête du cycle : elle produit une spec par feature dans `docs/specs/` (versionnée), qui aligne les attentes avant le dev et sert ensuite de contexte de référence — intention, philosophie, comportement attendu, hors-scope, dépendances, décisions et points d'entrée techniques
 
+- Les scripts distribués (hooks universels, checks) sont désormais de vrais fichiers versionnés dans `skills/setup/scripts/`, copiés tels quels par `/setup`, au lieu de blocs de code que le modèle recopiait depuis un markdown. Seuls les templates réellement variables (lint, format, test) restent documentés en markdown
+- Ajoute `check-specs.sh`, lancé par `/pipe-review` avec le format, le lint et les tests : il détecte mécaniquement les points d'entrée pointant vers des fichiers disparus et les specs absentes de l'index (donc jamais injectées dans le contexte)
+
 ### Changed
 
+- `/pipe-review` ne se contente plus de matcher les points d'entrée exacts pour repérer les specs à vérifier : il croise aussi le répertoire, la spec du pilotage et les écarts du check outillé. Un fichier structurant ajouté par le ticket ne figure dans aucune liste de points d'entrée — c'était l'angle mort, et précisément le cas où la spec devient fausse
 - Le cycle démarre par la spec : `/pipe-plan` s'assure qu'elle est à jour avant de planifier, `/pipe-test` en tire les garanties à couvrir, `/pipe-code` la lit comme contexte global, et `/pipe-review` vérifie en fin de cycle qu'elle ne ment pas
 - Le fichier de pilotage est désormais ouvert par `/pipe-spec` dès l'identification de la feature, et non plus à la création du plan : la phase de cadrage devient reprenable par `/pipe-ship` dans une session neuve, comme les autres
 - `/setup` crée `docs/specs/` avec son index, installe un hook `SessionStart` qui injecte cet index dans le contexte de chaque session — les specs sont lues d'office et non plus sur bonne volonté du modèle — et ajoute au `CLAUDE.md` du projet le pointeur correspondant

@@ -33,7 +33,12 @@ Deux documents, deux durees de vie — ne jamais les confondre :
 
 Sur un projet existant, `/pipe-spec` sans argument inventorie les features deja livrees et les classe par valeur (frequence de modification), pour rattraper l'existant une feature a la fois — jamais en masse : chaque spec exige son cadrage humain.
 
-Un hook `SessionStart` (deploye par `/setup`) injecte l'index `docs/specs/README.md` dans le contexte de chaque session : conformement a la regle du projet, la lecture des specs est garantie par un hook, pas par une instruction au LLM.
+Deux garde-fous outilles, conformement a la regle du projet — la qualite ne repose pas sur des instructions au LLM :
+
+- Un hook `SessionStart` injecte l'index `docs/specs/README.md` dans le contexte de chaque session : la lecture des specs ne depend pas de la bonne volonte du modele
+- `.claude/scripts/check-specs.sh`, lance par `/pipe-review` avec le format et les tests, detecte les points d'entree morts et les specs hors index
+
+Les deux sont deployes par `/setup`.
 
 Regle : si une phrase devient fausse une fois le ticket merge, elle n'a rien a faire dans une spec. Aucune etape d'implementation, aucun bloc de code, aucun TODO. Le detail est dans `skills/pipe-spec/reference.md`.
 
@@ -48,6 +53,7 @@ Voie rapide : les changements sans comportement a tester (typo, libelle, bump mi
 - Les fichiers dans `skills/` sont **partages** — distribues via le plugin
 - `.claude/skills/` contient l'outillage local du repo (create-skill) — jamais distribue
 - Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
+- **Un script est un fichier, jamais un bloc de code dans un markdown.** Les scripts sans variable projet (hooks universels, checks) vivent dans `skills/setup/scripts/*.sh` et sont **copies** par `/setup` (`cp` + `chmod +x`). Faire recopier un script par le LLM depuis un markdown, c'est lui confier un travail deterministe — avec le risque d'erreur d'echappement en prime. Les markdown ne gardent que les templates reellement variables (commandes de lint, format, test) et l'explication des scripts, pas leur code
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
 - La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM
