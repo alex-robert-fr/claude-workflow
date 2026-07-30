@@ -81,6 +81,8 @@ Pour que ce contexte soit reellement utilise et non simplement disponible, `/set
 
 Une spec qui ment etant pire que pas de spec, la fraicheur est verifiee a deux niveaux : un script (`check-specs.sh`) lance par `/pipe-review` avec le format et les tests, qui detecte les points d'entree pointant vers des fichiers disparus et les specs oubliees de l'index ; et la review elle-meme, qui juge si le comportement decrit correspond encore au code livre.
 
+Quand une feature est **retiree**, sa spec ne se corrige pas : elle passe au statut `depreciee`, avec sa version de retrait et sa raison. Le corps est conserve — il repond a « pourquoi cette feature a existe, et pourquoi elle a disparu », ce qui evite de la reintroduire par erreur. Elle sort alors du contexte injecte et du controle des chemins, sans disparaitre de l'historique.
+
 **Projet existant ?** `/pipe-spec` sans argument inventorie les features deja livrees, les classe par valeur (les zones les plus retouchees du `git log` sont celles qu'on relira le plus) et en cadre une par passe. Sans ce rattrapage, les specs n'arriveraient qu'au rythme des futurs tickets — donc jamais pour le code deja ecrit.
 
 `/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Chaque etape reste invocable individuellement.
