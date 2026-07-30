@@ -30,6 +30,7 @@ Des commits ont pu etre crees au fil du dev (`/pipe-code` committe les unites te
 
 - Lis l'ensemble des changements restants (diff du working tree + fichiers non trackes)
 - Regroupe par unite logique : modele + migration, service metier, composant UI, config... Les tests accompagnent le changeset du comportement qu'ils verifient — pas de commit fourre-tout `tests`
+- Une spec modifiee (`docs/specs/`) accompagne le changeset de la feature qu'elle decrit, pas un commit `docs` isole. Seule exception : une spec ecrite hors cycle, qui devient alors son propre commit `docs`
 - Ordre logique : dependances d'abord ; chaque commit laisse idealement le projet coherent
 - Granularite = le fichier (staging par chemin). Si un meme fichier melange deux changesets, rattache-le au changeset principal et documente-le dans le body
 - Pour chaque changeset, redige le message complet selon `git-conventions` : titre `emoji type(scope): description`, body en puces (le pourquoi, l'approche choisie, les impacts non evidents depuis le diff)

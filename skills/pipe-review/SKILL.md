@@ -1,6 +1,6 @@
 ---
 name: pipe-review
-description: Review du code en session dediee : checks outilles (format, lint, tests), review par agent a haute valeur, puis pause pour la review humaine du code. Ne remonte que ce qui compte — un rapport vide est un resultat valide. Utiliser dans une nouvelle session apres /pipe-code.
+description: Review du code en session dediee : checks outilles (format, lint, tests), review par agent a haute valeur, pause pour la review humaine du code, puis controle de fraicheur de la spec de la feature. Ne remonte que ce qui compte — un rapport vide est un resultat valide. Utiliser dans une nouvelle session apres /pipe-code.
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
@@ -149,9 +149,34 @@ Si des bloquants ont ete ignores, signale-le explicitement :
 ⚠️ Attention : X bloquant(s) ont ete ignores. Ces problemes peuvent causer des bugs ou regressions.
 ```
 
-Quand l'utilisateur valide le code : coche `Code valide` dans le pilotage et consigne les decisions notables dans sa section Decisions.
+Quand l'utilisateur valide le code : consigne les decisions notables dans la section Decisions du pilotage, puis passe a l'etape 6.
 
-## Etape 6 — Proposer la suite
+## Etape 6 — Fraicheur de la spec
+
+Le code est fige : c'est le moment de verifier que la doc de la feature ne ment pas. Une spec fausse coute plus cher que pas de spec — c'est le contexte que les sessions suivantes chargeront a la place du code.
+
+Identifie les specs concernees : dans `docs/specs/`, celles dont un **point d'entree** apparait dans le diff, plus celle liee au pilotage. Aucune spec (`sans objet`, ou projet sans `docs/specs/`) → passe a l'etape 7 sans rien signaler.
+
+Pour chaque spec concernee, applique la section « Verification de fraicheur » de `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (charge-la avec Read) : comportement attendu, hors scope, points d'entree, decisions prises pendant le dev.
+
+Si des ecarts existent, presente-les et applique les corrections apres validation :
+
+```
+### Spec — `docs/specs/<feature>.md`
+
+- [section] <ecart constate> → <correction proposee>
+```
+
+Regles :
+
+- La spec reste une spec : corriger, ce n'est pas y verser le detail de l'implementation ni les etapes du plan
+- Une decision structurante prise pendant le dev (ecart au plan, arbitrage metier) rejoint le journal Decisions de la spec, avec le ticket
+- Aucun ecart est un resultat valide — le dire en une ligne et passer a la suite
+- La spec modifiee fait partie du travail a committer : elle sera rattachee au changeset de la feature par `/pipe-commit`
+
+Puis coche `Code valide` dans le pilotage.
+
+## Etape 7 — Proposer la suite
 
 ```
 ---
