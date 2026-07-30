@@ -1,6 +1,6 @@
 ---
 name: pipe-test
-description: Ecrire les tests unitaires d'une fonctionnalite avant son implementation, depuis le plan du fichier de pilotage. Assez de tests pour couvrir le comportement, pas plus. S'arrete pour la review humaine des tests — ils deviennent le contrat du dev. Utiliser apres /pipe-plan.
+description: Ecrire les tests d'une feature avant son implementation, depuis le plan du pilotage. Ils deviennent le contrat du dev.
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 

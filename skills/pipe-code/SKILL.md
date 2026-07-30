@@ -1,6 +1,6 @@
 ---
 name: pipe-code
-description: Implementer une fonctionnalite en session dediee, guidee par les tests valides et le plan du fichier de pilotage. Code jusqu'a tests verts, en committant par changesets propres au fil de l'eau. Utiliser dans une nouvelle session apres /pipe-test.
+description: Implementer la feature en session dediee, guidee par les tests valides et le plan du pilotage. Apres /pipe-test.
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 

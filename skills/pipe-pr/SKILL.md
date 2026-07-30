@@ -1,6 +1,6 @@
 ---
 name: pipe-pr
-description: Creer ou mettre a jour une Pull Request. Genere titre, description et commentaire d'iteration selon les conventions, avec les infos du ticket (JIRA ou issue), la version cible et les changesets. Utiliser apres /pipe-commit ou pour soumettre une branche.
+description: Creer ou mettre a jour une Pull Request : titre, description, commentaire d'iteration. Apres /pipe-commit.
 argument-hint: [rien — detecte automatiquement la branche courante]
 ---
 

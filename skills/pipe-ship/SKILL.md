@@ -1,6 +1,6 @@
 ---
 name: pipe-ship
-description: Reprendre le cycle en cours d'un ticket : lit le fichier de pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Le seul geste a retenir dans chaque nouvelle session. Utiliser a tout moment du cycle.
+description: Reprendre le cycle d'un ticket : lit le pilotage, detecte la phase, deroule jusqu'a la prochaine pause humaine.
 argument-hint: [cle du ticket ou rien pour detecter le cycle en cours]
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: pipe-commit
-description: Decouper le travail en commits-changesets clairs qui servent de doc technique, selon les conventions git. En cycle (pilotage present), decoupe tout le travail valide en plusieurs commits ; hors cycle, committe proprement les changements en cours.
+description: Decouper le travail en commits-changesets qui servent de doc technique, selon les conventions git.
 argument-hint: [description optionnelle du changement]
 ---
 

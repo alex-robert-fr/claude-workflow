@@ -1,6 +1,6 @@
 ---
 name: pipe-release
-description: Preparer une release : CHANGELOG oriente metier ecrit au moment de la release, puis PR de la branche d'integration vers la branche de production. Utiliser quand assez de features sont mergees sur la branche d'integration. Apres merge et deploiement, /pipe-tag.
+description: Preparer une release : CHANGELOG metier, puis PR de la branche d'integration vers la production.
 disable-model-invocation: true
 argument-hint: "[version cible ex: 0.5.2, ou rien pour detecter]"
 ---

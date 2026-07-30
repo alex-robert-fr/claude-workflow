@@ -1,8 +1,15 @@
 ---
 name: git-conventions
-description: Conventions git du projet. Branches, commits et Pull Requests. Utiliser lors de la creation de branches, commits ou PRs pour respecter les formats standard.
+description: Conventions git du projet : branches, commits, Pull Requests.
 user-invocable: false
+disable-model-invocation: true
 ---
+
+<!-- Referentiel pur : jamais invoque, toujours charge par Read depuis un chemin
+     qualifie (pipe-commit, pipe-test, pipe-pr, setup). Les deux drapeaux ci-dessus
+     le retirent du catalogue de l'utilisateur ET de celui du modele : sa description
+     cesse d'etre payee dans le prompt systeme de chaque session. -->
+
 
 ## Branches
 
@@ -80,7 +87,7 @@ Format : `[Type] Titre de l'issue (#numero)`
 
 ### Body et commentaire d'iteration
 
-Pour rediger le body ou un commentaire d'iteration, utilise Read pour charger `reference.md` et suivre les templates.
+Pour rediger le body ou un commentaire d'iteration, utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` et suivre les templates.
 
 ### Reference au ticket (obligatoire)
 
