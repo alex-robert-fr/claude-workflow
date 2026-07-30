@@ -120,9 +120,8 @@ Presente le plan a l'utilisateur. Coche `Plan valide` dans l'etat **uniquement a
 
 ```
 ---
-Plan valide, pilotage cree : `.claude/plans/plan-XX.md`.
-Phase suivante : ecrire les tests — `/pipe-test XX`, dans cette session.
-A tout moment : `/pipe-ship XX` reprend le cycle la ou il en est.
+Plan valide · pilotage `.claude/plans/plan-XX.md`.
+Suite : les tests — `/pipe-test XX` (cette session). `/pipe-ship XX` reprend le cycle a tout moment.
 ```
 
 ---

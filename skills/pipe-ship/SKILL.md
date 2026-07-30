@@ -37,8 +37,7 @@ Le dev et la review se font chacun dans une session neuve, avec un contexte prop
 - Si la phase a executer exige une session neuve **et** qu'une autre phase vient d'etre executee dans cette conversation, ne pas enchainer. Afficher :
 
 ```
-Phase suivante : [dev | review] — a lancer dans une NOUVELLE session :
-ouvre une session et lance `/pipe-ship [ticket]`.
+Suite : [dev | review], dans une **nouvelle session** — `/pipe-ship [ticket]`.
 ```
 
 - Si `/pipe-ship` est lance en debut de session (rien d'autre execute avant), executer la phase courante directement, quelle qu'elle soit.

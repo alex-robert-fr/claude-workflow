@@ -16,13 +16,7 @@ Si une verification echoue, signale-le clairement et arrete-toi.
 
 ### Push
 
-Si la branche n'est pas encore poussee sur le remote, pousse-la :
-
-```
-Push vers origin/[branche-courante]...
-```
-
-Confirme avant de push si c'est le premier push de cette branche.
+Si la branche n'est pas encore poussee sur le remote, pousse-la. Confirme avant de push si c'est le premier push de cette branche. Ne commente pas le push : la sortie de la commande le montre deja.
 
 ## Etape 1 — Recuperer le contexte
 
@@ -70,16 +64,12 @@ Affiche le contenu complet avant de soumettre et demande confirmation.
 **Nouvelle PR :**
 
 ```
----
-Pull Request a creer :
-
-Titre : [Type] Titre de l'issue (#XX)
-Base  : [branche par defaut du projet]
-Head  : type/XX-description
+**PR a creer** — [Type] Titre de l'issue (#XX)
+`type/XX-description` → `[branche par defaut du projet]`
 
 [body complet]
----
-Je cree cette PR sur GitHub ?
+
+Je cree cette PR ?
 ```
 
 **Mise a jour :** affiche la description reecrite + le commentaire d'iteration, puis demande confirmation.
@@ -112,9 +102,8 @@ Propose la suite :
 
 ```
 ---
-PR soumise vers [branche par defaut]. Cycle du ticket termine.
-Quand assez de features sont mergees : `/pipe-release` pour preparer la release
-vers la branche de production, puis `/pipe-tag` apres merge et deploiement.
+PR soumise vers [branche par defaut] — cycle du ticket termine.
+Quand assez de features sont mergees : `/pipe-release`, puis `/pipe-tag` apres deploiement.
 ```
 
 ---

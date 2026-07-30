@@ -9,6 +9,12 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-07-30
+
+### Changed
+
+- Les skills du pipeline affichent des sorties compactes : une ligne de statut plutôt qu'un titre suivi d'une métrique, un fait par ligne, et plus de récapitulatif répété d'une étape à l'autre. Le rapport de review passe de 22 à 8 lignes par constat, sans rien perdre de son contenu ([`19bc699`](https://github.com/alex-robert-fr/claude-workflow/commit/19bc699))
+
 ## [1.6.1] - 2026-07-30
 
 ### Changed
@@ -257,7 +263,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.9...v1.5.0

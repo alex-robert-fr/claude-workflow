@@ -50,25 +50,18 @@ Une fois tous les tests verts :
 - Affiche le recap :
 
 ```
-## Implementation terminee — [ticket]
+**Dev termine — [ticket]** · tests ✅ N passent (dont M nouveaux)
 
-Tests : ✅ N passent (dont M nouveaux)
-
-### Commits crees (le reste attend /pipe-commit)
+Commits crees (le reste attend `/pipe-commit`) :
 - emoji type(scope): description
 
-### Fichiers crees
-- chemin/fichier.ts
+Fichiers — `+ chemin/nouveau.ts` · `~ chemin/modifie.ts`
 
-### Fichiers modifies
-- chemin/fichier.ts
-```
-
-```
 ---
-Phase suivante : la review, dans une NOUVELLE session :
-ouvre une session et lance `/pipe-ship [ticket]` (ou `/pipe-review [ticket]`).
+Suite : la review, dans une **nouvelle session** — `/pipe-ship [ticket]`.
 ```
+
+`+` pour un fichier cree, `~` pour un fichier modifie : deux sections separees pour la meme information, c'est une section de trop.
 
 ---
 
