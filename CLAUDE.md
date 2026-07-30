@@ -31,6 +31,8 @@ Deux documents, deux durees de vie — ne jamais les confondre :
 - **Spec** (`docs/specs/<feature>.md`, versionnee) : ce que la feature **est**. Intention, philosophie, comportement attendu, hors-scope, dependances, decisions, points d'entree techniques. Une spec par feature, alimentee par N tickets, ecrite au present. Elle survit au cycle et sert de contexte de reference aux sessions suivantes — on la lit au lieu de parcourir le code.
 - **Pilotage** (`.claude/plans/plan-<ticket>.md`, gitignore) : ce qu'on **fait** sur ce ticket. Ephemere, supprime a la PR.
 
+Sur un projet existant, `/pipe-spec` sans argument inventorie les features deja livrees et les classe par valeur (frequence de modification), pour rattraper l'existant une feature a la fois — jamais en masse : chaque spec exige son cadrage humain.
+
 Un hook `SessionStart` (deploye par `/setup`) injecte l'index `docs/specs/README.md` dans le contexte de chaque session : conformement a la regle du projet, la lecture des specs est garantie par un hook, pas par une instruction au LLM.
 
 Regle : si une phrase devient fausse une fois le ticket merge, elle n'a rien a faire dans une spec. Aucune etape d'implementation, aucun bloc de code, aucun TODO. Le detail est dans `skills/pipe-spec/reference.md`.

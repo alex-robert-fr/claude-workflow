@@ -11,6 +11,7 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ### Added
 
+- Ajoute le mode inventaire de `/pipe-spec` (appel sans argument) : il repère les features déjà livrées d'un projet existant, les classe par valeur et en cadre une par passe — sans quoi les specs n'arriveraient qu'au rythme des futurs tickets
 - Ajoute `/pipe-spec`, l'étape de cadrage en tête du cycle : elle produit une spec par feature dans `docs/specs/` (versionnée), qui aligne les attentes avant le dev et sert ensuite de contexte de référence — intention, philosophie, comportement attendu, hors-scope, dépendances, décisions et points d'entrée techniques
 
 ### Changed

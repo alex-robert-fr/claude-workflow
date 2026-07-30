@@ -79,6 +79,8 @@ Deux benefices : les attentes sont alignees **avant** la premiere ligne de code,
 
 Pour que ce contexte soit reellement utilise et non simplement disponible, `/setup` installe un hook **SessionStart** qui injecte l'index des specs au demarrage de chaque session : la doc de tes features est presente d'office, sans dependre de la bonne volonte du modele. Cout : l'index seul, une ligne par feature.
 
+**Projet existant ?** `/pipe-spec` sans argument inventorie les features deja livrees, les classe par valeur (les zones les plus retouchees du `git log` sont celles qu'on relira le plus) et en cadre une par passe. Sans ce rattrapage, les specs n'arriveraient qu'au rythme des futurs tickets — donc jamais pour le code deja ecrit.
+
 `/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Chaque etape reste invocable individuellement.
 
 Quand assez de features sont mergees sur la branche d'integration :
@@ -136,7 +138,7 @@ Le cycle complet se justifie quand il y a un **comportement a valider**. Regle d
 | Skill | Description |
 |-------|-------------|
 | [`pipe-ship`](skills/pipe-ship/SKILL.md) | Reprendre le cycle d'un ticket : detecte la phase et deroule jusqu'a la prochaine pause |
-| [`pipe-spec`](skills/pipe-spec/SKILL.md) | Cadrer la feature dans une spec durable et versionnee (`docs/specs/`), ouvrir le pilotage |
+| [`pipe-spec`](skills/pipe-spec/SKILL.md) | Cadrer la feature dans une spec durable (`docs/specs/`), ouvrir le pilotage ; sans argument, inventorier l'existant |
 | [`pipe-plan`](skills/pipe-plan/SKILL.md) | Co-construire le plan par Q/R (metier + architecture), completer le fichier de pilotage |
 | [`pipe-test`](skills/pipe-test/SKILL.md) | Ecrire les tests avant le dev, review humaine — ils deviennent le contrat |
 | [`pipe-code`](skills/pipe-code/SKILL.md) | Implementer en session dediee, guide par les tests, jusqu'a tests verts |
