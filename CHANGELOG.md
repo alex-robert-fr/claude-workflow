@@ -9,6 +9,16 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+### Added
+
+- Ajoute `/pipe-spec`, l'étape de cadrage en tête du cycle : elle produit une spec par feature dans `docs/specs/` (versionnée), qui aligne les attentes avant le dev et sert ensuite de contexte de référence — intention, philosophie, comportement attendu, hors-scope, dépendances, décisions et points d'entrée techniques
+
+### Changed
+
+- Le cycle démarre par la spec : `/pipe-plan` s'assure qu'elle est à jour avant de planifier, `/pipe-test` en tire les garanties à couvrir, `/pipe-code` la lit comme contexte global, et `/pipe-review` vérifie en fin de cycle qu'elle ne ment pas
+- Le fichier de pilotage est désormais ouvert par `/pipe-spec` dès l'identification de la feature, et non plus à la création du plan : la phase de cadrage devient reprenable par `/pipe-ship` dans une session neuve, comme les autres
+- `/setup` crée `docs/specs/` avec son index, installe un hook `SessionStart` qui injecte cet index dans le contexte de chaque session — les specs sont lues d'office et non plus sur bonne volonté du modèle — et ajoute au `CLAUDE.md` du projet le pointeur correspondant
+
 ## [1.5.0] - 2026-07-12
 
 > **BREAKING** : cette version refond le pipeline (v2). Les projets configurés doivent repasser par `/setup` pour migrer `tech-stack` vers `workflow-config` et adopter le nouveau cycle.
