@@ -50,10 +50,10 @@ La version du plugin se resout par ordre de priorite : le champ de `plugin.json`
 
 | Version | Ticket | Decision | Raison | Alternative ecartee |
 |---------|--------|----------|--------|---------------------|
-| 1.6.0 (a venir) | — | Une seule declaration de version fait autorite | Deux des quatre declarations d'origine n'etaient jamais lues : l'entree marketplace est masquee par `plugin.json`, et le champ sous `metadata` n'existe que par compatibilite ascendante | Synchroniser les quatre par script |
-| 1.6.0 (a venir) | — | Le bump de version reste un geste local | La mecanique de publication d'un plugin est propre a ce repo ; un skill distribue ne peut pas la porter | Integrer le bump a la chaine de release distribuee |
-| 1.6.0 (a venir) | — | L'audit de coherence ne tourne qu'a la publication | En mode brouillon il coutait plusieurs appels reseau par execution, pour un historique qui n'avait pas bouge | Auditer a chaque passage |
-| 1.6.0 (a venir) | — | Le CHANGELOG est lu par bornes | Un fichier qui grossit a chaque release finit par couter plus cher que la seule section utile | Le charger puis en extraire la section |
+| 1.6.0 | — | Une seule declaration de version fait autorite | Deux des quatre declarations d'origine n'etaient jamais lues : l'entree marketplace est masquee par `plugin.json`, et le champ sous `metadata` n'existe que par compatibilite ascendante | Synchroniser les quatre par script |
+| 1.6.0 | — | Le bump de version reste un geste local | La mecanique de publication d'un plugin est propre a ce repo ; un skill distribue ne peut pas la porter | Integrer le bump a la chaine de release distribuee |
+| 1.6.0 | — | L'audit de coherence ne tourne qu'a la publication | En mode brouillon il coutait plusieurs appels reseau par execution, pour un historique qui n'avait pas bouge | Auditer a chaque passage |
+| 1.6.0 | — | Le CHANGELOG est lu par bornes | Un fichier qui grossit a chaque release finit par couter plus cher que la seule section utile | Le charger puis en extraire la section |
 
 ## Points d'entree
 

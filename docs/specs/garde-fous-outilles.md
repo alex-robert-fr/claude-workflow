@@ -54,10 +54,10 @@ L'injection de contexte passe par `hookSpecificOutput.additionalContext`, seul c
 
 | Version | Ticket | Decision | Raison | Alternative ecartee |
 |---------|--------|----------|--------|---------------------|
-| 1.6.0 (a venir) | — | Un script est un fichier, copie a l'installation | Faire recopier du code deterministe par le LLM ajoute un risque d'echappement sans contrepartie | Blocs bash dans un markdown, recopies a chaque installation |
-| 1.6.0 (a venir) | — | Bloquer l'irreversible et le faux, signaler le reste | Un garde-fou ressenti comme un frein finit desactive | Bloquer a chaque ecart ; ne jamais bloquer |
-| 1.6.0 (a venir) | — | Dependance absente : inerte et muet, `exit 0` | Une session ne doit pas casser parce qu'un outil n'est pas installe | Prevenir au premier declenchement ; echouer bruyamment |
-| 1.6.0 (a venir) | — | Les extensions voyagent en liste, la regex est construite dans le script | Une regex dans une chaine JSON est un echappement invalide qui tue les quatre hooks d'un coup, en silence | Transporter la regex complete depuis `settings.json` |
+| 1.6.0 | — | Un script est un fichier, copie a l'installation | Faire recopier du code deterministe par le LLM ajoute un risque d'echappement sans contrepartie | Blocs bash dans un markdown, recopies a chaque installation |
+| 1.6.0 | — | Bloquer l'irreversible et le faux, signaler le reste | Un garde-fou ressenti comme un frein finit desactive | Bloquer a chaque ecart ; ne jamais bloquer |
+| 1.6.0 | — | Dependance absente : inerte et muet, `exit 0` | Une session ne doit pas casser parce qu'un outil n'est pas installe | Prevenir au premier declenchement ; echouer bruyamment |
+| 1.6.0 | — | Les extensions voyagent en liste, la regex est construite dans le script | Une regex dans une chaine JSON est un echappement invalide qui tue les quatre hooks d'un coup, en silence | Transporter la regex complete depuis `settings.json` |
 
 ## Points d'entree
 

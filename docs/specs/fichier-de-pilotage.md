@@ -55,8 +55,8 @@ Cycle de vie : ouverture par `/pipe-spec` (en-tete seul), enrichissement par cha
 |---------|--------|----------|--------|---------------------|
 | 1.5.0 | #52 | Gitignore plutot que versionne | Un document de travail versionne devient une doc morte | Le committer avec la feature |
 | 1.5.0 | #52 | Etat en cases a cocher, pas en champ `phase:` | Montre d'un coup d'oeil ce qui est fait et ce qui reste | Un champ de statut unique |
-| 1.6.0 (a venir) | — | Ouvert par `/pipe-spec`, non par `/pipe-plan` | Rend le cadrage reprenable par `/pipe-ship` comme les autres phases | Laisser `/pipe-plan` le creer, au prix d'un angle mort pendant le cadrage |
-| 1.6.0 (a venir) | — | Template sorti dans `shared/pilotage-template.md` | `/pipe-spec` chargeait deux fois `pipe-plan/reference.md` dans une seule invocation, pour ~2 500 tokens jetes | Le laisser chez `pipe-plan`, qui n'est pas le createur du fichier |
+| 1.6.0 | — | Ouvert par `/pipe-spec`, non par `/pipe-plan` | Rend le cadrage reprenable par `/pipe-ship` comme les autres phases | Laisser `/pipe-plan` le creer, au prix d'un angle mort pendant le cadrage |
+| 1.6.0 | — | Template sorti dans `shared/pilotage-template.md` | `/pipe-spec` chargeait deux fois `pipe-plan/reference.md` dans une seule invocation, pour ~2 500 tokens jetes | Le laisser chez `pipe-plan`, qui n'est pas le createur du fichier |
 
 ## Points d'entree
 
