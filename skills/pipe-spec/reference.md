@@ -29,6 +29,7 @@ Interdits dans une spec :
 
 > **Statut** : active | experimentale | depreciee
 > **Tickets** : PROJ-42, PROJ-58
+> **Retrait** : 2.1.0 — raison en une ligne _(uniquement si depreciee)_
 
 ## En une phrase
 
@@ -117,13 +118,59 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 | Feature | Spec | En une phrase |
 |---------|------|---------------|
 | Export CSV | [`export-csv.md`](export-csv.md) | Resume issu de la section « En une phrase » |
+
+## Specs depreciees
+
+Features retirees. Conservees pour l'historique — **ne pas les traiter comme du contexte actif**.
+
+| Feature | Spec | Retrait |
+|---------|------|---------|
+| Import XML | [`import-xml.md`](import-xml.md) | 2.1.0 — remplace par l'import CSV |
 ```
 
 Regles :
 
 - Trie les lignes par ordre alphabetique de feature
 - La colonne « En une phrase » reprend mot pour mot la section correspondante de la spec
-- Une spec `depreciee` reste dans l'index, avec la mention dans sa colonne feature
+- **La section « Specs depreciees » doit rester la derniere** et porter ce titre : le hook SessionStart s'arrete a elle pour n'injecter que les features actives. La renommer ou la deplacer reintroduirait les features retirees dans le contexte
+- Pas de spec depreciee → omettre la section entierement
+
+## Fin de vie d'une spec
+
+Une spec qui survit a sa feature est le pire cas de figure : elle est lue comme une reference et decrit du code qui n'existe plus. Le statut `depreciee` sert exactement a cela — encore faut-il que quelqu'un le pose.
+
+### Quand deprecier
+
+- La feature est **retiree du produit** (code supprime, endpoint ferme, ecran enleve)
+- Elle est **remplacee** par une autre feature — la spec qui prend le relais est mentionnee dans la raison
+- Elle est **fusionnee** dans une feature plus large : la spec absorbee est depreciee, celle qui absorbe est mise a jour
+
+Ne pas deprecier une feature simplement refactorisee : le comportement subsiste, la spec reste active et ses points d'entree sont mis a jour.
+
+### Comment
+
+1. Passer le statut a `depreciee` et ajouter la ligne `Retrait` : version de retrait et raison en une ligne
+2. **Ne rien supprimer du corps.** L'interet d'une spec depreciee est de repondre a « pourquoi cette feature a existe, et pourquoi elle a disparu » — c'est ce qui evite de la reintroduire par erreur des mois plus tard
+3. Deplacer sa ligne de l'index vers la section « Specs depreciees »
+4. Ne jamais supprimer le fichier : git garderait la trace, mais plus personne ne la trouverait
+
+### Effets automatiques
+
+Une fois le statut pose, deux mecanismes s'ajustent sans intervention :
+
+- Le hook `SessionStart` cesse d'injecter la feature : il s'arrete a la section des depreciees
+- `check-specs.sh` cesse de controler ses points d'entree — ils ont disparu par construction, les signaler eternellement serait du bruit
+
+### Signal de detection
+
+`check-specs.sh` distingue deux cas, et la difference porte le diagnostic :
+
+| Constat | Interpretation | Action |
+|---------|----------------|--------|
+| Quelques points d'entree morts | La spec a pris du retard | Mettre a jour les points d'entree |
+| **Tous** les points d'entree morts | La feature n'existe plus | Deprecier — ne pas rafistoler |
+
+La depreciation n'est **jamais** automatique : le script signale, l'humain tranche. Une feature peut avoir simplement demenage.
 
 ## Inventaire des features non specifiees
 

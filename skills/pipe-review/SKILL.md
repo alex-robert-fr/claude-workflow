@@ -169,6 +169,19 @@ Si un fichier structurant du diff n'est couvert par aucune spec alors qu'il appa
 
 Pour chaque spec concernee, applique la section « Verification de fraicheur » de `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (charge-la avec Read) : comportement attendu, hors scope, points d'entree, decisions prises pendant le dev.
 
+### Feature retiree
+
+Un ticket peut **supprimer** une feature, pas seulement la modifier. Dans ce cas la spec ne se corrige pas : elle se deprecie. Deux signaux :
+
+- Le check de l'etape 1 annonce `tous les points d'entree ont disparu`
+- Le diff supprime les fichiers structurants d'une feature specifiee
+
+Applique alors la section « Fin de vie d'une spec » de `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` : statut `depreciee`, ligne `Retrait` (version + raison), ligne deplacee vers la section « Specs depreciees » de l'index, corps **conserve** tel quel.
+
+Ne deprecie jamais sans validation explicite de l'utilisateur : une feature dont les fichiers ont disparu a peut-etre simplement demenage — et dans ce cas ce sont les points d'entree qu'il faut corriger.
+
+### Ecarts ordinaires
+
 Si des ecarts existent, presente-les et applique les corrections apres validation :
 
 ```

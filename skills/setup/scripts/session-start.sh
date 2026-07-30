@@ -7,8 +7,12 @@ INDEX="${CLAUDE_PROJECT_DIR:-.}/docs/specs/README.md"
 
 HEADER="Index des specs de features de ce projet (docs/specs/). Chaque spec porte l'intention, le comportement attendu, le hors-scope, les decisions et les points d'entree techniques d'une feature. AVANT de modifier une feature, lire sa spec plutot que de parcourir le code."
 
+# On s'arrete a la section des specs depreciees : une feature retiree ne doit pas
+# etre proposee comme contexte de reference. Pas de section → tout l'index est actif.
+ACTIVE=$(awk '/^## /{ if (tolower($0) ~ /d[eé]preci/) exit } {print}' "$INDEX")
+[ -n "$(printf '%s' "$ACTIVE" | tr -d '[:space:]')" ] || exit 0
+
 # additionalContext est le seul canal garanti pour injecter du contexte.
 # jq -Rs echappe le markdown de l'index : ne jamais construire ce JSON a la main.
-jq -Rs --arg header "$HEADER" \
-  '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: ($header + "\n\n" + .)}, suppressOutput: true}' \
-  "$INDEX"
+printf '%s' "$ACTIVE" | jq -Rs --arg header "$HEADER" \
+  '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: ($header + "\n\n" + .)}, suppressOutput: true}'

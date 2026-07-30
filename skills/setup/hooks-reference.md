@@ -44,6 +44,8 @@ Points de mecanique, tous verifies par test — a connaitre avant de modifier le
 
 - **Ne lire que la colonne 1 du tableau.** La colonne Role cite souvent d'autres chemins (`.gitignore`, `.claude/plans/`) qui ne sont pas des points d'entree — les extraire produirait des faux positifs a chaque spec
 - **Ignorer les lignes `(a creer)`**, accents compris. Une spec est ecrite avant le dev : sans cette tolerance, tout cadrage en amont echouerait le check
+- **Distinguer quelques chemins morts de tous les chemins morts.** Le second cas signifie que la feature a disparu : le message invite a deprecier plutot qu'a rafistoler. C'est un diagnostic, pas une action — la depreciation reste humaine
+- **Sauter les specs au statut `depreciee`** pour le controle des chemins : leurs fichiers ont disparu par construction, les signaler a chaque review serait du bruit permanent. Elles restent en revanche controlees cote index
 - Projet sans `docs/specs/` → exit 0 silencieux
 - Exit 1 des qu'un ecart est trouve : `/pipe-review` le remonte comme les autres checks, sans bloquer le cycle
 
@@ -59,6 +61,7 @@ Points de mecanique — a connaitre avant de modifier le script :
 
 - L'injection passe par `hookSpecificOutput.additionalContext`, avec `hookEventName` **obligatoire** — un `echo` de texte brut n'est pas garanti d'atteindre le contexte
 - `jq -Rs` echappe le markdown de l'index : ne jamais construire ce JSON a la main
+- **L'injection s'arrete a la section « Specs depreciees »** : une feature retiree ne doit pas etre proposee comme contexte de reference. Le titre de cette section est donc un contrat entre l'index et ce script
 - `suppressOutput: true` evite d'afficher l'index dans le transcript a chaque demarrage
 - Projet sans `docs/specs/README.md` → sortie vide et exit 0 : le hook est inerte, pas en erreur
 - Cout : l'index seul (une ligne par feature), pas les specs. Compter ~200 tokens pour une dizaine de features — c'est ce qui evite l'exploration a l'aveugle
