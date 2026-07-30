@@ -1,6 +1,6 @@
 ---
 name: pipe-release
-description: Preparer une release : CHANGELOG oriente metier ecrit au moment de la release, puis PR de la branche d'integration vers la branche de production. Utiliser quand assez de features sont mergees sur la branche d'integration. Apres merge et deploiement, /pipe-tag.
+description: Preparer une release : CHANGELOG metier, puis PR de la branche d'integration vers la production.
 disable-model-invocation: true
 argument-hint: "[version cible ex: 0.5.2, ou rien pour detecter]"
 ---
@@ -56,6 +56,12 @@ Adaptation : affiche le resultat mais ne demande pas la confirmation interne de 
 Le CHANGELOG parle au metier : entrees courtes, effet visible pour l'utilisateur ou le consommateur. Le detail technique reste dans les commits et les PRs vers lesquels chaque entree pointe.
 
 Committe le CHANGELOG sur la branche d'integration.
+
+### Figer les decisions des specs
+
+Dans `docs/specs/`, les journaux de decisions portent la version de livraison. Celles de la release en cours y sont notees `X.Y.Z (a venir)` : retire la mention `(a venir)` pour la version qu'on livre — la decision est desormais publiee.
+
+Recherche `(a venir)` dans `docs/specs/` et ne touche qu'aux lignes de la version cible ; celles d'une version ulterieure restent en l'etat. Aucune occurrence, ou projet sans `docs/specs/` → passe a la suite sans rien signaler. Committe ces corrections avec le CHANGELOG.
 
 ## Etape 4 — PR de release
 

@@ -72,35 +72,3 @@ Pour chaque probleme, produis ces 7 champs structures (utilises ensuite par la p
 Une a deux phrases par champ suffisent.
 
 Produis un rapport structure avec statut global : OK, AVERTISSEMENTS, ou BLOQUANT.
-
-## Exemple de rendu Question/Reponse (phase 2 du skill)
-
-```
-[Bloquant 1/3] — src/services/user.service.ts:42
-
-❓ De quoi on parle ?
-   De la modification du profil utilisateur. Quand l'utilisateur
-   enregistre des changements, on met a jour la base, on rafraichit
-   le cache, puis on lui confirme que c'est sauvegarde pour qu'il
-   voie les bonnes infos sur les ecrans suivants.
-
-❓ Le probleme en une phrase
-   On confirme la sauvegarde a l'utilisateur avant que le cache
-   soit reellement a jour.
-
-❓ C'est grave ?
-   L'utilisateur verra l'ancienne version de son profil juste apres
-   l'avoir modifie. Ca se produit environ 1 fois sur 10 selon la
-   charge, et il faut recharger la page pour voir les bonnes infos.
-
-❓ D'ou ca vient ?
-   Le code lance le rafraichissement du cache mais n'attend pas
-   sa fin avant d'envoyer la confirmation. Un mot-cle d'attente
-   est manquant a cet endroit precis.
-
-❓ Comment on corrige ?
-   Attendre la fin du rafraichissement du cache avant de notifier
-   l'utilisateur : ajouter `await` devant l'appel a `saveCache(user)`.
-
-→ corriger / adapter / ignorer ?
-```

@@ -1,63 +1,38 @@
 # claude-workflow
 
-Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline complet : plan co-construit, tests d'abord, dev guide par les tests, review, commits-changesets, PR, release.
+Plugin Claude Code pour le workflow AI-Driven Development (`name: claude-workflow` dans `.claude-plugin/plugin.json` — les skills sont namespaces `/claude-workflow:pipe-code`).
 
-## Plugin
-
-Ce repo est un **plugin Claude Code** (`name: workflow`). Les skills sont namespaces : `/workflow:pipe-code`, `/workflow:pipe-review`, etc.
-
-Installation : `claude --plugin-dir /chemin/vers/claude-workflow`
-
-Manifest : `.claude-plugin/plugin.json` (name, version, description, author).
-
-Structure : `.claude-plugin/plugin.json` (manifest), `skills/nom/SKILL.md` (skills distribues).
+Le detail fonctionnel — raison d'etre, pipeline commente, specs, voie rapide, installation, inventaire des skills — vit dans `README.md`. Le lire avant de modifier le comportement d'un skill : il est la source unique, ce fichier n'en est pas une copie.
 
 ## Pipeline
 
-Cycle d'une demande metier (ticket JIRA ou issue), pilote par un **fichier de pilotage** dans `.claude/plans/` du projet cible (gitignore, supprime a la PR). L'humain intervient a deux pauses : la review des tests et la review du code. Le dev et la review se font chacun dans une session neuve — le pilotage porte le contexte de reprise.
-
+<!-- pipeline:debut -->
 ```
-/pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
+/pipe-spec (cadrage de la feature + validation humaine)
+→ /pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
 → session neuve : /pipe-code (guide par les tests, changesets au fil de l'eau)
-→ session neuve : /pipe-review (format/lint/tests outilles + agent haute valeur + review humaine)
+→ session neuve : /pipe-review (format/lint/tests outilles + agent + review humaine + fraicheur de la spec)
 → /pipe-commit (decoupage en changesets) → /pipe-pr (vers la branche d'integration)
 ```
+<!-- pipeline:fin -->
 
-`/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Les skills unitaires restent invocables independamment.
+`/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, detecte la phase et deroule jusqu'a la prochaine pause humaine. Release : `/pipe-release` → [merge + deploiement] → `/pipe-tag`.
 
-Release, quand assez de features sont mergees sur la branche d'integration : `/pipe-release` (CHANGELOG oriente metier + PR integration → production) → [merge + deploiement] → `/pipe-tag`.
-
-Voie rapide : les changements sans comportement a tester (typo, libelle, bump mineur) passent par `/pipe-commit` sans ticket ni pilotage. Les tickets techniques (refactor, migration) suivent le cycle complet avec les tests existants comme contrat (+ caracterisation si zone mal couverte).
+Deux documents, deux durees de vie — ne jamais les confondre. La **spec** (`docs/specs/<feature>.md`, versionnee) dit ce que la feature **est** ; le **pilotage** (`.claude/plans/plan-<ticket>.md`, gitignore) dit ce qu'on **fait** sur ce ticket, et meurt a la PR. Regle de tri : si une phrase devient fausse une fois le ticket merge, elle n'a rien a faire dans une spec.
 
 ## Regles
 
-- Les fichiers dans `skills/` sont **partages** — distribues via le plugin
-- `.claude/skills/` contient l'outillage local du repo (create-skill) — jamais distribue
+- Les fichiers de `skills/` sont **partages** — distribues via le plugin. `.claude/` porte l'outillage local du repo (create-skill, scripts de check) et n'est jamais distribue
 - Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
+- **Un script est un fichier, jamais un bloc de code dans un markdown.** Les scripts sans variable projet vivent dans `skills/setup/scripts/*.sh` et sont **copies** par `/setup` (`cp` + `chmod +x`). Faire recopier un script par le LLM depuis un markdown, c'est lui confier un travail deterministe — avec le risque d'erreur d'echappement en prime. Les markdown ne gardent que les templates reellement variables (commandes de lint, format, test) et l'explication des scripts, pas leur code
+- La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM. Les garde-fous outilles : `.claude/scripts/check-skills.sh` (budget et coherence des skills), `skills/setup/scripts/check-specs.sh` (coherence des specs, lance par `/pipe-review`)
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
-- La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM
-- References entre skills du plugin : `${CLAUDE_SKILL_DIR}/../autre-skill/`
-- References aux fichiers projet-specifiques : `.claude/skills/`
+- References entre skills du plugin : `${CLAUDE_SKILL_DIR}/../autre-skill/`. **Toujours un chemin qualifie**, jamais un nom de fichier nu : `Read` exige un chemin absolu, et un nom nu n'est resolvable que depuis le cwd de ce repo — pas depuis un plugin installe
+- Toute ligne ajoutee ici est payee dans **chaque** session : ce fichier reste un aide-memoire operationnel, pas de la documentation
 
-## Versioning
+## Renvois
 
-Lors d'une release (`/pipe-release` puis `/pipe-tag`), toujours mettre a jour la version simultanement dans :
-- `.claude-plugin/plugin.json` (champ `version`)
-- `.claude-plugin/marketplace.json` (champs `metadata.version` ET `plugins[0].version`)
-- `CHANGELOG.md`
-
-Les trois doivent rester strictement synchronises sous peine de desynchroniser la version annoncee dans la marketplace publique.
-
-## Git
-
-Les conventions git (commits, branches, PRs) sont definies dans `skills/git-conventions/SKILL.md`. Les respecter systematiquement.
-
-## Conventions
-
-- Nommage : `kebab-case`, chaque skill est un repertoire `nom/SKILL.md`
-- Skills invocables : `user-invocable: true` (defaut)
-- Skills expertise : `user-invocable: false`
-- `$ARGUMENTS` toujours en fin de skill invocable
-- Prefixes : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `*-conventions` (expertise)
-- Pas de champ `model` dans le frontmatter des skills : il bascule reellement le modele pour le reste du tour (auto-invocation comprise) et peut retrograder la session. Voir `.claude/skills/create-skill/reference.md` section `model`.
+- Ecrire ou modifier un skill : `.claude/skills/create-skill/` (conventions de nommage, frontmatter, seuils de delegation)
+- Commits, branches, Pull Requests : `skills/git-conventions/SKILL.md` — a respecter systematiquement
+- Publier une version : `/pipe-release` puis `/pipe-tag`. La version de `plugin.json` est la **cle de cache des mises a jour** : sans bump, aucun utilisateur ne recoit quoi que ce soit et `/plugin update` repond « already at the latest version ». Panne totale et silencieuse, qu'aucun test ne rattrape — lancer `.claude/scripts/bump-version.sh X.Y.Z`, jamais editer a la main

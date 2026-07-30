@@ -1,197 +1,123 @@
 # Hooks Reference — Templates pour /setup
 
-Ce fichier contient les templates de hooks a adapter pour chaque projet.
-Les hooks sont des garde-fous deterministes — ils ne coutent rien en tokens et ne ratent jamais.
+Ce fichier documente les hooks et checks outilles a installer dans un projet.
+Ce sont des garde-fous deterministes — ils ne ratent jamais, la ou une instruction au LLM peut etre ignoree.
 
-## Principe
+## Deux categories, deux traitements
 
-| Hook | Role | Quand |
-|------|------|-------|
-| PreToolUse | Bloquer les commandes dangereuses | Avant chaque appel d'outil |
-| PostToolUse | Auto-lint/format apres ecriture | Apres Write ou Edit |
-| Stop | Verifier que les tests passent | Quand Claude pense avoir fini |
+| Categorie | Contenu | Comment `/setup` l'installe |
+|-----------|---------|------------------------------|
+| **Scripts universels** | Aucune variable projet | **Copies tels quels** depuis `${CLAUDE_SKILL_DIR}/scripts/` — jamais recopies a la main |
+| **Valeurs par stack** | Liste d'extensions, commandes de format et de test | Injectees comme **arguments** des scripts dans `settings.json`, depuis `workflow-config` |
+
+Un script universel n'a **qu'une** version correcte : le recopier depuis un markdown, c'est confier a un LLM un travail que `cp` fait sans erreur d'echappement. Ne jamais reecrire ces fichiers a la main — les corriger dans le plugin. Ce qui varie d'un projet a l'autre ne vit donc pas dans le corps d'un script, mais dans ses arguments.
+
+## Principe — les 5 scripts a copier
+
+| Hook / check | Role | Quand | Script (plugin → projet) | Arguments |
+|--------------|------|-------|--------------------------|-----------|
+| SessionStart | Injecter l'index des specs dans le contexte | Au demarrage de chaque session | `scripts/session-start.sh` → `.claude/hooks/` | aucun |
+| PreToolUse | Bloquer les commandes dangereuses | Avant chaque appel d'outil | `scripts/pre-tool-use.sh` → `.claude/hooks/` | aucun |
+| PostToolUse | Auto-lint/format apres ecriture | Apres Write ou Edit | `scripts/post-tool-use.sh` → `.claude/hooks/` | liste d'extensions + commande de format |
+| Stop | Verifier que les tests passent | Quand Claude pense avoir fini | `scripts/stop.sh` → `.claude/hooks/` | commande de test |
+| check-specs | Coherence des specs | Appele par `/pipe-review` | `scripts/check-specs.sh` → `.claude/scripts/` | aucun |
+
+`cp` puis `chmod +x`. Les sections ci-dessous expliquent ce que chacun fait et pourquoi — elles ne contiennent pas leur code.
+
+## Check outille — coherence des specs
+
+Ce n'est **pas un hook** : c'est un script appele par `/pipe-review` dans ses checks outilles (etape 1), au meme titre que le format, le lint et les tests. Il est ici parce que `/setup` le deploie comme les hooks.
+
+Il couvre quatre ecarts qu'un agent detecte mal : une spec qui pointe vers des fichiers disparus ; une spec absente de l'index, donc jamais injectee par le hook SessionStart, donc morte ; une ligne d'index pointant vers une spec disparue, seul mode de panne qui produise de la **fausse** information plutot que de l'absence ; et une phrase d'index depassant 80 caracteres.
+
+Points de mecanique, tous verifies par test — a connaitre avant de modifier le script :
+
+- **Ne lire que la colonne 1 du tableau.** La colonne Role cite souvent d'autres chemins (`.gitignore`, `.claude/plans/`) qui ne sont pas des points d'entree — les extraire produirait des faux positifs a chaque spec
+- **Ignorer les lignes `(a creer)`**, accents compris. Une spec est ecrite avant le dev : sans cette tolerance, tout cadrage en amont echouerait le check
+- **Distinguer quelques chemins morts de tous les chemins morts.** Le second cas signifie que la feature a disparu : le message invite a deprecier plutot qu'a rafistoler. C'est un diagnostic, pas une action — la depreciation reste humaine
+- **Sauter les specs au statut `depreciee`** pour le controle des chemins : leurs fichiers ont disparu par construction, les signaler a chaque review serait du bruit permanent. Elles restent en revanche controlees cote index
+- **Valider l'index dans les deux sens.** Partir des fichiers ne voit pas la ligne d'index orpheline — et celle-la continue d'etre injectee dans chaque session en decrivant une feature qui n'existe plus
+- **Plafonner la phrase d'index a 80 caracteres.** L'index est le seul poste de contexte qui grossit a chaque `/pipe-spec` reussi : sans borne outillee, il derive vers ~1300 tokens par session a vingt specs
+- **Comparer les noms de fichiers en entier.** Un match en sous-chaine ferait passer `csv.md` pour indexe des qu'une ligne cite `export-csv.md`
+- Projet sans `docs/specs/` → exit 0 silencieux
+- Exit 1 des qu'un ecart est trouve : `/pipe-review` le remonte comme les autres checks, sans bloquer le cycle
+
+## SessionStart — Index des specs
+
+Les specs de `docs/specs/` n'ont de valeur que si elles sont **lues**. Une instruction dans le CLAUDE.md repose sur la bonne volonte du LLM ; ce hook rend l'index present dans le contexte des le demarrage, sans exception.
+
+**Pas de matcher** — l'evenement n'en prend pas. **Pas d'argument.**
+
+Points de mecanique — a connaitre avant de modifier le script :
+
+- L'injection passe par `hookSpecificOutput.additionalContext`, avec `hookEventName` **obligatoire** — un `echo` de texte brut n'est pas garanti d'atteindre le contexte
+- `jq -Rs` echappe le markdown de l'index : ne jamais construire ce JSON a la main
+- **L'injection s'arrete a la section « Specs depreciees »** : une feature retiree ne doit pas etre proposee comme contexte de reference. Le titre de cette section est donc un contrat entre l'index et ce script
+- `suppressOutput: true` evite d'afficher l'index dans le transcript a chaque demarrage
+- Projet sans `docs/specs/README.md` → sortie vide et exit 0 : le hook est inerte, pas en erreur
+- Cout : l'index seul (une ligne par feature), pas les specs. Compter ~200 tokens pour une dizaine de features — c'est ce qui evite l'exploration a l'aveugle
 
 ## PreToolUse — Blocage des commandes dangereuses
 
 Bloque les commandes Bash qui pourraient causer des degats irreversibles.
 
-**Matcher** : `Bash`
+**Matcher** : `Bash`. **Pas d'argument.**
 
-**Script template** :
+La liste des patterns bloques vit dans le script (`rm -rf`, `git push --force` sur une branche protegee, `DROP TABLE`, `git reset --hard`...). Pour l'etendre sur un projet, editer le fichier deploye ; pour l'etendre partout, le corriger dans le plugin.
 
-```bash
-#!/bin/bash
-# Hook PreToolUse — bloque les commandes dangereuses
-# Recoit l'input de l'outil sur stdin en JSON
-
-INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-
-# Patterns dangereux a bloquer
-DANGEROUS_PATTERNS=(
-  'rm\s+-rf\s+/'
-  'rm\s+-rf\s+\.'
-  'git\s+push\s+--force\s+(origin\s+)?(main|master|develop)'
-  'git\s+push\s+-f\s+(origin\s+)?(main|master|develop)'
-  'DROP\s+(TABLE|DATABASE)'
-  'TRUNCATE\s+TABLE'
-  'git\s+reset\s+--hard'
-  'git\s+checkout\s+\.\s*$'
-  'git\s+clean\s+-fd'
-  'chmod\s+-R\s+777'
-)
-
-for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-  if echo "$COMMAND" | grep -qEi "$pattern"; then
-    echo "BLOCKED: commande dangereuse detectee — $COMMAND"
-    exit 2
-  fi
-done
-```
-
-**Commande inline (alternative sans script)** :
-
-```
-bash -c 'CMD=$(cat | jq -r ".tool_input.command // empty"); echo "$CMD" | grep -qEi "(rm\\s+-rf\\s+[/.]|git\\s+push\\s+--force.*(main|master)|DROP\\s+(TABLE|DATABASE)|git\\s+reset\\s+--hard|git\\s+checkout\\s+\\.\\s*$)" && echo "BLOCKED: commande dangereuse" && exit 2 || true'
-```
+Exit 2 bloque l'action, et c'est **stderr** qui est alors transmis a Claude — un motif ecrit sur stdout donne un blocage sans explication.
 
 ## PostToolUse — Auto-lint/format
 
 Formate automatiquement les fichiers apres chaque ecriture. Le lint est deterministe — ca ne doit JAMAIS etre fait par le LLM.
 
-**Matcher** : `Write|Edit`
+**Matcher** : `Write|Edit`.
 
-**Templates par stack** :
+**Arguments** : `post-tool-use.sh '<EXTENSIONS>' '<COMMANDE_FORMAT>'`. Le script lit le JSON du hook sur stdin, en extrait le chemin ecrit, et n'applique la commande que si l'extension figure dans la liste. Le chemin du fichier est ajoute par le script : la commande s'ecrit sans lui.
 
-### Biome (TypeScript/JavaScript)
-```bash
-#!/bin/bash
-INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-if [ -n "$FILE" ] && [[ "$FILE" =~ \.(ts|tsx|js|jsx|json|css)$ ]]; then
-  npx biome check --write "$FILE" 2>/dev/null || true
-fi
-```
-
-### ESLint + Prettier
-```bash
-#!/bin/bash
-INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-if [ -n "$FILE" ] && [[ "$FILE" =~ \.(ts|tsx|js|jsx)$ ]]; then
-  npx eslint --fix "$FILE" 2>/dev/null || true
-  npx prettier --write "$FILE" 2>/dev/null || true
-fi
-```
-
-### Ruff (Python)
-```bash
-#!/bin/bash
-INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-if [ -n "$FILE" ] && [[ "$FILE" =~ \.py$ ]]; then
-  ruff check --fix "$FILE" 2>/dev/null || true
-  ruff format "$FILE" 2>/dev/null || true
-fi
-```
-
-### rustfmt (Rust)
-```bash
-#!/bin/bash
-INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-if [ -n "$FILE" ] && [[ "$FILE" =~ \.rs$ ]]; then
-  rustfmt "$FILE" 2>/dev/null || true
-fi
-```
-
-### gofmt (Go)
-```bash
-#!/bin/bash
-INPUT=$(cat)
-FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-if [ -n "$FILE" ] && [[ "$FILE" =~ \.go$ ]]; then
-  gofmt -w "$FILE" 2>/dev/null || true
-fi
-```
+`<EXTENSIONS>` est une liste separee par `|`, **sans point ni antislash** (`ts|tsx|js`). C'est le script qui construit la regex. Transporter une regex du type `\.(ts|tsx)$` dans une chaine JSON serait un echappement invalide : `settings.json` deviendrait illisible et les quatre hooks mourraient d'un coup, en silence.
 
 ## Stop — Verification des tests
 
-Verifie que les tests passent avant de considerer la tache comme terminee. Si le hook retourne un code non-zero, Claude continue a travailler.
+Verifie que les tests passent avant de laisser Claude terminer.
 
-**Templates par stack** :
+**Pas de matcher.**
 
-### npm/Node.js
-```bash
-npm run test 2>&1
-```
+**Arguments** : `stop.sh <COMMANDE_TEST>` — la commande complete, telle quelle.
 
-### Vitest
-```bash
-npx vitest run 2>&1
-```
+Points de mecanique — a connaitre avant de modifier le script :
 
-### Go
-```bash
-go test ./... 2>&1
-```
+- **Seul `exit 2` bloque l'arret**, et c'est **stderr** qui est alors transmis a Claude. Un `exit 1` est une erreur non bloquante : Claude s'arrete quand meme, sans diagnostic. Propager le code de retour brut de la commande de test rendrait donc le hook inerte — un `npm test` rouge sort en 1
+- Sur `exit 0`, stdout ne va qu'au journal de debug : Claude ne le voit pas
+- **`stop_hook_active` protege de la boucle infinie.** Si Claude a deja ete relance par ce hook, le script sort en 0 et le laisse s'arreter. Sans ce garde-fou, des tests durablement rouges bloqueraient la session indefiniment
+- Aucune commande passee en argument → exit 0 : un projet sans commande de test n'est jamais bloque
 
-### Python
-```bash
-pytest 2>&1
-```
+## Valeurs par stack
 
-### Rust
-```bash
-cargo test 2>&1
-```
+Ces valeurs alimentent les arguments des deux scripts ci-dessus dans `settings.json`. La commande de format et celle de test viennent de `workflow-config` quand elles y sont deja renseignees ; ce tableau sert de defaut par stack.
+
+| Stack | Extensions | Commande format/lint | Commande test |
+|-------|------------|----------------------|---------------|
+| Biome (TypeScript/JavaScript) | `ts\|tsx\|js\|jsx\|json\|css` | `npx biome check --write` | `npx vitest run` |
+| ESLint + Prettier | `ts\|tsx\|js\|jsx` | `npx eslint --fix` puis `npx prettier --write` | `npm run test` |
+| Ruff (Python) | `py` | `ruff check --fix` puis `ruff format` | `pytest` |
+| rustfmt (Rust) | `rs` | `rustfmt` | `cargo test` |
+| gofmt (Go) | `go` | `gofmt -w` | `go test ./...` |
+
+- Dans ce tableau, `\|` est un `|` echappe pour le markdown : ecrire `|` dans `settings.json`
+- Pas de point, pas d'antislash, pas de `$` : la regex est construite par le script (voir PostToolUse ci-dessus)
+- Deux commandes de format pour une meme stack (ESLint **puis** Prettier, `ruff check` **puis** `ruff format`) → deux entrees dans le tableau `hooks` du meme matcher PostToolUse, pas une commande composee
 
 ## Structure settings.json complete
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/pre-tool-use.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/post-tool-use.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/stop.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+Template : `${CLAUDE_SKILL_DIR}/settings-template.json` — les 4 hooks cables vers les scripts copies, avec les placeholders `<EXTENSIONS>`, `<COMMANDE_FORMAT>` et `<COMMANDE_TEST>`. `/setup` le copie puis remplace les placeholders ; il ne genere pas ce JSON de tete.
 
 ## Notes
 
-- Les hooks sont executes par le harness Claude Code, pas par le LLM — ils sont gratuits en tokens
-- Un hook PreToolUse qui retourne exit code 2 bloque l'action avec le message stdout
-- Un hook Stop qui retourne exit code non-zero force Claude a continuer
+- Les hooks sont executes par le harness Claude Code, pas par le LLM — leur execution est gratuite en tokens (un hook qui injecte du contexte, comme SessionStart, coute en revanche ce qu'il injecte)
+- Un hook PreToolUse ne bloque l'action que sur **exit 2**, et transmet alors **stderr** a Claude — pas stdout. Un diagnostic sur stdout produit un blocage muet (`No stderr output`) : l'action est refusee sans que Claude apprenne pourquoi, et il la retente
+- Un hook Stop ne force Claude a continuer que sur **exit 2**, et lit alors **stderr** ; tout autre code non-zero est une erreur non bloquante
 - Les hooks PostToolUse ne bloquent pas — ils s'executent silencieusement
 - Toujours `|| true` sur les commandes de lint pour ne pas bloquer l'ecriture si le linter crash
 - Les scripts doivent etre dans `.claude/hooks/` et rendus executables (`chmod +x`)
+- Un hook cable vers un script absent ou non executable ne fait **rien** : le PostToolUse meurt en silence, et le formatage automatique avec lui. C'est pourquoi `/setup` verifie l'existence de chaque cible au diagnostic comme apres ecriture

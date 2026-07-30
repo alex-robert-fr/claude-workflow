@@ -128,16 +128,18 @@ Charge les skills depuis `../shared-config/.claude/skills/`.
 
 Les descriptions sont chargees dans le contexte pour que Claude sache quels skills existent — dans **chaque session de chaque projet** ou le plugin est actif.
 
-- La combinaison `description` + `when_to_use` est **tronquee a 1 536 caracteres** par skill dans le listing (doc officielle, v2.1.196+)
+- La combinaison `description` + `when_to_use` est **tronquee a 1 536 caracteres** par skill dans le listing (doc officielle, v2.1.196+). C'est la limite de la plateforme, pas un budget : ecrire 1 500 caracteres de description est techniquement valide et economiquement absurde
+- Le budget du plugin est **130 caracteres par description**. C'est le poste le plus cher : le corps d'un skill ne se paie qu'a l'invocation, la description se paie a chaque session de chaque projet, meme celles qui n'invoquent jamais le skill. 100 caracteres retires d'une description valent plus que 1 000 retires d'un `reference.md`
 - Un skill jamais utilise coute donc son entree de listing a chaque session, pour zero benefice
 
 ### Verification
 
-Lancer `/context` : la ligne Skills affiche la taille reelle du listing tel que recu par le modele.
+- `.claude/scripts/check-skills.sh` — plafond de 130 caracteres, chemins de chargement qualifies, `$ARGUMENTS` present, seuil de delegation, concordance des trois copies du diagramme du pipeline. Outillage local, a lancer a la main
+- `/context` — la ligne Skills affiche la taille reelle du listing tel que recu par le modele
 
 ### Optimisation
 
-- Descriptions concises (20-50 mots)
+- Descriptions a 130 caracteres max : verbe + objet + declencheur, sans enumerer les etapes du skill ni les sections du document produit
 - `disable-model-invocation: true` sur les skills rarement auto-charges
 - `user-invocable: false` sur les skills de reference pure
 
@@ -222,6 +224,8 @@ Si CLAUDE.md dit "indentation 2 espaces" mais le skill dit "indentation 4 espace
 | `${CLAUDE_SKILL_DIR}`  | Chemin absolu du repertoire du skill | Pour referencer les fichiers supports                |
 | `${CLAUDE_SESSION_ID}` | UUID de la session courante          | Pour logs/fichiers temporaires                       |
 
+`$N` est un raccourci de `$ARGUMENTS[N]`, donc **indexe a 0** : `$0` est le premier argument positionnel, `$1` le second. Attention au reflexe shell, ou `$0` designe le nom du programme et `$1` le premier argument : ici il n'y a pas ce decalage d'un rang. Les exemples de ce fichier suivent l'indexation a 0.
+
 Si `$ARGUMENTS` n'est pas dans le contenu, Claude Code l'ajoute automatiquement a la fin.
 
 ## Conventions de nommage
@@ -243,7 +247,9 @@ Si `$ARGUMENTS` n'est pas dans le contenu, Claude Code l'ajoute automatiquement 
 ## Anti-patterns
 
 - Description vague -> jamais charge auto
-- Skill >200 lignes sans fichiers supports -> fragmenter
+- Description qui enumere les etapes ou les sections produites -> gonfle le prompt systeme de chaque session sans rien ajouter au routage
+- Description au-dela de 130 caracteres -> refusee par `.claude/scripts/check-skills.sh`
+- Skill au-dela de ~150 lignes sans fichiers supports -> deleguer le detail dans `reference.md`
 - Frontmatter sans description -> routing impossible
 - `context: fork` avec guidelines sans tache explicite -> sous-agent inutile
 - `disable-model-invocation: true` sur un skill d'expertise -> jamais utilise

@@ -1,3 +1,14 @@
+# Tout .claude/ est ignore par defaut, puis on re-inclut explicitement l'outillage
+# local du repo. Sans la re-inclusion de scripts/, les garde-fous outilles de ce
+# projet (check-skills, check-specs, bump-version) ne seraient pas versionnes.
 .claude/*
 !.claude/skills/
-settings.json
+!.claude/scripts/
+
+# Restent ignores par la regle ci-dessus, listes ici pour l'intention :
+#   .claude/settings.local.json  — permissions propres a la machine
+#   .claude/plans/               — fichiers de pilotage, ephemeres, supprimes a la PR
+#   .claude/hooks/               — copies produites par /setup depuis skills/setup/scripts/
+
+# Ne jamais utiliser de motif nu comme `settings.json` : non ancre, il ignorerait
+# tout fichier de ce nom n'importe ou dans le repo, y compris un template distribue.

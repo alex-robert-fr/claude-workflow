@@ -1,6 +1,6 @@
 ---
 name: pipe-code
-description: Implementer une fonctionnalite en session dediee, guidee par les tests valides et le plan du fichier de pilotage. Code jusqu'a tests verts, en committant par changesets propres au fil de l'eau. Utiliser dans une nouvelle session apres /pipe-test.
+description: Implementer la feature en session dediee, guidee par les tests valides et le plan du pilotage. Apres /pipe-test.
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
@@ -18,6 +18,8 @@ Verifie :
 - [ ] Les fichiers de tests listes dans le pilotage existent
 
 Lis le pilotage en entier : plan, decisions, notes de reprise — c'est tout le contexte de la session.
+
+Si le pilotage reference une spec (`docs/specs/<feature>.md`), lis-la aussi : intention, philosophie, hors-scope, dependances et pieges. C'est le contexte global de la feature, celui qui evite de reparcourir le code et de reprendre une direction ecartee volontairement.
 
 ## Etape 1 — Implementer
 

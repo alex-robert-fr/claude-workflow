@@ -1,6 +1,6 @@
 ---
 name: pipe-ship
-description: Reprendre le cycle en cours d'un ticket : lit le fichier de pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Le seul geste a retenir dans chaque nouvelle session. Utiliser a tout moment du cycle.
+description: Reprendre le cycle d'un ticket : lit le pilotage, detecte la phase, deroule jusqu'a la prochaine pause humaine.
 argument-hint: [cle du ticket ou rien pour detecter le cycle en cours]
 ---
 
@@ -10,7 +10,7 @@ Ce skill n'a pas de logique propre : il localise le pilotage, identifie la phase
 
 - Argument fourni → `.claude/plans/plan-<identifiant>.md`
 - Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
-- Aucun pilotage → pas de cycle en cours : propose `/pipe-plan [ticket]` pour en demarrer un, et arrete-toi
+- Aucun pilotage → pas de cycle en cours : propose de demarrer par le cadrage, `/pipe-spec [ticket]` (c'est lui qui ouvre le pilotage), et arrete-toi
 
 ## Etape 1 — Identifier la phase courante
 
@@ -20,6 +20,7 @@ Lis le pilotage en entier. Dans la section Etat, la **premiere case non cochee**
 
 | Premiere case non cochee | Phase a executer | Skill a charger (Read) | Session |
 |---|---|---|---|
+| `Spec a jour` | cadrage de la feature dans `docs/specs/` | `${CLAUDE_SKILL_DIR}/../pipe-spec/SKILL.md` | courante |
 | `Plan valide` | co-construction du plan | `${CLAUDE_SKILL_DIR}/../pipe-plan/SKILL.md` | courante |
 | `Tests ecrits` ou `Tests valides` | ecriture + review humaine des tests | `${CLAUDE_SKILL_DIR}/../pipe-test/SKILL.md` | courante |
 | `Dev termine` | implementation guidee par les tests | `${CLAUDE_SKILL_DIR}/../pipe-code/SKILL.md` | **neuve obligatoire** |

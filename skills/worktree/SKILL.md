@@ -1,6 +1,6 @@
 ---
 name: worktree
-description: Creer et gerer des worktrees git pour travailler en parallele sur plusieurs branches. Utiliser pour isoler le travail sur une issue sans perdre le contexte courant.
+description: Creer, lister, supprimer et basculer entre worktrees git pour travailler en parallele sur plusieurs branches.
 argument-hint: [create|list|remove|switch] [branche]
 allowed-tools: Read, Bash(git *)
 ---

@@ -1,6 +1,6 @@
 ---
 name: pipe-tag
-description: Creer et pousser un tag git annote pour une release. Verifie la branche de production, detecte la version depuis CHANGELOG.md ou argument, cree un tag annote semantique. Utiliser apres merge de la PR de release et deploiement.
+description: Creer et pousser le tag git annote d'une release, apres merge de la PR et deploiement.
 disable-model-invocation: true
 argument-hint: "[v1.2.3]"
 ---
@@ -35,14 +35,20 @@ Si le pull echoue (divergence), signale-le et arrete-toi.
 
 ## Etape 1 — Determiner la version cible
 
-Utilise Read pour charger `reference.md` avant de valider le format.
+Format attendu : `vMAJOR.MINOR.PATCH` — trois composants numeriques (`v1.2.0`, jamais `v1.2`), prefixe `v` obligatoire, minuscules, sans espace ni slash. Pre-release : `vX.Y.Z-alpha.1`, `-beta.2`, `-rc.1` (precedence `alpha` < `beta` < `rc` < stable). Tag toujours annote (`git tag -a`), jamais leger.
+
+Ne charger `${CLAUDE_SKILL_DIR}/reference.md` que si le cas sort de ce cadre — pre-release a arbitrer, tag existant a supprimer, doute sur le bump SemVer — ou si l'utilisateur demande le detail.
 
 **Si un argument est fourni** (ex: `v1.2.3` ou `1.2.3`) : utiliser cet argument comme version cible. Si le prefixe `v` est absent, l'ajouter automatiquement et en informer l'utilisateur.
 
-**Si aucun argument** : detecter depuis `CHANGELOG.md` —
-- Lire le fichier avec Read
-- Extraire la derniere version publiee (format `## [X.Y.Z]`, exclure `[Unreleased]`)
-- Ajouter le prefixe `v` pour obtenir `vX.Y.Z`
+**Si aucun argument** : detecter depuis `CHANGELOG.md` sans le lire en entier —
+- Extraire le premier titre de section versionnee, qui est la derniere version publiee :
+  ```
+  grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md
+  ```
+  Le motif exclut `[Unreleased]` de fait, et tolere un titre linke (`## [1.4.8](url/releases/tag/v1.4.8) - date`).
+- Retirer les crochets et ajouter le prefixe `v` pour obtenir `vX.Y.Z`
+- Si la commande ne renvoie rien (pas de CHANGELOG, ou aucune version publiee), demander la version a l'utilisateur et s'arreter s'il n'en fournit pas
 - Proposer cette version comme cible
 
 Afficher :
@@ -56,9 +62,15 @@ Verifier que le tag `vX.Y.Z` n'existe pas deja (`git tag -l "vX.Y.Z"`). Si le ta
 
 ## Etape 2 — Extraire les notes de release
 
-Lire `CHANGELOG.md` avec Read et extraire le contenu de la section correspondant a la version cible (`## [X.Y.Z]`).
+Extraire la seule section de la version cible, sans charger `CHANGELOG.md` en entier :
 
-Si la section n'existe pas dans le CHANGELOG, les notes de release seront vides — le message du tag se limitera a `Release vX.Y.Z`.
+```
+sed -n '/^## \[1\.2\.3\]/,/^## \[/{/^## \[/d;/^\[[^]]*\]: /d;p;}' CHANGELOG.md
+```
+
+- Remplacer `1\.2\.3` par la version cible **sans prefixe `v`, points echappes**
+- `/^## \[/d` retire l'en-tete de la section et celui de la section suivante ; `/^\[[^]]*\]: /d` retire le bloc de liens de comparaison en bas de fichier, qui serait ramasse si la version cible est la plus ancienne section
+- Sortie vide = section absente : les notes de release sont vides, le message du tag se limite a `Release vX.Y.Z` et le recap de l'etape 3 affiche `(aucune note)`
 
 ## Etape 3 — Confirmer avant de tagger
 

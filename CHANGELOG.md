@@ -9,6 +9,33 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-07-30
+
+### Added
+
+- Ajoute `/pipe-spec`, l'étape de cadrage en tête du cycle : elle produit une spec par feature dans `docs/specs/` (versionnée), qui aligne les attentes avant le dev et sert ensuite de contexte de référence — intention, philosophie, comportement attendu, hors-scope, dépendances, décisions et points d'entrée techniques ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- Ajoute le mode inventaire de `/pipe-spec` (appel sans argument) : il repère les features déjà livrées d'un projet existant, les classe par valeur et en cadre une par passe — sans quoi les specs n'arriveraient qu'au rythme des futurs tickets ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- Gère la fin de vie d'une spec : quand une feature est retirée, `/pipe-review` la passe au statut `depreciee` (version et raison du retrait, corps conservé) au lieu de laisser une doc qui décrit du code disparu. Le hook `SessionStart` cesse alors de l'injecter et `check-specs.sh` cesse de contrôler ses points d'entrée. Le script signale le cas — tous les points d'entrée disparus d'un coup — mais la dépréciation reste une décision humaine ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- Ajoute `check-specs.sh`, lancé par `/pipe-review` avec le format, le lint et les tests : il détecte mécaniquement les points d'entrée pointant vers des fichiers disparus et les specs absentes de l'index (donc jamais injectées dans le contexte) ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+
+### Changed
+
+- Le cycle démarre par la spec : `/pipe-plan` s'assure qu'elle est à jour avant de planifier, `/pipe-test` en tire les garanties à couvrir, `/pipe-code` la lit comme contexte global, et `/pipe-review` vérifie en fin de cycle qu'elle ne ment pas ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- `/setup` crée `docs/specs/` avec son index, installe un hook `SessionStart` qui injecte cet index dans le contexte de chaque session — les specs sont lues d'office et non plus sur bonne volonté du modèle — et ajoute au `CLAUDE.md` du projet le pointeur correspondant ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- `/pipe-review` ne se contente plus de matcher les points d'entrée exacts pour repérer les specs à vérifier : il croise aussi le répertoire, la spec du pilotage et les écarts du check outillé. Un fichier structurant ajouté par le ticket ne figure dans aucune liste de points d'entrée — c'était l'angle mort, et précisément le cas où la spec devient fausse ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- Le fichier de pilotage est désormais ouvert par `/pipe-spec` dès l'identification de la feature, et non plus à la création du plan : la phase de cadrage devient reprenable par `/pipe-ship` dans une session neuve, comme les autres ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- Les scripts distribués (hooks universels, checks) sont désormais de vrais fichiers versionnés dans `skills/setup/scripts/`, copiés tels quels par `/setup`, au lieu de blocs de code que le modèle recopiait depuis un markdown. Seuls les templates réellement variables (lint, format, test) restent documentés en markdown ([#54](https://github.com/ToolsForSaaS/claude-workflow/pull/54))
+- Allège le contexte payé à chaque session : les 16 descriptions de skills passent de 3 952 à 1 646 caractères, et les référentiels purs (`git-conventions`, `workflow-config`) sortent du catalogue du modèle puisqu'ils ne sont jamais invoqués, seulement lus ([`5bae04b`](https://github.com/ToolsForSaaS/claude-workflow/commit/5bae04b), [`7a1e112`](https://github.com/ToolsForSaaS/claude-workflow/commit/7a1e112))
+- Allège le contexte chargé à l'invocation des skills : `/pipe-review` ne charge plus le contenu des fichiers que son sous-agent relit déjà (~14 000 tokens par review), et `/pipe-tag` comme `/pipe-changelog` n'extraient plus qu'une section du CHANGELOG au lieu du fichier entier (~12 200 tokens par release) ([`7b9b4ab`](https://github.com/ToolsForSaaS/claude-workflow/commit/7b9b4ab))
+- L'index des specs peut être regroupé en sections thématiques quand leur nombre le justifie ; les noms de fichiers restent à plat ([`f5b33f7`](https://github.com/ToolsForSaaS/claude-workflow/commit/f5b33f7))
+
+### Fixed
+
+- `/setup` câblait dans `settings.json` des hooks `PostToolUse` et `Stop` pointant vers des fichiers inexistants, et son placeholder d'extensions produisait un JSON invalide qui cassait les quatre hooks d'un coup. Les scripts sont désormais copiés tels quels, le template est validé par `jq`, et le diagnostic vérifie que chaque commande pointe vers un fichier existant ([`4a59e7a`](https://github.com/ToolsForSaaS/claude-workflow/commit/4a59e7a))
+- Le hook `Stop` ne bloquait jamais : il sortait en `exit 1` avec son diagnostic sur stdout, alors que seul un `exit 2` avec message sur stderr arrête la fin de tâche. Des tests pouvaient échouer sans que le garde-fou intervienne ([`4a59e7a`](https://github.com/ToolsForSaaS/claude-workflow/commit/4a59e7a))
+- Le hook `PreToolUse` bloquait sans transmettre son motif : Claude recevait « No stderr output » et pouvait retenter la même commande ([`7770502`](https://github.com/ToolsForSaaS/claude-workflow/commit/7770502))
+- Les hooks des specs étaient silencieusement inertes hors locale UTF-8 : une spec dépréciée continuait d'être injectée dans chaque session, et une spec absente de l'index passait au vert dès qu'une autre spec contenait son nom ([`33ffff1`](https://github.com/ToolsForSaaS/claude-workflow/commit/33ffff1))
+
 ## [1.5.0] - 2026-07-12
 
 > **BREAKING** : cette version refond le pipeline (v2). Les projets configurés doivent repasser par `/setup` pour migrer `tech-stack` vers `workflow-config` et adopter le nouveau cycle.
@@ -224,7 +251,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.9...v1.5.0
 [1.4.9]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v1.4.9
 [1.4.8]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.7...v1.4.8

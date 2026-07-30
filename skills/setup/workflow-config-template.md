@@ -1,8 +1,13 @@
 ---
 name: workflow-config
-description: Configuration du workflow AI-Driven Development pour ce projet. Contrat unique entre le plugin et le projet — plateforme, commandes, stack et conventions, lu par tous les skills du workflow. Rempli par /setup.
+description: Config du workflow pour ce projet : plateforme, commandes, stack, conventions. Lu par tous les skills. Rempli par /setup.
 user-invocable: false
+disable-model-invocation: true
 ---
+
+<!-- Referentiel de config : lu par Read depuis les skills du pipeline, jamais
+     invoque. Les deux drapeaux le retirent du catalogue de l'utilisateur ET de
+     celui du modele — sa description cesse d'etre payee dans chaque session. -->
 
 ## Plateforme
 

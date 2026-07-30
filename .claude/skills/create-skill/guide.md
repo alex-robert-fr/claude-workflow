@@ -36,11 +36,17 @@ Claude lit les descriptions pour decider quel skill charger.
 **Mauvais** : `description: Gere les commits`
 **Bon** : `description: Convention de messages de commit. Utiliser lors de la creation de commits pour formater avec le bon emoji, type et scope.`
 
-Regles : decrire le **domaine** ET le **declencheur**, 20-50 mots max.
+**Plafond : 130 caracteres.** La description est le poste le plus cher du plugin. Le corps d'un `SKILL.md` n'est charge qu'a l'invocation ; la description, elle, est injectee dans le prompt systeme de **chaque session de chaque projet** ou le plugin est actif — y compris les sessions qui n'invoqueront jamais ce skill. Retirer 100 caracteres d'une description vaut donc plus que retirer 1 000 caracteres d'un `reference.md`.
+
+`.claude/scripts/check-skills.sh` verifie ce plafond. C'est de l'outillage local a ce repo, non distribue : aucun skill du pipeline ne peut l'appeler — le lancer a la main apres toute modification de skill.
+
+**Regle de redaction : verbe + objet + declencheur, rien d'autre.** Surtout pas l'enumeration des etapes du skill ni des sections du document qu'il produit — c'est exactement ce qui fait deraper les descriptions, et cela n'apporte aucun pouvoir de declenchement : Claude route sur le domaine et le declencheur, jamais sur un sommaire.
 
 ## Fichiers supports
 
-Fragmenter les skills >150 lignes :
+**Declencheur de delegation : ~150 lignes.** Ce n'est pas un plafond dur et le depasser n'est pas une faute — c'est le moment de se demander ce qui n'a rien a faire dans le `SKILL.md`. Le corps d'un skill n'est charge qu'a l'invocation : sa taille coute a l'usage, jamais en permanent. Le vrai risque d'un fichier long n'est donc pas le nombre de tokens mais la **dilution de l'attention** entre la premiere et la derniere instruction — risque d'autant plus reel quand une pause humaine coupe le fichier en son milieu. Un skill de 200 lignes qui a delegue son detail se tient ; un skill de 120 lignes qui melange procedure et tables de reference, non.
+
+Quoi sortir :
 
 - `reference.md` — details exhaustifs, tables, exemples
 - `scripts/` — scripts utilitaires
@@ -94,7 +100,7 @@ agent: Explore | Plan                 # [SI fork + read-only souhaite]
 allowed-tools: Bash(git *), Bash(ls *)  # [SI contexte dynamique avec !`cmd`]
 ---
 
-## Contexte                           # obligatoire (optionnel si expertise)
+## Contexte                           # [SI des donnees d'environnement conditionnent les etapes]
 
 - Info1 : !`commande1`
 - Info2 : !`commande2`
@@ -129,22 +135,24 @@ $ARGUMENTS
 | Condition | Sections / champs concernes |
 |---|---|
 | Accepte des arguments | `argument-hint` + `## Input utilisateur` + `$ARGUMENTS` |
-| Non-invocable (expertise) | `user-invocable: false`, pas d'etapes numerotees, `## Contexte` optionnel |
+| Non-invocable (expertise) | `user-invocable: false`, pas d'etapes numerotees |
+| Des donnees d'environnement conditionnent les etapes | `## Contexte` avec `!`cmd`` en tete |
 | Isolation sub-agent | `context: fork` |
 | Fork read-only | Ajouter `agent: Explore` ou `agent: Plan` |
 | A des prerequis | `## Etape 0 — Verifications` |
 | Pipeline sequentiel | Derniere etape = transition vers le skill suivant |
 | Contexte dynamique `!`cmd`` | `allowed-tools` avec les patterns Bash necessaires (ex: `Bash(git *)`, `Bash(gh *)`, `Bash(ls *)`) |
-| Depasse ~100 lignes | Deleguer le detail dans `reference.md` |
+| Depasse ~150 lignes | Se demander quoi deleguer dans `reference.md` |
 
 ## Regles strictes
 
-- `## Contexte` avec `!`cmd`` en tete de chaque skill (optionnel pour expertise)
+- `## Contexte` avec `!`cmd`` en tete **quand** des donnees d'environnement conditionnent les etapes — section optionnelle, la majorite des skills n'en a pas besoin. Un contexte dynamique qu'aucune etape n'exploite coute une commande shell a chaque invocation pour rien
 - Commandes simples dans `!`cmd`` — pas de redirections, pipes, operateurs, ni single quotes
 - Ordre : contexte dynamique → etapes
 - Les donnees pre-chargees dans `## Contexte` ne doivent pas etre re-cherchees par les etapes. Claude peut utiliser des outils externes uniquement pour des donnees absentes du contexte pre-charge, et seulement si le skill le demande explicitement.
 - Frontmatter minimal : pas de `effort`, `paths`, `model` sauf besoin explicite
 - `allowed-tools` obligatoire si le skill utilise `!`cmd`` — declarer les commandes du contexte dynamique pour eviter les prompts de permission
 - Confirmation obligatoire avant toute action irreversible : `"Je [action] ?"`
-- Description : 20-50 mots, format verbe infinitif + objet + declencheur
+- Description : 130 caracteres max, format verbe infinitif + objet + declencheur — jamais l'enumeration des etapes ni des sections produites (verifie par `.claude/scripts/check-skills.sh`)
+- Au-dela de ~150 lignes, deleguer le detail dans `reference.md` — declencheur, pas plafond
 - Formulation `utilise Read pour charger` (jamais "lis", "consulte", "charge")
