@@ -7,4 +7,4 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 
 | Feature | Spec | En une phrase |
 |---------|------|---------------|
-| Fichier de pilotage | [`fichier-de-pilotage.md`](fichier-de-pilotage.md) | Un document de travail ephemere qui porte l'etat, les decisions et le plan d'un ticket, et permet de reprendre son cycle dans une session neuve |
+| Fichier de pilotage | [`fichier-de-pilotage.md`](fichier-de-pilotage.md) | Porte l'etat d'un ticket et rend son cycle reprenable en session neuve |

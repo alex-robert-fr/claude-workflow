@@ -20,7 +20,7 @@ Dans Claude Code :
 
 ```
 /plugin marketplace add ToolsForSaaS/claude-workflow
-/plugin install workflow
+/plugin install claude-workflow
 ```
 
 Puis recharger les plugins :
@@ -49,19 +49,23 @@ Ou pour tester sur une session :
 claude --plugin-dir /chemin/vers/claude-workflow
 ```
 
-Les skills sont accessibles avec le namespace `workflow:` (ex: `/workflow:pipe-ship`).
+Les skills sont accessibles avec le namespace `claude-workflow:` (ex: `/claude-workflow:pipe-ship`).
 
 ## Pipeline
 
 Le cycle d'une demande metier est pilote par un **fichier de pilotage** (`.claude/plans/`, gitignore, ouvert des le cadrage et supprime a la PR) qui porte le plan, les decisions et l'etat d'avancement — c'est lui qui permet de reprendre dans une session neuve, a n'importe quelle phase. L'humain intervient a trois pauses : la **validation de la spec** (les attentes, avant tout dev), la **review des tests** (le contrat de la fonctionnalite) et la **review du code**.
 
+<!-- pipeline:debut -->
 ```
 /pipe-spec (cadrage de la feature + validation humaine)
 → /pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
-→ session neuve : /pipe-code (guide par les tests)
-→ session neuve : /pipe-review (outils + agent + review humaine + fraicheur de la spec)
-→ /pipe-commit (changesets) → /pipe-pr (vers develop)
+→ session neuve : /pipe-code (guide par les tests, changesets au fil de l'eau)
+→ session neuve : /pipe-review (format/lint/tests outilles + agent + review humaine + fraicheur de la spec)
+→ /pipe-commit (decoupage en changesets) → /pipe-pr (vers la branche d'integration)
 ```
+<!-- pipeline:fin -->
+
+Ce diagramme est reproduit a l'identique dans `CLAUDE.md` (aide-memoire de session) et dans le recap de `/setup`. `.claude/scripts/check-skills.sh` verifie qu'ils ne divergent pas : les trois avaient deja diverge une fois, le dernier ayant perdu une pause humaine.
 
 ### Les specs, memoire de tes features
 
@@ -98,31 +102,31 @@ Quand assez de features sont mergees sur la branche d'integration :
 Configuration unique du projet :
 
 ```
-/workflow:setup            # CLAUDE.md, hooks, workflow-config (+ placeholders)
+/claude-workflow:setup            # CLAUDE.md, hooks, workflow-config (+ placeholders)
 ```
 
 Cycle du ticket PROJ-42 — session 1 (spec + plan + tests) :
 
 ```
-/workflow:pipe-spec PROJ-42   # lit le ticket Jira, ouvre le pilotage, cadre la feature,
-                              # s'arrete pour ta validation de la spec
-/workflow:pipe-plan PROJ-42   # Q/R architecture, plan (enchaine depuis la spec)
-/workflow:pipe-ship PROJ-42   # ecrit les tests, s'arrete pour ta review des tests
+/claude-workflow:pipe-spec PROJ-42   # lit le ticket Jira, ouvre le pilotage, cadre la feature,
+                                     # s'arrete pour ta validation de la spec
+/claude-workflow:pipe-plan PROJ-42   # Q/R architecture, plan (enchaine depuis la spec)
+/claude-workflow:pipe-ship PROJ-42   # ecrit les tests, s'arrete pour ta review des tests
 ```
 
 Session 2 (dev) puis session 3 (review → PR) :
 
 ```
-/workflow:pipe-ship PROJ-42   # session neuve : implemente jusqu'a tests verts
-/workflow:pipe-ship PROJ-42   # session neuve : format/lint/tests, review agent,
-                              # ta review du code, puis commits-changesets et PR
+/claude-workflow:pipe-ship PROJ-42   # session neuve : implemente jusqu'a tests verts
+/claude-workflow:pipe-ship PROJ-42   # session neuve : format/lint/tests, review agent,
+                                     # ta review du code, puis commits-changesets et PR
 ```
 
 Au moment de releaser :
 
 ```
-/workflow:pipe-release 0.5.2  # CHANGELOG metier + PR develop → main
-/workflow:pipe-tag v0.5.2     # tag git annote SemVer (apres merge + deploiement)
+/claude-workflow:pipe-release 0.5.2  # CHANGELOG metier + PR develop → main
+/claude-workflow:pipe-tag v0.5.2     # tag git annote SemVer (apres merge + deploiement)
 ```
 
 `pipe-spec`, `pipe-plan` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
