@@ -98,7 +98,14 @@ Cree les repertoires manquants :
 
 Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres). `docs/specs/`, au contraire, est **versionne** : ne jamais l'ignorer.
 
-Cree l'index `docs/specs/README.md` s'il manque, en chargeant le format depuis `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (section « Index »). Sur un projet existant qui a deja des features, ne les documente pas ici : les specs se remplissent au fil des cycles, ou a la demande via `/pipe-spec <nom de feature>`.
+Cree l'index `docs/specs/README.md` s'il manque, en chargeant le format depuis `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (section « Index »). Laisse-le vide : n'ecris aucune spec depuis `/setup`, chacune exige un cadrage avec l'utilisateur.
+
+Sur un projet qui a **deja des features**, signale le rattrapage — sans lui, les specs n'arriveront qu'au rythme des futurs tickets :
+
+```
+Ce projet a deja des features livrees. Pour les documenter en partant des plus
+rentables : `/pipe-spec` sans argument (inventaire priorise, une feature par passe).
+```
 
 ## Etape 5 — Recap final
 

@@ -1,18 +1,33 @@
 ---
 name: pipe-spec
-description: Cadrer une feature dans une spec durable et versionnee (docs/specs/) avant de planifier le dev. Decrit ce que la feature est, ce qu'on en attend, sa philosophie, son hors-scope, ses dependances et ses points d'entree techniques. Sert de contexte central aux sessions suivantes. Utiliser en tout debut de cycle, avant /pipe-plan.
-argument-hint: [cle JIRA, numero issue, URL, nom de feature ou texte]
+description: Cadrer une feature dans une spec durable et versionnee (docs/specs/) avant de planifier le dev. Decrit ce que la feature est, ce qu'on en attend, sa philosophie, son hors-scope, ses dependances et ses points d'entree techniques. Sert de contexte central aux sessions suivantes. Utiliser en tout debut de cycle, avant /pipe-plan — ou sans argument pour inventorier et rattraper les features deja livrees d'un projet existant.
+argument-hint: [cle JIRA, numero issue, URL, nom de feature, ou rien pour inventorier l'existant]
 ---
 
 Une spec repond a « qu'est-ce que cette feature, et pourquoi ? ». Elle vit **dans le repo**, versionnee, et survit au ticket qui l'a fait naitre : c'est le contexte que toute session future charge avant de toucher a la feature, au lieu de relire le code.
 
 **Une spec n'est pas un plan.** Le plan (`/pipe-plan`) dit ce qu'on va faire, dans quel ordre, dans quels fichiers — il est ephemere et meurt a la PR. La spec dit ce qui **est** — elle est durable. Cette frontiere est la regle la plus importante de ce skill ; les criteres exacts sont dans `reference.md`.
 
+## Mode inventaire — amorcer un projet existant
+
+**Declencheur : aucun argument.** Un projet dont les features existent deja n'aura jamais de specs si elles ne s'ecrivent qu'au fil des cycles — il faudrait autant de tickets que de features. Ce mode rattrape l'existant, en commencant par ce qui rapporte le plus.
+
+Applique la section « Inventaire des features non specifiees » de `${CLAUDE_SKILL_DIR}/reference.md` (charge-le avec Read) : elle donne la methode de reperage, le critere de priorisation et le format du tableau.
+
+Presente le classement, puis demande **quelle feature specifier maintenant**. Une fois le choix fait, reprends le flow normal a l'etape 2 en traitant ce nom de feature comme l'argument (pas de ticket, donc pas de pilotage).
+
+Deux regles non negociables :
+
+- **Une feature par passe.** Ne genere jamais plusieurs specs d'affilee : chacune exige le Q/R de l'etape 4, et une spec ecrite sans validation humaine est une doc inventee — le pire resultat possible, puisqu'elle sera lue comme une reference
+- **Ne devine pas l'intention.** Sur une feature existante, le code dit le comportement mais **jamais** le pourquoi, le hors-scope ni les alternatives ecartees. Ces sections viennent de l'utilisateur ; si elles restent vides, l'exercice ne vaut pas son cout. Le dire plutot que de meubler
+
 ## Etape 0 — Detecter l'environnement et recuperer le ticket
 
 Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-plan/reference.md` et applique la section « Detection de l'environnement et recuperation du ticket ».
 
 Si l'argument est un nom de feature libre sans ticket (`authentification`, `export CSV`), c'est un usage autonome legitime : on documente une feature existante ou a venir, sans cycle. Passe directement a l'etape 1.
+
+Aucun argument → applique le **mode inventaire** ci-dessus au lieu de cette etape.
 
 ## Etape 1 — Trier : cette demande merite-t-elle une spec ?
 
@@ -132,6 +147,13 @@ A tout moment : `/pipe-ship <ticket>` reprend le cycle la ou il en est.
 ---
 Spec [creee | mise a jour] : `docs/specs/<feature>.md`.
 Elle sera committee avec le prochain changeset (`/pipe-commit`).
+```
+
+**En mode inventaire**, ajoute le reste a faire — c'est ce qui permet de reprendre le rattrapage plus tard :
+
+```
+Rattrapage : N feature(s) specifiee(s) sur M reperees.
+Suivante par ordre de valeur : [nom]. Relance `/pipe-spec` sans argument.
 ```
 
 ---
