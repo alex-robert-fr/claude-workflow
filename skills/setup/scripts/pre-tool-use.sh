@@ -1,6 +1,10 @@
 #!/bin/bash
 # Hook PreToolUse — bloque les commandes Bash aux degats irreversibles.
-# Recoit l'input de l'outil sur stdin en JSON. Exit 2 = action bloquee.
+# Recoit l'input de l'outil sur stdin en JSON.
+#
+# Exit 2 bloque l'appel, et STDERR est le seul canal transmis a Claude — un
+# diagnostic sur stdout produit un blocage muet (« No stderr output »), et Claude
+# reessaie alors la meme commande sans savoir ce qui lui est reproche.
 
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
@@ -20,7 +24,9 @@ DANGEROUS_PATTERNS=(
 
 for pattern in "${DANGEROUS_PATTERNS[@]}"; do
   if echo "$COMMAND" | grep -qEi "$pattern"; then
-    echo "BLOCKED: commande dangereuse detectee — $COMMAND"
+    echo "BLOCKED: commande dangereuse detectee — $COMMAND" >&2
     exit 2
   fi
 done
+
+exit 0

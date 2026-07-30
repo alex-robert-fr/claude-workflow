@@ -65,7 +65,7 @@ Bloque les commandes Bash qui pourraient causer des degats irreversibles.
 
 La liste des patterns bloques vit dans le script (`rm -rf`, `git push --force` sur une branche protegee, `DROP TABLE`, `git reset --hard`...). Pour l'etendre sur un projet, editer le fichier deploye ; pour l'etendre partout, le corriger dans le plugin.
 
-Exit 2 bloque l'action et remonte le message a Claude.
+Exit 2 bloque l'action, et c'est **stderr** qui est alors transmis a Claude — un motif ecrit sur stdout donne un blocage sans explication.
 
 ## PostToolUse — Auto-lint/format
 
@@ -115,7 +115,7 @@ Template : `${CLAUDE_SKILL_DIR}/settings-template.json` — les 4 hooks cables v
 ## Notes
 
 - Les hooks sont executes par le harness Claude Code, pas par le LLM — leur execution est gratuite en tokens (un hook qui injecte du contexte, comme SessionStart, coute en revanche ce qu'il injecte)
-- Un hook PreToolUse qui retourne exit code 2 bloque l'action avec le message stdout
+- Un hook PreToolUse ne bloque l'action que sur **exit 2**, et transmet alors **stderr** a Claude — pas stdout. Un diagnostic sur stdout produit un blocage muet (`No stderr output`) : l'action est refusee sans que Claude apprenne pourquoi, et il la retente
 - Un hook Stop ne force Claude a continuer que sur **exit 2**, et lit alors **stderr** ; tout autre code non-zero est une erreur non bloquante
 - Les hooks PostToolUse ne bloquent pas — ils s'executent silencieusement
 - Toujours `|| true` sur les commandes de lint pour ne pas bloquer l'ecriture si le linter crash
