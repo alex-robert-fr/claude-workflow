@@ -1,14 +1,21 @@
 #!/bin/bash
-# Synchronise la version du plugin dans les trois fichiers qui doivent la porter.
+# Fixe la version du plugin et verifie que le CHANGELOG l'annonce.
 # Usage : .claude/scripts/bump-version.sh 1.6.0
 #
-# Pourquoi un script : la version est declaree a QUATRE endroits (plugin.json,
-# marketplace.json x2, CHANGELOG.md). Un oubli desynchronise la version annoncee
-# dans la marketplace publique de celle du plugin installe — panne silencieuse.
-# C'est un travail deterministe : il ne se confie pas a un LLM.
+# Pourquoi un script pour un seul champ : parce que l'oublier est une panne
+# TOTALE et SILENCIEUSE. La version de `plugin.json` est la cle de cache des
+# mises a jour — la doc officielle est explicite : « If you set version in
+# plugin.json, you must bump it every time you want users to receive changes.
+# Pushing new commits alone is not enough. » Sans bump, `/plugin update` repond
+# « already at the latest version » et personne ne recoit rien. Aucun test, aucune
+# review et aucun lint ne rattrape cet oubli : seul un utilisateur le decouvre,
+# et il ne peut pas savoir que la faute est la.
 #
 # Le CHANGELOG n'est pas ecrit ici (c'est le role de /pipe-changelog) : le script
 # verifie seulement que la section de la version existe deja.
+#
+# Ce script est LOCAL a ce repo : la mecanique de publication d'un plugin n'a
+# rien a faire dans un skill distribue.
 
 set -eu
 
@@ -31,49 +38,45 @@ PLUGIN="$ROOT/.claude-plugin/plugin.json"
 MARKET="$ROOT/.claude-plugin/marketplace.json"
 CHANGELOG="$ROOT/CHANGELOG.md"
 
-for f in "$PLUGIN" "$MARKET"; do
-  [ -f "$f" ] || { echo "Fichier introuvable : $f" >&2; exit 1; }
-done
+[ -f "$PLUGIN" ] || { echo "Fichier introuvable : $PLUGIN" >&2; exit 1; }
 
-# jq n'ecrit jamais en place : passer par un temporaire, et ne remplacer qu'en cas de succes.
-# $1 = fichier, $2 = filtre jq. La version est injectee en variable $v (jamais interpolee
-# dans le filtre : une version non validee ne doit pas pouvoir devenir du code jq).
-patch() {
-  tmp=$(mktemp)
-  if jq --arg v "$VERSION" "$2" "$1" > "$tmp"; then
-    mv "$tmp" "$1"
-  else
-    rm -f "$tmp"
-    echo "Echec du patch de $1" >&2
-    exit 1
-  fi
-}
+# Tout ce qui peut refuser le bump est verifie AVANT d'ecrire : un echec ne doit
+# laisser aucun effet de bord. Sinon un CHANGELOG manquant sort en erreur en ayant
+# quand meme bumpe la version — l'etat le plus trompeur possible, puisque le repo
+# annonce alors une version dont rien ne documente le contenu.
 
-patch "$PLUGIN" '.version = $v'
-patch "$MARKET" '.metadata.version = $v | .plugins[0].version = $v'
-
-echo "plugin.json          → $VERSION"
-echo "marketplace.json     → $VERSION (metadata + plugins[0])"
-
-status=0
-if [ -f "$CHANGELOG" ]; then
-  if grep -qF "## [$VERSION]" "$CHANGELOG"; then
-    echo "CHANGELOG.md         → section [$VERSION] presente"
-  else
-    echo "CHANGELOG.md         → section [$VERSION] ABSENTE : lancer /pipe-changelog $VERSION" >&2
-    status=1
-  fi
-else
-  echo "CHANGELOG.md         → fichier absent" >&2
-  status=1
+if [ ! -f "$CHANGELOG" ]; then
+  echo "CHANGELOG.md introuvable — rien n'a ete modifie" >&2
+  exit 1
 fi
 
-# Filet : aucune autre occurrence de l'ancienne version ne doit subsister dans les manifests.
-reste=$(grep -oE '"version": *"[0-9]+\.[0-9]+\.[0-9]+"' "$PLUGIN" "$MARKET" | grep -vF "\"$VERSION\"" || true)
-if [ -n "$reste" ]; then
-  echo "Versions desynchronisees restantes :" >&2
-  printf '%s\n' "$reste" >&2
-  status=1
+if ! grep -qF "## [$VERSION]" "$CHANGELOG"; then
+  echo "CHANGELOG.md : section [$VERSION] absente — rien n'a ete modifie" >&2
+  echo "Lancer d'abord /pipe-changelog $VERSION" >&2
+  exit 1
 fi
 
-exit $status
+# Garde anti-regression. `plugin.json` gagne dans l'ordre de resolution de version,
+# donc une version redeclaree dans le marketplace n'est jamais lue : elle ne casse
+# rien, elle ment. Ces champs ont ete retires une fois, ce test empeche leur retour.
+if [ -f "$MARKET" ] \
+  && jq -e '(.metadata.version? // empty), (.plugins[]?.version? // empty)' "$MARKET" >/dev/null 2>&1; then
+  echo "marketplace.json declare une version : champ mort, plugin.json fait autorite" >&2
+  echo "La retirer avant de bumper — rien n'a ete modifie" >&2
+  exit 1
+fi
+
+# jq n'ecrit jamais en place : passer par un temporaire, et ne remplacer qu'en cas
+# de succes — un jq en echec ne doit pas laisser un manifeste tronque. La version
+# est injectee en variable, jamais interpolee dans le filtre.
+tmp=$(mktemp)
+if ! jq --arg v "$VERSION" '.version = $v' "$PLUGIN" > "$tmp"; then
+  rm -f "$tmp"
+  echo "Echec du patch de $PLUGIN" >&2
+  exit 1
+fi
+mv "$tmp" "$PLUGIN"
+
+echo "plugin.json      → $VERSION"
+echo "CHANGELOG.md     → section [$VERSION] presente"
+echo "marketplace.json → aucune version declaree (correct)"

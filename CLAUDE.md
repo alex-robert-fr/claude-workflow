@@ -35,4 +35,4 @@ Deux documents, deux durees de vie — ne jamais les confondre. La **spec** (`do
 
 - Ecrire ou modifier un skill : `.claude/skills/create-skill/` (conventions de nommage, frontmatter, seuils de delegation)
 - Commits, branches, Pull Requests : `skills/git-conventions/SKILL.md` — a respecter systematiquement
-- Publier une version : `/pipe-release` puis `/pipe-tag`. La version est declaree a quatre endroits (`plugin.json`, `marketplace.json` x2, `CHANGELOG.md`) — ne jamais les editer a la main, lancer `.claude/scripts/bump-version.sh X.Y.Z`, qui les synchronise et echoue si la section du CHANGELOG manque
+- Publier une version : `/pipe-release` puis `/pipe-tag`. La version de `plugin.json` est la **cle de cache des mises a jour** : sans bump, aucun utilisateur ne recoit quoi que ce soit et `/plugin update` repond « already at the latest version ». Panne totale et silencieuse, qu'aucun test ne rattrape — lancer `.claude/scripts/bump-version.sh X.Y.Z`, jamais editer a la main
