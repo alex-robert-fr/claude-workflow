@@ -7,6 +7,10 @@
 #   - une spec dont TOUS les points d'entree ont disparu : la feature a
 #     probablement ete retiree, la spec doit etre depreciee et non corrigee
 #   - une spec absente de l'index (donc jamais injectee dans le contexte)
+#   - une ligne d'index pointant vers une spec disparue : le seul ecart qui
+#     injecte de la FAUSSE information dans chaque session, pas de l'absence
+#   - une phrase d'index trop longue : l'index est injecte a chaque session,
+#     c'est le seul poste de contexte qui grossit tout seul
 #
 # Une spec au statut depreciee est exclue du controle des chemins : ses fichiers
 # ont disparu par construction, la signaler eternellement serait du bruit.
@@ -22,13 +26,19 @@ for spec in "$SPECS"/*.md; do
   base=$(basename "$spec")
   [ "$base" = "README.md" ] && continue
 
-  if [ -f "$SPECS/README.md" ] && ! grep -qF "$base" "$SPECS/README.md"; then
+  # Bornes autour du nom : sans elles `csv.md` serait trouve dans `export-csv.md`.
+  # Le point du nom est echappe — sinon il matche n'importe quel caractere.
+  esc=${base//./\\.}
+  if [ -f "$SPECS/README.md" ] && ! grep -qE "(^|[^A-Za-z0-9._-])$esc([^A-Za-z0-9]|$)" "$SPECS/README.md"; then
     echo "SPEC $base — absente de l'index docs/specs/README.md"
     status=1
   fi
 
   # Statut depreciee : plus rien a verifier cote fichiers
-  grep -qiE '^>.*statut.*:.*d[eé]preci' "$spec" && continue
+  # Meme precaution de locale que dans session-start.sh (voir son commentaire).
+  awk '/^>/ { t = tolower($0); gsub(/[^ -~]/, "", t)
+              if (t ~ /statut.*:.*de*pre*ci/) { found = 1; exit } }
+       END { exit !found }' "$spec" && continue
 
   # Points d'entree : premiere colonne du tableau de la section uniquement.
   # La colonne Role cite souvent d'autres chemins — les lire produirait des faux positifs.
@@ -58,6 +68,44 @@ for spec in "$SPECS"/*.md; do
     done
   fi
 done
+
+if [ -f "$SPECS/README.md" ]; then
+  # Sens inverse : une ligne d'index pointant vers une spec supprimee ou renommee
+  # continue d'etre injectee dans chaque session par le hook SessionStart.
+  #
+  # On ne retient que les CIBLES DE LIEN `](nom.md)` dont le nom est un simple
+  # basename, jamais un chemin. Extraire tout ce qui ressemble a `*.md` ferait
+  # remonter le moindre chemin cite en prose (`docs/specs/README.md`, un lien vers
+  # `../CONTRIBUTING.md`) comme une spec disparue — un check bruyant finit ignore.
+  while IFS= read -r ref; do
+    [ -z "$ref" ] && continue
+    [ "$ref" = "README.md" ] && continue
+    [ -e "$SPECS/$ref" ] && continue
+    echo "SPEC $ref — reference dans l'index mais fichier introuvable"
+    status=1
+  done < <(grep -oE '\]\([A-Za-z0-9._-]+\.md\)' "$SPECS/README.md" \
+    | sed 's/^](//; s/)$//' | sort -u)
+
+  # Plafond de la derniere colonne : l'index est injecte a chaque session, il ne
+  # peut pas grossir librement. Le message est formate en bash — l'apostrophe de
+  # « d'index » ne passerait pas dans un programme awk entre quotes simples.
+  while IFS=$'\t' read -r name len; do
+    [ -z "$name" ] && continue
+    echo "SPEC $name — phrase d'index trop longue ($len car, max 80)"
+    status=1
+  done < <(awk -F'|' '
+    /^\|[ \t:|-]+$/ { body = 1; next }
+    !body { next }
+    /^\|/ && NF > 2 {
+      last = $(NF - 1)
+      gsub(/^[ \t]+/, "", last); gsub(/[ \t]+$/, "", last)
+      if (length(last) <= 80) next
+      name = $2
+      gsub(/^[ \t]+/, "", name); gsub(/[ \t]+$/, "", name)
+      if (match($0, /[A-Za-z0-9._-]+\.md/)) name = substr($0, RSTART, RLENGTH)
+      print name "\t" length(last)
+    }' "$SPECS/README.md")
+fi
 
 [ $status -eq 0 ] && echo "Specs : coherentes"
 exit $status

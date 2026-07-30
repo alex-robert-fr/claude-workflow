@@ -9,7 +9,12 @@ HEADER="Index des specs de features de ce projet (docs/specs/). Chaque spec port
 
 # On s'arrete a la section des specs depreciees : une feature retiree ne doit pas
 # etre proposee comme contexte de reference. Pas de section → tout l'index est actif.
-ACTIVE=$(awk '/^## /{ if (tolower($0) ~ /d[eé]preci/) exit } {print}' "$INDEX")
+# Le test de depreciation ne peut pas s'ecrire `d[eé]pr[eé]ci` : sous LC_ALL=C la
+# classe designe des octets, et `é` en occupe deux — le motif echoue alors sur un
+# titre correctement accentue, et les specs depreciees repartent dans le contexte.
+# On retire donc les octets non-ASCII avant de comparer, puis on rend les `e`
+# optionnels : « depreciees » et « dprcies » (accents otes) matchent tous deux.
+ACTIVE=$(awk '/^## /{ t = tolower($0); gsub(/[^ -~]/, "", t); if (t ~ /de*pre*ci/) exit } {print}' "$INDEX")
 [ -n "$(printf '%s' "$ACTIVE" | tr -d '[:space:]')" ] || exit 0
 
 # additionalContext est le seul canal garanti pour injecter du contexte.
