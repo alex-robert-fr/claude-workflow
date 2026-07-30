@@ -1,16 +1,51 @@
 # Hooks Reference — Templates pour /setup
 
-Ce fichier contient les templates de hooks a adapter pour chaque projet.
-Les hooks sont des garde-fous deterministes — ils ne coutent rien en tokens et ne ratent jamais.
+Ce fichier documente les hooks et checks outilles a installer dans un projet.
+Ce sont des garde-fous deterministes — ils ne ratent jamais, la ou une instruction au LLM peut etre ignoree.
+
+## Deux categories, deux traitements
+
+| Categorie | Contenu | Comment `/setup` l'installe |
+|-----------|---------|------------------------------|
+| **Scripts universels** | Aucune variable projet | **Copies tels quels** depuis `${CLAUDE_SKILL_DIR}/scripts/` — jamais recopies a la main |
+| **Templates par stack** | Commandes de lint, format, test | Adaptes depuis ce fichier avec les valeurs de `workflow-config` |
+
+Un script universel n'a **qu'une** version correcte : le recopier depuis un markdown, c'est confier a un LLM un travail que `cp` fait sans erreur d'echappement. Ne jamais reecrire ces fichiers a la main — les corriger dans le plugin.
 
 ## Principe
 
-| Hook | Role | Quand |
-|------|------|-------|
-| SessionStart | Injecter l'index des specs dans le contexte | Au demarrage de chaque session |
-| PreToolUse | Bloquer les commandes dangereuses | Avant chaque appel d'outil |
-| PostToolUse | Auto-lint/format apres ecriture | Apres Write ou Edit |
-| Stop | Verifier que les tests passent | Quand Claude pense avoir fini |
+| Hook / check | Role | Quand | Type |
+|--------------|------|-------|------|
+| SessionStart | Injecter l'index des specs dans le contexte | Au demarrage de chaque session | script |
+| PreToolUse | Bloquer les commandes dangereuses | Avant chaque appel d'outil | script |
+| PostToolUse | Auto-lint/format apres ecriture | Apres Write ou Edit | template |
+| Stop | Verifier que les tests passent | Quand Claude pense avoir fini | template |
+| check-specs | Coherence des specs | Appele par `/pipe-review` | script |
+
+## Scripts universels — a copier
+
+| Source (plugin) | Destination (projet) |
+|-----------------|----------------------|
+| `scripts/session-start.sh` | `.claude/hooks/session-start.sh` |
+| `scripts/pre-tool-use.sh` | `.claude/hooks/pre-tool-use.sh` |
+| `scripts/check-specs.sh` | `.claude/scripts/check-specs.sh` |
+
+`cp` puis `chmod +x`. Les sections ci-dessous expliquent ce que chacun fait et pourquoi — elles ne contiennent pas leur code.
+
+## Check outille — coherence des specs
+
+Ce n'est **pas un hook** : c'est un script appele par `/pipe-review` dans ses checks outilles (etape 1), au meme titre que le format, le lint et les tests. Il est ici parce que `/setup` le deploie comme les hooks.
+
+Il couvre ce qu'un agent detecte mal : une spec qui pointe vers des fichiers disparus, et une spec absente de l'index — donc jamais injectee par le hook SessionStart, donc morte.
+
+**Script** : `scripts/check-specs.sh` → `.claude/scripts/check-specs.sh`
+
+Points de mecanique, tous verifies par test — a connaitre avant de modifier le script :
+
+- **Ne lire que la colonne 1 du tableau.** La colonne Role cite souvent d'autres chemins (`.gitignore`, `.claude/plans/`) qui ne sont pas des points d'entree — les extraire produirait des faux positifs a chaque spec
+- **Ignorer les lignes `(a creer)`**, accents compris. Une spec est ecrite avant le dev : sans cette tolerance, tout cadrage en amont echouerait le check
+- Projet sans `docs/specs/` → exit 0 silencieux
+- Exit 1 des qu'un ecart est trouve : `/pipe-review` le remonte comme les autres checks, sans bloquer le cycle
 
 ## SessionStart — Index des specs
 
@@ -18,23 +53,9 @@ Les specs de `docs/specs/` n'ont de valeur que si elles sont **lues**. Une instr
 
 **Pas de matcher** — l'evenement n'en prend pas.
 
-**Script template** (`.claude/hooks/session-start.sh`) :
+**Script** : `scripts/session-start.sh` → `.claude/hooks/session-start.sh`
 
-```bash
-#!/bin/bash
-# Hook SessionStart — injecte l'index des specs dans le contexte de la session
-
-INDEX="${CLAUDE_PROJECT_DIR:-.}/docs/specs/README.md"
-[ -f "$INDEX" ] || exit 0
-
-HEADER="Index des specs de features de ce projet (docs/specs/). Chaque spec porte l'intention, le comportement attendu, le hors-scope, les decisions et les points d'entree techniques d'une feature. AVANT de modifier une feature, lire sa spec plutot que de parcourir le code."
-
-jq -Rs --arg header "$HEADER" \
-  '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: ($header + "\n\n" + .)}, suppressOutput: true}' \
-  "$INDEX"
-```
-
-Points de mecanique :
+Points de mecanique — a connaitre avant de modifier le script :
 
 - L'injection passe par `hookSpecificOutput.additionalContext`, avec `hookEventName` **obligatoire** — un `echo` de texte brut n'est pas garanti d'atteindre le contexte
 - `jq -Rs` echappe le markdown de l'index : ne jamais construire ce JSON a la main
@@ -48,43 +69,11 @@ Bloque les commandes Bash qui pourraient causer des degats irreversibles.
 
 **Matcher** : `Bash`
 
-**Script template** :
+**Script** : `scripts/pre-tool-use.sh` → `.claude/hooks/pre-tool-use.sh`
 
-```bash
-#!/bin/bash
-# Hook PreToolUse — bloque les commandes dangereuses
-# Recoit l'input de l'outil sur stdin en JSON
+La liste des patterns bloques vit dans le script (`rm -rf`, `git push --force` sur une branche protegee, `DROP TABLE`, `git reset --hard`...). Pour l'etendre sur un projet, editer le fichier deploye ; pour l'etendre partout, le corriger dans le plugin.
 
-INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
-
-# Patterns dangereux a bloquer
-DANGEROUS_PATTERNS=(
-  'rm\s+-rf\s+/'
-  'rm\s+-rf\s+\.'
-  'git\s+push\s+--force\s+(origin\s+)?(main|master|develop)'
-  'git\s+push\s+-f\s+(origin\s+)?(main|master|develop)'
-  'DROP\s+(TABLE|DATABASE)'
-  'TRUNCATE\s+TABLE'
-  'git\s+reset\s+--hard'
-  'git\s+checkout\s+\.\s*$'
-  'git\s+clean\s+-fd'
-  'chmod\s+-R\s+777'
-)
-
-for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-  if echo "$COMMAND" | grep -qEi "$pattern"; then
-    echo "BLOCKED: commande dangereuse detectee — $COMMAND"
-    exit 2
-  fi
-done
-```
-
-**Commande inline (alternative sans script)** :
-
-```
-bash -c 'CMD=$(cat | jq -r ".tool_input.command // empty"); echo "$CMD" | grep -qEi "(rm\\s+-rf\\s+[/.]|git\\s+push\\s+--force.*(main|master)|DROP\\s+(TABLE|DATABASE)|git\\s+reset\\s+--hard|git\\s+checkout\\s+\\.\\s*$)" && echo "BLOCKED: commande dangereuse" && exit 2 || true'
-```
+Exit 2 bloque l'action et remonte le message a Claude.
 
 ## PostToolUse — Auto-lint/format
 

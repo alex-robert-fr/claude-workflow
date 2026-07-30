@@ -11,6 +11,7 @@ Analyse l'etat actuel du projet et identifie ce qui manque :
 - [ ] `CLAUDE.md` existe a la racine
 - [ ] `.claude/skills/workflow-config/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
 - [ ] `.claude/settings.json` existe avec des hooks configures — verifie chaque type separement (SessionStart, PreToolUse, PostToolUse, Stop) : un projet configure par une version anterieure a les trois derniers mais pas le premier
+- [ ] `.claude/scripts/check-specs.sh` existe (check outille lance par `/pipe-review`)
 - [ ] `.claude/plans/` existe
 - [ ] `docs/specs/` existe avec son index `README.md`
 - [ ] Aucun autre fichier de `.claude/skills/` ne contient de placeholders `<!-- ... -->`
@@ -71,18 +72,36 @@ Meme mecanique pour tout autre fichier de `.claude/skills/` contenant des placeh
 
 ## Etape 3 — Hooks
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md` pour les templates de hooks.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md`.
 
-Genere `.claude/settings.json` avec les hooks adaptes au projet. Utilise les commandes definies dans `workflow-config` pour les hooks PostToolUse et Stop.
+### Scripts universels — copier, ne jamais reecrire
 
-La structure complete des hooks est dans `hooks-reference.md` (deja charge). Genere les 4 types :
+Ces scripts n'ont aucune variable projet : une seule version est correcte, et `cp` ne se trompe pas d'echappement la ou une recopie manuelle le peut. Cree les repertoires puis copie :
 
-- **SessionStart** — injecte l'index des specs (`docs/specs/README.md`) dans le contexte de chaque session
-- **PreToolUse** (Bash) — bloque les commandes dangereuses
-- **PostToolUse** (Write|Edit) — lint/format automatique avec la commande de `workflow-config`
-- **Stop** — tests avant de terminer
+```bash
+mkdir -p .claude/hooks .claude/scripts
+cp "${CLAUDE_SKILL_DIR}/scripts/session-start.sh" .claude/hooks/
+cp "${CLAUDE_SKILL_DIR}/scripts/pre-tool-use.sh"  .claude/hooks/
+cp "${CLAUDE_SKILL_DIR}/scripts/check-specs.sh"   .claude/scripts/
+chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
+```
 
-Le hook SessionStart est ce qui rend les specs **effectivement** lues : sans lui, leur consultation depend de la bonne volonte du LLM. Le script est inerte tant que `docs/specs/README.md` n'existe pas — genere-le meme sur un projet qui n'a pas encore de spec. Il requiert `jq` : si l'outil est absent du systeme, signale-le et installe le hook quand meme (il sortira en erreur silencieuse).
+Si un fichier existe deja, compare-le a la source : identique → ne rien faire ; different → signale que le projet a une version modifiee et demande avant d'ecraser (elle a pu etre adaptee volontairement).
+
+### Templates par stack — a adapter
+
+Genere `.claude/settings.json` avec les hooks adaptes au projet, en utilisant les commandes definies dans `workflow-config` pour PostToolUse et Stop — eux dependent de la stack et n'ont pas de version unique.
+
+Les 4 hooks a couvrir :
+
+- **SessionStart** — pointe vers le script copie ci-dessus
+- **PreToolUse** (Bash) — pointe vers le script copie ci-dessus
+- **PostToolUse** (Write|Edit) — lint/format avec la commande de `workflow-config`
+- **Stop** — tests avant de terminer, avec la commande de `workflow-config`
+
+`check-specs.sh` n'est reference dans aucun hook : c'est `/pipe-review` qui l'appelle dans ses checks outilles.
+
+Le hook SessionStart est ce qui rend les specs **effectivement** lues : sans lui, leur consultation depend de la bonne volonte du LLM. Il est inerte tant que `docs/specs/README.md` n'existe pas — installe-le meme sur un projet qui n'a pas encore de spec. Lui et `check-specs.sh` requierent `jq` : si l'outil est absent du systeme, signale-le et installe quand meme.
 
 Si un `.claude/settings.json` existe deja, merge les hooks sans ecraser les permissions ou MCP existants.
 
@@ -95,6 +114,8 @@ Cree les repertoires manquants :
 - `.claude/plans/` — pour les plans generes par `/pipe-plan`
 - `.claude/rules/` — pour les rules contextuelles futures
 - `docs/specs/` — pour les specs de features generees par `/pipe-spec`
+
+`.claude/hooks/` et `.claude/scripts/` ont deja ete crees a l'etape 3 avec les scripts.
 
 Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres). `docs/specs/`, au contraire, est **versionne** : ne jamais l'ignorer.
 
@@ -116,6 +137,7 @@ rentables : `/pipe-spec` sans argument (inventaire priorise, une feature par pas
 - ✅ CLAUDE.md
 - ✅ workflow-config (lint: [cmd], test: [cmd], ...)
 - ✅ hooks (SessionStart, PreToolUse, PostToolUse, Stop)
+- ✅ check-specs.sh (coherence des specs, lance par /pipe-review)
 - ✅ .claude/plans/
 - ✅ .claude/rules/
 - ✅ docs/specs/ (+ index)
