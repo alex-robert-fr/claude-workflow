@@ -15,4 +15,5 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 | Garde-fous outilles | [`garde-fous-outilles.md`](garde-fous-outilles.md) | Des scripts deployes par /setup qui font respecter les regles sans le LLM |
 | Livraison : commits, branches et PR | [`livraison-git.md`](livraison-git.md) | Des commits qui documentent le projet, une PR qui n'en est que le sommaire |
 | Plan technique d'un ticket | [`plan-technique-d-un-ticket.md`](plan-technique-d-un-ticket.md) | Un ticket devient une feuille de route co-construite et calibree |
+| Reprise de cycle | [`reprise-de-cycle.md`](reprise-de-cycle.md) | Lit ou en est un ticket et deroule jusqu'a la prochaine pause humaine |
 | Review de fin de cycle | [`review-de-fin-de-cycle.md`](review-de-fin-de-cycle.md) | Outils, agent isole, relecture humaine, puis fraicheur de la spec |
