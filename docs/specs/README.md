@@ -18,3 +18,4 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 | Plan technique d'un ticket | [`plan-technique-d-un-ticket.md`](plan-technique-d-un-ticket.md) | Un ticket devient une feuille de route co-construite et calibree |
 | Reprise de cycle | [`reprise-de-cycle.md`](reprise-de-cycle.md) | Lit ou en est un ticket et deroule jusqu'a la prochaine pause humaine |
 | Review de fin de cycle | [`review-de-fin-de-cycle.md`](review-de-fin-de-cycle.md) | Outils, agent isole, relecture humaine, puis fraicheur de la spec |
+| Worktrees paralleles | [`worktrees-paralleles.md`](worktrees-paralleles.md) | Plusieurs branches cote a cote, sans remiser le travail en cours |
