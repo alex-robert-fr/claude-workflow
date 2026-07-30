@@ -89,7 +89,7 @@ Quand une feature est **retiree**, sa spec ne se corrige pas : elle passe au sta
 
 **Projet existant ?** `/pipe-spec` sans argument inventorie les features deja livrees, les classe par valeur (les zones les plus retouchees du `git log` sont celles qu'on relira le plus) et en cadre une par passe. Sans ce rattrapage, les specs n'arriveraient qu'au rythme des futurs tickets — donc jamais pour le code deja ecrit.
 
-`/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Chaque etape reste invocable individuellement.
+`/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Sur un ticket qui n'a pas encore de pilotage, elle demarre le cycle par le cadrage — c'est donc aussi la commande d'entree, pas seulement de reprise. Chaque etape reste invocable individuellement.
 
 Quand assez de features sont mergees sur la branche d'integration :
 

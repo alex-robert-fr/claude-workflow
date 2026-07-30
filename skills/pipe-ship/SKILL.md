@@ -10,11 +10,11 @@ Ce skill n'a pas de logique propre : il localise le pilotage, identifie la phase
 
 - Argument fourni → `.claude/plans/plan-<identifiant>.md`
 - Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
-- Aucun pilotage → pas de cycle en cours : propose de demarrer par le cadrage, `/pipe-spec [ticket]` (c'est lui qui ouvre le pilotage), et arrete-toi
+- Aucun pilotage → le cycle n'a pas encore commence : c'est le cadrage qui l'ouvrira. Va directement a la phase `Spec a jour` de l'etape 2, avec l'argument recu comme ticket. Sans argument, demande d'abord le ticket ou le nom de la feature : ne charge jamais `/pipe-spec` sans argument depuis ici, ce declencheur ouvre le mode inventaire, qui n'est pas un cycle
 
 ## Etape 1 — Identifier la phase courante
 
-Lis le pilotage en entier. Dans la section Etat, la **premiere case non cochee** donne la phase courante. Annonce en une ligne : ticket, branche, phase courante, ce qui va se passer.
+Lis le pilotage en entier. Dans la section Etat, la **premiere case non cochee** donne la phase courante. Sans pilotage, la phase courante est le cadrage. Annonce en une ligne : ticket, branche, phase courante, ce qui va se passer.
 
 ## Etape 2 — Derouler
 

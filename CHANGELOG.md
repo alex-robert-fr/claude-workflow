@@ -9,6 +9,12 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-07-30
+
+### Changed
+
+- `/pipe-ship <ticket>` démarre le cycle quand le ticket n'a pas encore de pilotage, au lieu de proposer `/pipe-spec` et de rendre la main : c'est la commande d'entrée autant que de reprise, et la phase de cadrage n'est plus l'exception à retenir ([`3c260d4`](https://github.com/ToolsForSaaS/claude-workflow/commit/3c260d4))
+
 ## [1.6.0] - 2026-07-30
 
 ### Added
@@ -251,7 +257,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.9...v1.5.0
 [1.4.9]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.4.8...v1.4.9
