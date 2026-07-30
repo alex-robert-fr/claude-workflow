@@ -20,7 +20,8 @@ Reussi quand reprendre un ticket ne demande de se rappeler ni la phase, ni la co
 ## Comportement attendu
 
 - Sans argument, un cycle unique est pris automatiquement ; plusieurs cycles ouverts declenchent une question
-- Aucun cycle en cours propose de demarrer par le cadrage, et s'arrete la
+- Aucun cycle en cours ouvre le cadrage, qui creera le pilotage : la commande est un point d'entree autant qu'une reprise
+- Demarrer un cycle exige un ticket ou un nom de feature : sans lui, il est demande avant d'enchainer
 - La phase courante est la premiere etape non validee du pilotage, jamais une deduction depuis l'etat du code
 - La phase est annoncee avant d'etre executee : ticket, branche, ce qui va se passer
 - Les phases s'enchainent tant qu'aucune frontiere de session n'est franchie
@@ -55,6 +56,7 @@ Deux phases exigent un contexte neuf : l'implementation et la review. La frontie
 |---------|--------|----------|--------|---------------------|
 | — | — | La phase se lit dans le pilotage, pas dans l'etat du repo | Une branche poussee ou une suite verte ne disent pas si un humain a valide : seule une case cochee le dit | Deduire la phase du code et de git |
 | — | — | Aucune logique metier ici | Une regle dupliquee entre ce skill et celui de la phase divergerait au premier changement, et le doublon silencieux serait le pire cas | Recopier les verifications de chaque phase |
+| — | — | Un cycle absent est ouvert plutot qu'annonce | La commande est censee etre le seul geste a retenir : renvoyer vers une autre commande pour la seule phase de depart en fait une exception a memoriser | Proposer le cadrage et rendre la main |
 | — | — | La frontiere de session ne s'applique qu'en enchainement | Bloquer aussi un lancement en debut de session rendrait la reprise impossible precisement quand elle est legitime | Bloquer inconditionnellement |
 
 ## Points d'entree
@@ -67,5 +69,6 @@ Deux phases exigent un contexte neuf : l'implementation et la review. La frontie
 ## Pieges et zones sensibles
 
 - **La table etat → skill est couplee a l'ordre des cases du pilotage** : ajouter une phase sans toucher les deux rend la nouvelle etape inatteignable, sans erreur visible
+- **Le cadrage sans argument ne demarre pas un cycle mais l'inventaire des specs existantes** : d'ou le ticket exige avant d'y router
 - **Une case cochee en avance saute definitivement sa phase** : rien ne revient en arriere, la reprise fait confiance a l'etat declare
 - Le pilotage doit avoir ete supprime a la creation de la Pull Request : sinon la reprise repart sur un cycle deja livre
