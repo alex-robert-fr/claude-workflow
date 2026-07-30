@@ -12,4 +12,5 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 | Cycle de vie d'une spec | [`cycle-de-vie-d-une-spec.md`](cycle-de-vie-d-une-spec.md) | Comment une spec nait, se met a jour, se verifie et se deprecie |
 | Fichier de pilotage | [`fichier-de-pilotage.md`](fichier-de-pilotage.md) | Porte l'etat d'un ticket et rend son cycle reprenable en session neuve |
 | Garde-fous outilles | [`garde-fous-outilles.md`](garde-fous-outilles.md) | Des scripts deployes par /setup qui font respecter les regles sans le LLM |
+| Livraison : commits, branches et PR | [`livraison-git.md`](livraison-git.md) | Des commits qui documentent le projet, une PR qui n'en est que le sommaire |
 | Review de fin de cycle | [`review-de-fin-de-cycle.md`](review-de-fin-de-cycle.md) | Outils, agent isole, relecture humaine, puis fraicheur de la spec |
