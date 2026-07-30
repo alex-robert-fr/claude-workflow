@@ -51,11 +51,11 @@ Pour chaque probleme, produis ces 7 champs structures (utilises ensuite par la p
 
 - **fichier** : chemin et ligne (ex: `src/services/user.service.ts:42`)
 - **severite** : BLOQUANT (bug, faille, regression) / AVERTISSEMENT (dette significative) / SUGGESTION (lisibilite, robustesse)
-- **contexte_fonctionnel** : 1-2 phrases qui resituent le bout de code dans le parcours utilisateur ou le flux metier. Reponds a "qui appelle ce code, dans quelle situation, pour faire quoi ?" en langage du domaine. Pas de noms de fonctions, pas de tags XML/HTML, pas de jargon technique. Si le contexte n'est pas inferrable depuis le diff et les fichiers lus, ecris explicitement "Contexte non identifie depuis le diff" plutot que d'inventer
+- **contexte_fonctionnel** : **une phrase** qui resitue le bout de code dans le parcours utilisateur ou le flux metier. Reponds a "qui appelle ce code, dans quelle situation, pour faire quoi ?" en langage du domaine. Pas de noms de fonctions, pas de tags XML/HTML, pas de jargon technique. Si le contexte n'est pas inferrable depuis le diff et les fichiers lus, ecris explicitement "Contexte non identifie depuis le diff" plutot que d'inventer
 - **probleme_une_phrase** : reformulation **fonctionnelle** du probleme, comprehensible sans le code. **Interdit dans ce champ** : noms de fonctions ou variables, tags XML/HTML, syntaxe de code, noms de types. Exemple : "Si la reponse du logiciel de caisse est incomplete, on continue comme si tout allait bien" et non "La garde `single.children.length > 0` accepte un `<resultCustomerType>` sans `<id>`"
-- **gravite_impact** : la **premiere phrase** doit decrire une consequence concrete et observable cote utilisateur final ou metier (ce qu'il voit, perd, risque). Les nuances de frequence et le contexte technique viennent ensuite. Exemple : "L'utilisateur en caisse verrait un ecran de confirmation avec un numero de carte vide. Cas rare en pratique, mais sans message d'erreur le caissier n'a aucun moyen de comprendre ce qui s'est passe"
+- **gravite_impact** : une consequence concrete et observable cote utilisateur final ou metier (ce qu'il voit, perd, risque), avec sa frequence si elle change la lecture. Une phrase, deux au maximum. Exemple : "L'utilisateur en caisse verrait un ecran de confirmation avec un numero de carte vide, sans message d'erreur pour comprendre pourquoi — rare en pratique"
 - **cause** : explication accessible de l'origine. **Prefere** "le code", "la verification", "la fonction qui parse la reponse" plutot que les noms exacts de symboles. Ne nomme un symbole precis que si c'est indispensable pour pointer le bon endroit
-- **correction** : commence par une **phrase d'introduction fonctionnelle** ("Verifier que la reponse contient bien un numero de carte avant de continuer") puis donne la directive technique courte et actionnable, avec un avant/apres tres bref si pertinent. **Les noms de symboles sont autorises et souvent necessaires ici** pour pointer le fix exact (`saveCache`, `await`, type `Customer`, etc.) — l'interdiction posee sur `probleme_une_phrase` ne s'applique pas a ce champ ni a `cause`
+- **correction** : **une phrase** — l'intention fonctionnelle, puis la directive technique apres deux-points ("Verifier que la reponse contient un numero de carte avant de continuer : garde sur `card.id` avant l'appel a `confirm()`"). **Les noms de symboles sont autorises et souvent necessaires ici** pour pointer le fix exact — l'interdiction posee sur `probleme_une_phrase` ne s'applique ni a ce champ ni a `cause`
 
 **Ce que tu ne fais PAS :**
 - Pas de commentaire sur le style ou le formatting (c'est le role de Biome/ESLint)
@@ -69,6 +69,6 @@ Pour chaque probleme, produis ces 7 champs structures (utilises ensuite par la p
 - `contexte_fonctionnel`, `probleme_une_phrase`, `gravite_impact` s'adressent a quelqu'un qui n'a **pas** le code sous les yeux — un decideur produit, un dev qui reprend le projet la semaine prochaine, ou toi-meme dans 6 mois. Vocabulaire fonctionnel, consequence visible plutot qu'abstraction technique : preferer "ca peut crasher si X est null" a "violation du principe de null-safety".
 - `cause` et `correction` s'adressent au developpeur qui va corriger dans la foulee. Reste precis et actionnable, nomme les symboles quand c'est necessaire.
 
-Une a deux phrases par champ suffisent.
+**Une phrase par champ.** Un champ qui deborde n'est pas plus precis, il est juste plus long a lire.
 
 Produis un rapport structure avec statut global : OK, AVERTISSEMENTS, ou BLOQUANT.

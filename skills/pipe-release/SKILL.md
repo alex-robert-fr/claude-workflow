@@ -38,9 +38,8 @@ Verifie que le tag `vX.Y.Z` n'existe pas deja (`git tag -l`). Affiche la version
 Liste ce qui part en production :
 
 ```
-## Release vX.Y.Z — [integration] → [production]
+**Release vX.Y.Z** — [integration] → [production]
 
-### PRs incluses
 - #12 [Feat] Titre (PROJ-42)
 - #15 [Fix] Titre (PROJ-45)
 ```

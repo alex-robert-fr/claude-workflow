@@ -73,9 +73,7 @@ Remplace les crochets par les valeurs reelles avant de lancer le sub-agent.
 **Si le statut est OK** (rien a signaler), affiche une seule ligne — c'est un resultat valide, pas un echec de la review — et ne charge rien de plus :
 
 ```
-## Review — [branche]
-
-Rien a signaler : pas de bug detecte, l'organisation du projet est respectee.
+**Review [branche]** — rien a signaler : pas de bug detecte, organisation du projet respectee.
 ```
 
 **S'il y a des constats** — et seulement dans ce cas — utilise Read pour charger `${CLAUDE_SKILL_DIR}/rendu.md` : format du rapport, motif d'un constat, squelette Question/Reponse de l'etape 5 et exemple complet. Affiche le rapport du sub-agent a ce format.
@@ -88,10 +86,9 @@ C'est la pause du cycle : l'utilisateur relit le code lui-meme, avec le rapport 
 ### A relire
 
 - `chemin/fichier.ts` — [ce que le fichier apporte, une ligne]
-
-Checks : Format ✅ | Lint ✅ | Tests ✅ N passent | Specs ✅
-Rapport : X bloquant(s), Y avertissement(s), Z suggestion(s) — ou "rien a signaler"
 ```
+
+Rien d'autre : les checks et le decompte des constats ont deja ete affiches, les repeter ici n'apprend rien.
 
 Resume chaque fichier depuis le diff. Si l'un ne s'y resume pas, lis-le ponctuellement via Read — celui-la seul, jamais la liste entiere.
 
@@ -161,7 +158,7 @@ Puis coche `Code valide` dans le pilotage.
 
 ```
 ---
-Code valide. Phase suivante : `/pipe-commit [ticket]` pour decouper le travail en commits (meme session).
+Code valide. Suite : `/pipe-commit [ticket]` (meme session).
 ```
 
 ---

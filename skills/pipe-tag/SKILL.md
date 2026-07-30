@@ -54,8 +54,7 @@ Ne charger `${CLAUDE_SKILL_DIR}/reference.md` que si le cas sort de ce cadre —
 Afficher :
 
 ```
-Version cible : vX.Y.Z
-Dernier tag existant : [tag ou "aucun"]
+Version cible **vX.Y.Z** · dernier tag [tag ou "aucun"]
 ```
 
 Verifier que le tag `vX.Y.Z` n'existe pas deja (`git tag -l "vX.Y.Z"`). Si le tag existe deja, signaler l'erreur et s'arreter.
@@ -77,17 +76,11 @@ sed -n '/^## \[1\.2\.3\]/,/^## \[/{/^## \[/d;/^\[[^]]*\]: /d;p;}' CHANGELOG.md
 Afficher le recapitulatif :
 
 ```
----
-Tag a creer :
+**Tag vX.Y.Z** — annote, message `Release vX.Y.Z`
 
-  Version : vX.Y.Z
-  Type    : annote
-  Message : Release vX.Y.Z
+[notes extraites du CHANGELOG, ou "(aucune note)" si section absente]
 
-  Notes :
-  [contenu extrait du CHANGELOG ou "(aucune note)" si section absente]
----
-Je cree et pousse le tag vX.Y.Z ?
+Je cree et pousse ce tag ?
 ```
 
 Attendre la confirmation explicite avant de continuer.
@@ -110,17 +103,12 @@ Attendre la confirmation explicite avant de continuer.
    git push origin vX.Y.Z
    ```
 
-Afficher la confirmation :
-
-```
-Tag vX.Y.Z cree et pousse sur origin.
-```
-
 ## Etape 5 — Proposer la suite
 
+Une seule ligne pour la confirmation et la suite — les annoncer separement, c'est dire deux fois la meme chose :
+
 ```
----
-Tag vX.Y.Z publie. Pipeline termine.
+Tag vX.Y.Z cree et pousse sur origin. Pipeline termine.
 ```
 
 ---

@@ -82,8 +82,7 @@ Le dev se fait dans une session neuve, avec un contexte propre — le pilotage e
 
 ```
 ---
-Tests valides. Phase suivante : le dev, dans une NOUVELLE session :
-ouvre une session et lance `/pipe-ship [ticket]` (ou `/pipe-code [ticket]`).
+Tests valides. Suite : le dev, dans une **nouvelle session** — `/pipe-ship [ticket]`.
 ```
 
 ---

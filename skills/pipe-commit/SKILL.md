@@ -49,7 +49,7 @@ Coche `Commits crees` dans le pilotage.
 
 ```
 ---
-N commits crees. Phase suivante : `/pipe-pr [ticket]` pour creer la Pull Request.
+N commits crees. Suite : `/pipe-pr [ticket]`.
 ```
 
 ## Mode simple (commit ponctuel)
@@ -69,14 +69,10 @@ Committe directement, sans demander confirmation — un commit local est reversi
 Affiche le recap apres coup :
 
 ```
-Commit cree :
-
-emoji type(scope): description
-
+**Commit cree** — emoji type(scope): description
 - [puce du body si present]
 
-Fichiers :
-- chemin/fichier.ts
+Fichiers — `chemin/fichier.ts`
 ```
 
 ### Etape 3 — Push (optionnel)

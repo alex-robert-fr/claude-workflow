@@ -41,12 +41,10 @@ Recupere les informations necessaires :
 Affiche le contexte detecte :
 
 ```
-Contexte de versioning :
-- Dernier tag : [tag ou "aucun"]
-- Remote : [URL HTTPS]
-- Phase : [pre-v1.0.0 / post-v1.0.0]
-- Cible : [version ou "Unreleased"]
+Versioning — dernier tag [tag ou "aucun"] · [pre-v1.0.0 / post-v1.0.0] · cible [version ou "Unreleased"]
 ```
+
+Le remote sert aux liens, il n'a pas a etre affiche.
 
 ## Etape 2 — Collecter les changements
 
@@ -72,7 +70,7 @@ Utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` (referentiel de con
 Affiche les entrees classees avant de continuer :
 
 ```
-Changements detectes :
+**Changements detectes**
 
 ### Added
 - [entree courte reformulee] ([#15](url/pull/15))
@@ -154,8 +152,7 @@ Affiche le contenu complet du fichier en creation (Cas 1), le diff seul en mise 
 Demande confirmation avant d'ecrire :
 
 ```
-Voici le CHANGELOG genere. Je l'ecris ?
-- CHANGELOG.md : [cree / mis a jour]
+J'ecris `CHANGELOG.md` ([cree / mis a jour]) ?
 ```
 
 Une fois confirme :
@@ -166,7 +163,7 @@ Une fois confirme :
 
 ```
 ---
-CHANGELOG mis a jour. En contexte release : retour a `/pipe-release` (PR vers la branche de production).
+CHANGELOG mis a jour. En contexte release : retour a `/pipe-release`.
 ```
 
 ---

@@ -144,6 +144,18 @@ $ARGUMENTS
 | Contexte dynamique `!`cmd`` | `allowed-tools` avec les patterns Bash necessaires (ex: `Bash(git *)`, `Bash(gh *)`, `Bash(ls *)`) |
 | Depasse ~150 lignes | Se demander quoi deleguer dans `reference.md` |
 
+## Grammaire de sortie
+
+Ce que le skill affiche a l'utilisateur est aussi une interface. Elle est **dense par defaut** : un skill qui deroule des paragraphes fait relire a chaque invocation ce qui tenait sur trois lignes.
+
+- **Une ligne de statut en tete**, jamais un en-tete suivi d'un blanc puis d'une metrique : `**Dev termine — PROJ-42** · tests ✅ 34 passent`
+- **Un fait par ligne**, libelle en gras puis tiret cadratin : `**Impact** — ...`. Les questions ouvertes (`❓ C'est grave ?`) et les listes a deux niveaux sont du remplissage
+- **Ne jamais afficher ce que l'utilisateur a deja sous les yeux** : sortie d'une commande, contenu d'un fichier qu'on vient de lui montrer, recap deja affiche a une etape precedente
+- **Aucune phrase d'introduction ni de transition** (« Voici… », « Je vais maintenant… », « Parfait, passons a… »)
+- **Tableau des qu'il y a trois colonnes de faits**, liste a puces sinon, prose jamais
+- **Fin d'etape = une ligne** : `Suite : <geste> — /commande`. Un bloc de trois lignes pour dire quoi taper est deux lignes de trop
+- Le detail que l'utilisateur veut vraiment, il le demande. L'afficher par defaut le fait payer a tout le monde
+
 ## Regles strictes
 
 - `## Contexte` avec `!`cmd`` en tete **quand** des donnees d'environnement conditionnent les etapes — section optionnelle, la majorite des skills n'en a pas besoin. Un contexte dynamique qu'aucune etape n'exploite coute une commande shell a chaque invocation pour rien

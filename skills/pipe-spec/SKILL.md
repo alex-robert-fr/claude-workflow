@@ -135,18 +135,15 @@ Une fois l'accord obtenu, et **seulement alors**, mets le pilotage a jour (s'il 
 
 ```
 ---
-Spec [creee | mise a jour] : `docs/specs/<feature>.md`.
-Pilotage : `.claude/plans/plan-<identifiant>.md`.
-Phase suivante : planifier le dev — `/pipe-plan <ticket>`, dans cette session.
-A tout moment : `/pipe-ship <ticket>` reprend le cycle la ou il en est.
+Spec [creee | mise a jour] `docs/specs/<feature>.md` · pilotage `.claude/plans/plan-<identifiant>.md`.
+Suite : le plan — `/pipe-plan <ticket>` (cette session). `/pipe-ship <ticket>` reprend le cycle a tout moment.
 ```
 
 **Usage autonome (sans ticket)** :
 
 ```
 ---
-Spec [creee | mise a jour] : `docs/specs/<feature>.md`.
-Elle sera committee avec le prochain changeset (`/pipe-commit`).
+Spec [creee | mise a jour] `docs/specs/<feature>.md` — sera committee avec le prochain changeset (`/pipe-commit`).
 ```
 
 **En mode inventaire**, ajoute le reste a faire — c'est ce qui permet de reprendre le rattrapage plus tard :
