@@ -10,3 +10,4 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 | CHANGELOG et release | [`changelog-et-release.md`](changelog-et-release.md) | Un CHANGELOG oriente consommateur, puis version, PR de production et tag |
 | Fichier de pilotage | [`fichier-de-pilotage.md`](fichier-de-pilotage.md) | Porte l'etat d'un ticket et rend son cycle reprenable en session neuve |
 | Garde-fous outilles | [`garde-fous-outilles.md`](garde-fous-outilles.md) | Des scripts deployes par /setup qui font respecter les regles sans le LLM |
+| Review de fin de cycle | [`review-de-fin-de-cycle.md`](review-de-fin-de-cycle.md) | Outils, agent isole, relecture humaine, puis fraicheur de la spec |
