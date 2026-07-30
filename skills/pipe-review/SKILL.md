@@ -24,13 +24,14 @@ La qualite mecanique passe par les vrais outils, pas par un agent. Lance dans l'
 1. **Format** — applique le formatage
 2. **Lint**
 3. **Tests**
+4. **Specs** — `bash .claude/scripts/check-specs.sh` si le script existe : points d'entree pointant vers des fichiers disparus, specs absentes de l'index. Un ecart n'est pas bloquant ici — il se corrige a l'etape 6, avec le reste de la fraicheur
 
 Si le lint ou les tests echouent : corrige (max 3 tentatives), en respectant la regle du contrat — **ne jamais modifier un test valide** pour le faire passer ; si le probleme semble venir d'un test, stoppe et signale-le. Apres 3 tentatives sans succes, stoppe avec le detail de ce qui a ete tente.
 
 Affiche un recap une ligne :
 
 ```
-Format : ✅ | Lint : ✅ | Tests : ✅ N passent
+Format : ✅ | Lint : ✅ | Tests : ✅ N passent | Specs : ✅
 ```
 
 Si une commande n'est pas configuree dans `workflow-config`, signale-le en une ligne et continue.
@@ -108,7 +109,7 @@ C'est la pause du cycle : l'utilisateur relit le code lui-meme, avec le rapport 
 
 - `chemin/fichier.ts` — [ce que le fichier apporte, une ligne]
 
-Checks : Format ✅ | Lint ✅ | Tests ✅ N passent
+Checks : Format ✅ | Lint ✅ | Tests ✅ N passent | Specs ✅
 Rapport : X bloquant(s), Y avertissement(s), Z suggestion(s) — ou "rien a signaler"
 ```
 
@@ -155,7 +156,16 @@ Quand l'utilisateur valide le code : consigne les decisions notables dans la sec
 
 Le code est fige : c'est le moment de verifier que la doc de la feature ne ment pas. Une spec fausse coute plus cher que pas de spec — c'est le contexte que les sessions suivantes chargeront a la place du code.
 
-Identifie les specs concernees : dans `docs/specs/`, celles dont un **point d'entree** apparait dans le diff, plus celle liee au pilotage. Aucune spec (`sans objet`, ou projet sans `docs/specs/`) → passe a l'etape 7 sans rien signaler.
+Identifie les specs concernees. Le piege est de ne matcher que les points d'entree : un fichier structurant **ajoute** par le ticket n'y figure pas encore, et c'est precisement le cas ou la spec devient fausse. Croise donc quatre sources :
+
+- Les specs dont un **point d'entree** apparait dans le diff
+- Les specs dont un point d'entree partage un **repertoire** avec un fichier du diff — ce qui rattrape les fichiers nouveaux
+- La spec **liee au pilotage**
+- Les ecarts remontes par le **check outille** de l'etape 1
+
+Aucune spec concernee (`sans objet`, ou projet sans `docs/specs/`) → passe a l'etape 7 sans rien signaler.
+
+Si un fichier structurant du diff n'est couvert par aucune spec alors qu'il appartient a une feature specifiee, l'ajouter aux points d'entree fait partie de la correction.
 
 Pour chaque spec concernee, applique la section « Verification de fraicheur » de `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (charge-la avec Read) : comportement attendu, hors scope, points d'entree, decisions prises pendant le dev.
 

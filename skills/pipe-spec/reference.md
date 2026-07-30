@@ -170,11 +170,17 @@ Terminer par le compte : combien de features reperees, combien deja specifiees, 
 
 ## Verification de fraicheur (utilisee par `/pipe-review`)
 
-Une spec qui ment est pire que pas de spec. A chaque review, pour chaque spec dont un point d'entree apparait dans le diff :
+Une spec qui ment est pire que pas de spec : elle est lue comme une reference.
+
+Deux niveaux, a ne pas confondre.
+
+**Mecanique** — couvert par `.claude/scripts/check-specs.sh`, lance dans les checks outilles de `/pipe-review`. Un chemin mort ou une spec hors index se detectent sans jugement, donc ils ne doivent pas dependre d'un agent : points d'entree pointant vers des fichiers disparus, spec absente de l'index.
+
+**Au jugement** — pour chaque spec concernee par le diff :
 
 1. Le **comportement attendu** decrit-il ce que le code fait maintenant ?
 2. Le **hors scope** est-il toujours exact — n'a-t-on pas implemente ce qui en etait exclu ?
-3. Les **points d'entree** couvrent-ils les nouveaux fichiers structurants de la feature ?
+3. Les **points d'entree** couvrent-ils les fichiers structurants **ajoutes** par le ticket ? C'est l'angle mort : un fichier neuf n'est dans aucune liste de points d'entree, donc aucun matching exact ne le rattrape. Matcher aussi par repertoire
 4. Une **decision** structurante a-t-elle ete prise pendant le dev sans etre consignee ?
 
 Tout ecart se corrige dans la spec avant de committer — la spec fait partie du changeset.
