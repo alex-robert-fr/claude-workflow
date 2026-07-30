@@ -197,7 +197,7 @@ Lors de la generation ou de l'audit d'un CHANGELOG existant :
 3. Pour les entrees referencees par SHA, utiliser la date du commit : `git log -1 --format=%aI <sha>`.
 4. Si la reference est **posterieure** a la date du tag, deplacer l'entree vers `[Unreleased]`.
 
-Cas typique : un CHANGELOG cree tardivement apres un premier tag, qui a absorbe par erreur des changements merges plus tard. L'audit doit etre systematique a chaque passage de `/pipe-changelog`.
+Cas typique : un CHANGELOG cree tardivement apres un premier tag, qui a absorbe par erreur des changements merges plus tard. Le declenchement de cet audit est decide par le skill (etape 2.5), pas ici.
 
 ## References dans les entrees
 

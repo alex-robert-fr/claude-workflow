@@ -1,6 +1,6 @@
 ---
 name: pipe-review
-description: Review du code en session dediee : checks outilles (format, lint, tests), review par agent a haute valeur, pause pour la review humaine du code, puis controle de fraicheur de la spec de la feature. Ne remonte que ce qui compte — un rapport vide est un resultat valide. Utiliser dans une nouvelle session apres /pipe-code.
+description: Reviewer le code en session dediee : checks outilles, agent, review humaine, fraicheur de la spec. Apres /pipe-code.
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
@@ -38,16 +38,17 @@ Si une commande n'est pas configuree dans `workflow-config`, signale-le en une l
 
 ## Etape 2 — Collecter le contexte
 
-Rassemble les informations necessaires :
+Rassemble le strict necessaire. Ce contexte doit rester leger : il porte encore la review humaine (etape 5), la fraicheur des specs (etape 6), puis `/pipe-commit` et `/pipe-pr` dans la meme session.
 
 - **Diff complet** vs branche par defaut, **y compris le travail non commite** : `git diff <branche-defaut>` + fichiers non trackes (`git status`)
 - **Liste des fichiers** modifies et crees
-- **Contenu integral** de chaque fichier modifie via Read (pas seulement le diff — le reviewer a besoin du contexte complet)
 - **Ticket lie** (depuis le pilotage, ou le nom de branche)
+
+Ne charge pas ici le contenu des fichiers : c'est le sub-agent de l'etape 3 qui les lit en entier, dans son propre contexte. Si une etape suivante a besoin d'un fichier precis, elle le lit ponctuellement a ce moment-la.
 
 ## Etape 3 — Lancer la review en sub-agent
 
-Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Le protocole complet du reviewer (barre de valeur, 7 champs structures, categories d'analyse, style) est dans `reference.md` — **ne le charge pas dans le contexte principal**, c'est le sub-agent qui le lit.
+Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Le protocole complet du reviewer (barre de valeur, 7 champs structures, categories d'analyse, style) est dans `${CLAUDE_SKILL_DIR}/reference.md` : il s'adresse au **sub-agent seul**, ne le charge jamais dans le contexte principal. Les maquettes destinees au contexte principal sont dans `${CLAUDE_SKILL_DIR}/rendu.md`.
 
 Prompt du sub-agent :
 
@@ -69,7 +70,7 @@ Remplace les crochets par les valeurs reelles avant de lancer le sub-agent.
 
 ## Etape 4 — Afficher le rapport
 
-**Si le statut est OK** (rien a signaler), affiche une seule ligne — c'est un resultat valide, pas un echec de la review :
+**Si le statut est OK** (rien a signaler), affiche une seule ligne — c'est un resultat valide, pas un echec de la review — et ne charge rien de plus :
 
 ```
 ## Review — [branche]
@@ -77,28 +78,7 @@ Remplace les crochets par les valeurs reelles avant de lancer le sub-agent.
 Rien a signaler : pas de bug detecte, l'organisation du projet est respectee.
 ```
 
-Sinon, affiche le rapport du sub-agent dans ce format (ne pas afficher les sections vides) :
-
-```
-## Review — [branche]
-
-### Statut : Avertissements / Bloquant
-
-### Problemes bloquants (a corriger avant de continuer)
-- `fichier.ts:42` <probleme_une_phrase>
-  · <contexte_fonctionnel>
-  → <correction>
-
-### Avertissements
-- `fichier.ts:15` <probleme_une_phrase>
-  · <contexte_fonctionnel>
-  → <correction>
-
-### Suggestions
-- `fichier.ts:8` <probleme_une_phrase>
-  · <contexte_fonctionnel>
-  → <correction>
-```
+**S'il y a des constats** — et seulement dans ce cas — utilise Read pour charger `${CLAUDE_SKILL_DIR}/rendu.md` : format du rapport, motif d'un constat, squelette Question/Reponse de l'etape 5 et exemple complet. Affiche le rapport du sub-agent a ce format.
 
 ## Etape 5 — Review humaine du code (pause)
 
@@ -113,33 +93,11 @@ Checks : Format ✅ | Lint ✅ | Tests ✅ N passent | Specs ✅
 Rapport : X bloquant(s), Y avertissement(s), Z suggestion(s) — ou "rien a signaler"
 ```
 
+Resume chaque fichier depuis le diff. Si l'un ne s'y resume pas, lis-le ponctuellement via Read — celui-la seul, jamais la liste entiere.
+
 Puis traite les retours, dans l'ordre :
 
-- **Problemes du rapport** : parcours-les par severite (bloquants d'abord) au format Question/Reponse pedagogique, en te basant sur les 7 champs produits par le sub-agent :
-
-```
-[Severite N/Total] — <fichier>:<ligne>
-
-❓ De quoi on parle ?
-   <contexte_fonctionnel>
-
-❓ Le probleme en une phrase
-   <probleme_une_phrase>
-
-❓ C'est grave ?
-   <gravite_impact>
-
-❓ D'ou ca vient ?
-   <cause>
-
-❓ Comment on corrige ?
-   <correction>
-
-→ corriger / adapter / ignorer ?
-```
-
-Attends la decision pour chaque probleme : **corriger** (relis le fichier via Read avant d'appliquer), **adapter** (demande la modification souhaitee puis applique), **ignorer** (passe au suivant). Si besoin d'un exemple complet de rendu, utilise Read pour charger `reference.md` (section "Exemple de rendu Question/Reponse").
-
+- **Problemes du rapport** : parcours-les par severite (bloquants d'abord) au format Question/Reponse pedagogique de `${CLAUDE_SKILL_DIR}/rendu.md` (deja charge a l'etape 4), en te basant sur les 7 champs produits par le sub-agent. Attends la decision pour chaque probleme : **corriger** (relis le fichier via Read avant d'appliquer), **adapter** (demande la modification souhaitee puis applique), **ignorer** (passe au suivant).
 - **Retours de l'utilisateur** sur le code qu'il relit : applique-les de la meme facon.
 - Apres toute correction : relance les tests (et le lint) pour verifier que rien ne casse.
 - Ne jamais corriger sans validation explicite de l'utilisateur.

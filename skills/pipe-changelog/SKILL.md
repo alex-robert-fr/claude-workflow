@@ -1,6 +1,6 @@
 ---
 name: pipe-changelog
-description: Generer ou mettre a jour CHANGELOG.md depuis les commits/tags. Entrees courtes orientees metier — le detail technique vit dans les corps de commits et les PRs, le CHANGELOG pointe vers eux. Respecte Keep a Changelog + SemVer. Utilise au moment d'une release par /pipe-release, ou seul.
+description: Generer ou maintenir CHANGELOG.md depuis les commits : entrees courtes orientees metier, Keep a Changelog, SemVer.
 argument-hint: [version a tagger ou rien pour Unreleased]
 ---
 
@@ -33,7 +33,7 @@ Recupere les informations necessaires :
 2. **URL du remote** — via `git remote get-url origin`, transforme en URL HTTPS pour les liens de comparaison (ex: `git@github.com:org/repo.git` → `https://github.com/org/repo`).
 3. **Phase de versioning** — si le dernier tag est `0.x.y`, on est en pre-v1.0.0. Sinon, post-v1.0.0.
 4. **Version cible** — si un argument est fourni (ex: `1.3.0`), c'est la version a publier. Sinon, on met a jour la section `[Unreleased]`.
-5. **Tags existants** — pour chaque version presente dans CHANGELOG.md (hors `[Unreleased]`) et pour la version cible, verifier si le tag existe :
+5. **Tags existants** — pour la version cible et pour la version de la section la plus recente (les seuls en-tetes que l'etape 3 ecrit ou reecrit ; les sections plus anciennes ne sont pas rechargees), verifier si le tag existe :
    - `git tag --list "v${version}"` → si resultat non vide, le tag `v${version}` existe
    - `git tag --list "${version}"` → fallback sans prefixe `v`
    - Construire un map `{ version → nom du tag tel que matche (ex: "v1.3.2") | null }` utilise a l'etape 3 pour generer les en-tetes de version
@@ -50,7 +50,7 @@ Contexte de versioning :
 
 ## Etape 2 — Collecter les changements
 
-Utilise Read pour charger `reference.md` (referentiel de conventions et mapping des types).
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` (referentiel de conventions et mapping des types).
 
 1. **Lister les commits** — `git log <dernier-tag>..HEAD --format="%h %s"` (ou `git log --format="%h %s"` si aucun tag). Le `%h` donne le SHA court de chaque commit.
 2. **Filtrer** — ne retenir que les commits a impact consommateur ou deploiement, selon la section "Mapping prefixe de commit → type" et la section "Exclusions" du referentiel :
@@ -63,11 +63,11 @@ Utilise Read pour charger `reference.md` (referentiel de conventions et mapping 
    - `gh pr list --state merged --limit 50 --json number,mergeCommit,headRefName` puis associer localement chaque commit a sa PR (via le merge commit ou la branche d'origine, `git log --format=%h` sur la plage concernee).
    - Si une PR est trouvee, c'est la reference de l'entree. Si pas de PR (commit direct), utiliser le SHA court en fallback.
    - Si `gh` echoue ou est indisponible, utiliser le SHA seul — ne pas bloquer la generation.
-6. **Reformuler court** — appliquer la section "Rediger pour le consommateur" de `reference.md` et sa sous-section "Regles de redaction". Le **template mental** `[Verbe actif present] [feature publique] [effet visible utilisateur]` aide a structurer la formulation.
+6. **Reformuler court** — appliquer la section "Rediger pour le consommateur" de `${CLAUDE_SKILL_DIR}/reference.md` et sa sous-section "Regles de redaction". Le **template mental** `[Verbe actif present] [feature publique] [effet visible utilisateur]` aide a structurer la formulation.
    - **Une entree = une phrase courte** : l'effet observable, sans detail d'implementation. Le lecteur qui veut le detail clique sur la reference — c'est le corps du commit qui le porte.
    - **Fusionner les entrees liees** : plusieurs commits qui composent la meme fonctionnalite vue du consommateur donnent une seule entree, avec plusieurs references si necessaire.
-   - **Consolider en etat final** : quand plusieurs commits successifs touchent le meme artefact au sein de la meme release, n'ecrire qu'une seule entree decrivant l'etat final. Un fichier ajoute puis supprime dans la meme PR ne donne aucune entree. Voir sous-section "Consolider en etat final" de `reference.md`.
-   - Chaque entree tient sur **une seule ligne** et se termine par sa ou ses references entre parentheses avec un lien Markdown explicite (voir section "References dans les entrees" de `reference.md`). L'URL de base du remote est detectee a l'etape 1.
+   - **Consolider en etat final** : quand plusieurs commits successifs touchent le meme artefact au sein de la meme release, n'ecrire qu'une seule entree decrivant l'etat final. Un fichier ajoute puis supprime dans la meme PR ne donne aucune entree. Voir sous-section "Consolider en etat final" de `${CLAUDE_SKILL_DIR}/reference.md`.
+   - Chaque entree tient sur **une seule ligne** et se termine par sa ou ses references entre parentheses avec un lien Markdown explicite (voir section "References dans les entrees" de `${CLAUDE_SKILL_DIR}/reference.md`). L'URL de base du remote est detectee a l'etape 1.
 
 Affiche les entrees classees avant de continuer :
 
@@ -91,13 +91,18 @@ Ne pas demander de confirmation ici — la confirmation unique a lieu a l'etape 
 
 Verifier que le CHANGELOG existant ne contient pas d'entrees mal placees : une PR mergee apres la date d'un tag ne peut pas figurer sous la section de ce tag.
 
-Procedure (voir `reference.md` section "Coherence versions/dates") :
+Procedure (voir `${CLAUDE_SKILL_DIR}/reference.md` section "Coherence versions/dates") :
 
-1. Pour chaque section versionnee `[X.Y.Z] - YYYY-MM-DD` du fichier, recuperer la date du tag correspondant via `git log -1 --format=%aI v<X.Y.Z>` (fallback sans prefixe `v`). Si le tag n'existe pas, passer la section — pas d'audit possible.
-2. Pour chaque entree sous cette section, extraire la reference (PR ou SHA) et recuperer sa date :
+1. Lister les sections versionnees sans charger le fichier — `grep -n '^## \[' CHANGELOG.md` ne renvoie que les titres et leurs numeros de ligne.
+2. Pour chaque section versionnee `[X.Y.Z] - YYYY-MM-DD`, recuperer la date du tag correspondant via `git log -1 --format=%aI v<X.Y.Z>` (fallback sans prefixe `v`). Si le tag n'existe pas, passer la section — pas d'audit possible.
+3. Extraire les entrees de la section a auditer, une section a la fois — jamais le fichier entier (remplacer la version, points echappes) :
+   ```
+   sed -n '/^## \[1\.5\.0\]/,/^## \[/{/^## \[/d;/^\[[^]]*\]: /d;p;}' CHANGELOG.md
+   ```
+4. Pour chaque entree extraite, extraire la reference (PR ou SHA) et recuperer sa date :
    - PR : `gh pr view <N> --json mergedAt --jq .mergedAt`
    - SHA : `git log -1 --format=%aI <sha>`
-3. Si la date de la reference est **posterieure** a la date du tag, l'entree doit etre deplacee vers `[Unreleased]`.
+5. Si la date de la reference est **posterieure** a la date du tag, l'entree doit etre deplacee vers `[Unreleased]`.
 
 Si des entrees mal placees sont detectees, les lister clairement :
 
@@ -121,10 +126,16 @@ Creer le fichier complet avec :
 
 ### Cas 2 : le fichier existe
 
-Lire le contenu existant et :
-- Si **version specifiee** : creer une nouvelle section `[X.Y.Z] - YYYY-MM-DD` sous `[Unreleased]`, y deplacer les entrees, vider `[Unreleased]`
+**Ne jamais lire `CHANGELOG.md` en entier** — il grossit a chaque release et seuls l'en-tete (le format) et la section `[Unreleased]` (les entrees a modifier) sont necessaires. Charger dans cet ordre :
+
+1. **Bornes des sections** — `grep -n -m 2 '^## \[' CHANGELOG.md` : la 1re occurrence est `## [Unreleased]`, la 2e est l'en-tete de la version la plus recente.
+2. **En-tete + `[Unreleased]`** — `Read` sur `CHANGELOG.md` avec `limit` = numero de ligne de la 2e occurrence. Cette lecture bornee est aussi le prealable exige par `Edit`. Ne pas reecrire le fichier avec `Write` : ecraser le fichier imposerait de l'avoir lu integralement.
+3. **Liens de comparaison** — `grep -n -m 2 -E '^\[[^]]+\]: ' CHANGELOG.md` : les deux premieres definitions (`[Unreleased]` et la derniere version) donnent le pattern d'URL et la ligne a modifier.
+
+Puis modifier avec `Edit` :
+- Si **version specifiee** : creer une nouvelle section `[X.Y.Z] - YYYY-MM-DD` sous `[Unreleased]` (Edit ancre sur `## [Unreleased]`), y deplacer les entrees, vider `[Unreleased]`
 - Si **pas de version** : inserer/mettre a jour les entrees dans `[Unreleased]`
-- Mettre a jour les liens de comparaison en bas du fichier
+- Mettre a jour les liens de comparaison en bas du fichier (Edit ancre sur la ligne `[Unreleased]: ...`, puis insertion de la nouvelle definition de version juste apres)
 
 ### Regles
 
@@ -138,7 +149,7 @@ Lire le contenu existant et :
 
 ## Etape 4 — Afficher le resultat et confirmer
 
-Affiche le contenu complet du fichier genere (ou le diff si mise a jour).
+Affiche le contenu complet du fichier en creation (Cas 1), le diff seul en mise a jour (Cas 2) — jamais l'integralite d'un CHANGELOG existant, qui n'a d'ailleurs pas ete chargee.
 
 Demande confirmation avant d'ecrire :
 

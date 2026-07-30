@@ -1,12 +1,12 @@
 ---
 name: pipe-plan
-description: Planifier une demande metier depuis un ticket (JIRA, GitHub, GitLab, Gitea). Co-construit le plan avec l'utilisateur par questions/reponses orientees metier et architecture, puis cree le fichier de pilotage qui suit le cycle jusqu'a la PR. Utiliser en debut de cycle, avant /pipe-test.
+description: Co-construire le plan d'un ticket (Jira, GitHub, GitLab, Gitea) par questions/reponses, et tenir le pilotage.
 argument-hint: [cle JIRA, numero issue, URL ou texte]
 ---
 
 ## Etape 0 — Detecter l'environnement et recuperer le ticket
 
-Utilise Read pour charger `reference.md` — il contient la procedure de detection et de recuperation du ticket, les criteres de classification, le template de plan et le template du fichier de pilotage.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` — il contient la procedure de detection et de recuperation du ticket, les criteres de classification et le template de plan.
 
 Applique sa section « Detection de l'environnement et recuperation du ticket » : plateforme git, tracker externe, verifications, formes de l'argument, hierarchie JIRA.
 
@@ -24,7 +24,7 @@ Si le projet n'a pas de repertoire `docs/specs/`, ne bloque pas : propose la cre
 
 ## Etape 2 — Classifier le ticket
 
-Determine la nature du ticket selon les criteres de `reference.md` :
+Determine la nature du ticket selon les criteres de `${CLAUDE_SKILL_DIR}/reference.md` :
 
 - **Technique** : dette, refactoring, perf, infra, CI/CD, migration, tooling
 - **Metier** : fonctionnalite utilisateur, user story, besoin business, UX/UI
@@ -34,13 +34,13 @@ Annonce la classification a l'utilisateur — elle oriente le plan.
 
 ## Etape 3 — Evaluer la taille et decomposer si necessaire
 
-Evalue si le ticket est implementable en un seul cycle (tests → dev → review). Consulte les criteres de decomposition dans `reference.md`.
+Evalue si le ticket est implementable en un seul cycle (tests → dev → review). Consulte les criteres de decomposition dans `${CLAUDE_SKILL_DIR}/reference.md`.
 
 **Si le ticket est trop petit pour le cycle** — aucun comportement a tester (typo, libelle, casse, config triviale, bump mineur de dependance) : propose la **voie rapide** au lieu du cycle. Correction directe + `/pipe-commit` (mode simple), micro-PR ou push direct selon la protection de branche — pas de pilotage, pas de tests dedies. Si l'utilisateur confirme : supprime le pilotage s'il en existe un (`/pipe-spec` a pu l'ouvrir), applique la correction et arrete-toi la.
 
 **Si le ticket est trop large :**
 
-1. Propose un decoupage en sous-tickets (voir guide dans `reference.md`)
+1. Propose un decoupage en sous-tickets (voir guide dans `${CLAUDE_SKILL_DIR}/reference.md`)
 2. Demande confirmation a l'utilisateur
 3. Cree les sous-tickets sur le tracker detecte via le MCP correspondant
 4. Continue en planifiant le premier sous-ticket
@@ -78,7 +78,7 @@ Regles :
 
 ## Etape 6 — Rediger le plan
 
-Structure le plan selon le template dans `reference.md`. Le plan doit etre **actionnable par `/pipe-test` puis `/pipe-code`** : chemins reels, signatures concretes, comportements explicites.
+Structure le plan selon le template dans `${CLAUDE_SKILL_DIR}/reference.md`. Le plan doit etre **actionnable par `/pipe-test` puis `/pipe-code`** : chemins reels, signatures concretes, comportements explicites.
 
 ### Concision
 
@@ -106,7 +106,7 @@ Quand le ticket est decompose en sous-tickets (etape 3) :
 
 Le pilotage est le fil rouge du cycle : chaque session suivante (tests, dev, review) le relit pour savoir ou on en est et ce qui a ete decide. Il a normalement ete ouvert par `/pipe-spec` — dans ce cas, **complete-le sans rien ecraser** (l'en-tete et les cases deja cochees restent).
 
-S'il n'existe pas (le ticket ne concernait aucune feature, ou `/pipe-plan` a ete invoque seul), cree `.claude/plans/plan-<identifiant>.md` selon le template "Fichier de pilotage" de `reference.md` :
+S'il n'existe pas (le ticket ne concernait aucune feature, ou `/pipe-plan` a ete invoque seul), cree `.claude/plans/plan-<identifiant>.md` selon `${CLAUDE_SKILL_DIR}/../../shared/pilotage-template.md` (charge-le avec Read) :
 
 - Issue git : `plan-42.md` ; ticket JIRA : `plan-PROJ-42.md` ; texte libre : `plan-<slug>.md`
 - Cree `.claude/plans/` si necessaire et verifie que le repertoire est dans `.gitignore` (document de travail ephemere — jamais versionne, supprime a la creation de la PR)

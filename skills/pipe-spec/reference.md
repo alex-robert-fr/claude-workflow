@@ -105,35 +105,7 @@ Un couplage invisible, un invariant a maintenir ailleurs. Pas de conseil general
 
 ## Index — `docs/specs/README.md`
 
-Point d'entree unique : c'est le seul fichier a charger pour savoir quelles features existent et laquelle ouvrir.
-
-```markdown
-# Specs
-
-Une spec par feature : ce qu'elle est, ce qu'on en attend, son perimetre et ses points
-d'entree techniques. A lire avant de modifier une feature — c'est le contexte de reference.
-
-Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
-
-| Feature | Spec | En une phrase |
-|---------|------|---------------|
-| Export CSV | [`export-csv.md`](export-csv.md) | Resume issu de la section « En une phrase » |
-
-## Specs depreciees
-
-Features retirees. Conservees pour l'historique — **ne pas les traiter comme du contexte actif**.
-
-| Feature | Spec | Retrait |
-|---------|------|---------|
-| Import XML | [`import-xml.md`](import-xml.md) | 2.1.0 — remplace par l'import CSV |
-```
-
-Regles :
-
-- Trie les lignes par ordre alphabetique de feature
-- La colonne « En une phrase » reprend mot pour mot la section correspondante de la spec
-- **La section « Specs depreciees » doit rester la derniere** et porter ce titre : le hook SessionStart s'arrete a elle pour n'injecter que les features actives. La renommer ou la deplacer reintroduirait les features retirees dans le contexte
-- Pas de spec depreciee → omettre la section entierement
+Format du tableau, section des specs depreciees et budget de la phrase de resume : `${CLAUDE_SKILL_DIR}/index-format.md` — fichier a part, car `/setup` en a besoin sans avoir besoin du reste de ce document.
 
 ## Fin de vie d'une spec
 
@@ -174,46 +146,8 @@ La depreciation n'est **jamais** automatique : le script signale, l'humain tranc
 
 ## Inventaire des features non specifiees
 
-Methode du mode inventaire de `/pipe-spec` (appel sans argument), pour amorcer un projet dont les features existent deja.
-
-### 1. Reperer les features candidates
-
-Croise trois sources, dans cet ordre :
-
-- **La structure du code** : les repertoires de premier et second niveau sous la racine de code (`src/`, `app/`, `packages/`...). Un module = souvent une feature
-- **Les points d'entree utilisateur** : routes, commandes CLI, ecrans, handlers, jobs — ce que le produit expose
-- **Le CLAUDE.md et le README** : ils nomment deja les features importantes, dans le vocabulaire du projet
-
-Retiens le **vocabulaire metier**, pas les noms techniques : la feature s'appelle « export CSV », pas `CsvExportService`.
-
-### 2. Prioriser par valeur
-
-Le critere : **une spec rapporte proportionnellement au nombre de fois ou on rouvrira la feature**. Le passe le predit — les zones les plus modifiees sont celles qu'on relira le plus.
-
-```bash
-git log --since="12 months ago" --name-only --pretty=format: -- <racine-de-code> \
-  | grep -v '^$' \
-  | awk -F/ '{print $1"/"$2}' \
-  | sort | uniq -c | sort -rn | head -20
-```
-
-Adapter la profondeur de l'`awk` a l'arborescence (`$1"/"$2"/"$3` sur un monorepo). Restreindre le pathspec a la racine de code : sans cela, `CHANGELOG.md`, les manifestes et les fichiers de config saturent le haut du classement sans etre des features.
-
-Trois signaux ponderent ce classement :
-
-- **Volume de code** : une feature d'un seul fichier trivial ne merite pas de spec
-- **Complexite du metier** : les regles implicites, les cas limites nombreux, les arbitrages passes — c'est la que la spec fait gagner le plus
-- **Ce que l'utilisateur sait encore** : une feature ecrite il y a deux ans dont personne ne se rappelle le pourquoi produira une spec creuse ; preferer celles dont l'intention est encore fraiche
-
-### 3. Presenter le classement
-
-| # | Feature | Repertoire | Modifs (12 mois) | Pourquoi maintenant |
-|---|---------|------------|------------------|---------------------|
-| 1 | Export CSV | `src/export/` | 38 | Zone la plus retouchee, regles metier implicites |
-
-Exclure les features deja presentes dans `docs/specs/README.md`. Si toutes le sont, le dire en une ligne : le rattrapage est termine.
-
-Terminer par le compte : combien de features reperees, combien deja specifiees, combien restent.
+Deplace dans `${CLAUDE_SKILL_DIR}/inventaire.md` — charge par le seul mode
+inventaire, qui n'a pas besoin du reste de ce fichier.
 
 ## Verification de fraicheur (utilisee par `/pipe-review`)
 

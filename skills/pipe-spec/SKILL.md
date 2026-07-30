@@ -1,18 +1,18 @@
 ---
 name: pipe-spec
-description: Cadrer une feature dans une spec durable et versionnee (docs/specs/) avant de planifier le dev. Decrit ce que la feature est, ce qu'on en attend, sa philosophie, son hors-scope, ses dependances et ses points d'entree techniques. Sert de contexte central aux sessions suivantes. Utiliser en tout debut de cycle, avant /pipe-plan — ou sans argument pour inventorier et rattraper les features deja livrees d'un projet existant.
+description: Cadrer une feature dans une spec durable et versionnee (docs/specs/) avant le dev. Sans argument, inventorier l'existant.
 argument-hint: [cle JIRA, numero issue, URL, nom de feature, ou rien pour inventorier l'existant]
 ---
 
 Une spec repond a « qu'est-ce que cette feature, et pourquoi ? ». Elle vit **dans le repo**, versionnee, et survit au ticket qui l'a fait naitre : c'est le contexte que toute session future charge avant de toucher a la feature, au lieu de relire le code.
 
-**Une spec n'est pas un plan.** Le plan (`/pipe-plan`) dit ce qu'on va faire, dans quel ordre, dans quels fichiers — il est ephemere et meurt a la PR. La spec dit ce qui **est** — elle est durable. Cette frontiere est la regle la plus importante de ce skill ; les criteres exacts sont dans `reference.md`.
+**Une spec n'est pas un plan.** Le plan (`/pipe-plan`) dit ce qu'on va faire, dans quel ordre, dans quels fichiers — il est ephemere et meurt a la PR. La spec dit ce qui **est** — elle est durable. Cette frontiere est la regle la plus importante de ce skill ; les criteres exacts sont dans `${CLAUDE_SKILL_DIR}/reference.md`.
 
 ## Mode inventaire — amorcer un projet existant
 
 **Declencheur : aucun argument.** Un projet dont les features existent deja n'aura jamais de specs si elles ne s'ecrivent qu'au fil des cycles — il faudrait autant de tickets que de features. Ce mode rattrape l'existant, en commencant par ce qui rapporte le plus.
 
-Applique la section « Inventaire des features non specifiees » de `${CLAUDE_SKILL_DIR}/reference.md` (charge-le avec Read) : elle donne la methode de reperage, le critere de priorisation et le format du tableau.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/inventaire.md` : il donne la methode de reperage, le critere de priorisation et le format du tableau.
 
 Presente le classement, puis demande **quelle feature specifier maintenant**. Une fois le choix fait, reprends le flow normal a l'etape 2 en traitant ce nom de feature comme l'argument (pas de ticket, donc pas de pilotage).
 
@@ -58,7 +58,7 @@ Annonce le verdict en une ligne : creation ou mise a jour, et de quel fichier.
 Le cadrage peut s'etaler sur plusieurs sessions. Ouvrir le pilotage **maintenant**, avant le Q/R, est ce qui rend cette phase reprenable par `/pipe-ship` : sans lui, une session interrompue en plein cadrage laisse le cycle invisible.
 
 - Le pilotage existe deja (reprise) → lis-le, ne l'ecrase pas, et reprends le cadrage la ou il en est
-- Sinon → cree `.claude/plans/plan-<identifiant>.md` depuis le template « Fichier de pilotage » de `${CLAUDE_SKILL_DIR}/../pipe-plan/reference.md` (charge-le avec Read)
+- Sinon → cree `.claude/plans/plan-<identifiant>.md` depuis `${CLAUDE_SKILL_DIR}/../../shared/pilotage-template.md` (charge-le avec Read)
 
 A ce stade, ne remplis **que** l'en-tete : Ticket (source, version cible, epic, lien), Spec (chemin vise) et l'Etat, toutes cases decochees. Le reste — branche, plan, tests — appartient aux skills suivants : ne les invente pas.
 
@@ -92,13 +92,13 @@ Regles :
 
 ## Etape 5 — Rediger la spec
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` — il contient le template de spec, les regles de redaction, la frontiere spec/plan et le format de l'index.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` — il contient le template de spec, les regles de redaction et la frontiere spec/plan.
 
 Ecris ou mets a jour `docs/specs/<feature>.md` (`kebab-case`, cree `docs/specs/` si necessaire).
 
 **En mise a jour** : modifie les sections concernees, **n'ecrase jamais** la section Decisions — elle s'ajoute, elle ne se reecrit pas. Ajoute la reference du ticket dans l'en-tete. Si le delta contredit une decision passee, garde l'ancienne et note qu'elle est remplacee, avec la raison.
 
-Puis mets a jour l'index `docs/specs/README.md` (cree-le s'il manque) selon le format de `reference.md`.
+Puis mets a jour l'index `docs/specs/README.md` (cree-le s'il manque) selon `${CLAUDE_SKILL_DIR}/index-format.md` (charge-le avec Read).
 
 ## Etape 6 — Elaguer
 
