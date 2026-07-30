@@ -7,9 +7,40 @@ Les hooks sont des garde-fous deterministes — ils ne coutent rien en tokens et
 
 | Hook | Role | Quand |
 |------|------|-------|
+| SessionStart | Injecter l'index des specs dans le contexte | Au demarrage de chaque session |
 | PreToolUse | Bloquer les commandes dangereuses | Avant chaque appel d'outil |
 | PostToolUse | Auto-lint/format apres ecriture | Apres Write ou Edit |
 | Stop | Verifier que les tests passent | Quand Claude pense avoir fini |
+
+## SessionStart — Index des specs
+
+Les specs de `docs/specs/` n'ont de valeur que si elles sont **lues**. Une instruction dans le CLAUDE.md repose sur la bonne volonte du LLM ; ce hook rend l'index present dans le contexte des le demarrage, sans exception.
+
+**Pas de matcher** — l'evenement n'en prend pas.
+
+**Script template** (`.claude/hooks/session-start.sh`) :
+
+```bash
+#!/bin/bash
+# Hook SessionStart — injecte l'index des specs dans le contexte de la session
+
+INDEX="${CLAUDE_PROJECT_DIR:-.}/docs/specs/README.md"
+[ -f "$INDEX" ] || exit 0
+
+HEADER="Index des specs de features de ce projet (docs/specs/). Chaque spec porte l'intention, le comportement attendu, le hors-scope, les decisions et les points d'entree techniques d'une feature. AVANT de modifier une feature, lire sa spec plutot que de parcourir le code."
+
+jq -Rs --arg header "$HEADER" \
+  '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: ($header + "\n\n" + .)}, suppressOutput: true}' \
+  "$INDEX"
+```
+
+Points de mecanique :
+
+- L'injection passe par `hookSpecificOutput.additionalContext`, avec `hookEventName` **obligatoire** — un `echo` de texte brut n'est pas garanti d'atteindre le contexte
+- `jq -Rs` echappe le markdown de l'index : ne jamais construire ce JSON a la main
+- `suppressOutput: true` evite d'afficher l'index dans le transcript a chaque demarrage
+- Projet sans `docs/specs/README.md` → sortie vide et exit 0 : le hook est inerte, pas en erreur
+- Cout : l'index seul (une ligne par feature), pas les specs. Compter ~200 tokens pour une dizaine de features — c'est ce qui evite l'exploration a l'aveugle
 
 ## PreToolUse — Blocage des commandes dangereuses
 
@@ -151,6 +182,16 @@ cargo test 2>&1
 ```json
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -189,7 +230,7 @@ cargo test 2>&1
 
 ## Notes
 
-- Les hooks sont executes par le harness Claude Code, pas par le LLM — ils sont gratuits en tokens
+- Les hooks sont executes par le harness Claude Code, pas par le LLM — leur execution est gratuite en tokens (un hook qui injecte du contexte, comme SessionStart, coute en revanche ce qu'il injecte)
 - Un hook PreToolUse qui retourne exit code 2 bloque l'action avec le message stdout
 - Un hook Stop qui retourne exit code non-zero force Claude a continuer
 - Les hooks PostToolUse ne bloquent pas — ils s'executent silencieusement

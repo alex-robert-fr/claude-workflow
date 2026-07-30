@@ -10,8 +10,9 @@ Analyse l'etat actuel du projet et identifie ce qui manque :
 
 - [ ] `CLAUDE.md` existe a la racine
 - [ ] `.claude/skills/workflow-config/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
-- [ ] `.claude/settings.json` existe avec des hooks configures
+- [ ] `.claude/settings.json` existe avec des hooks configures — verifie chaque type separement (SessionStart, PreToolUse, PostToolUse, Stop) : un projet configure par une version anterieure a les trois derniers mais pas le premier
 - [ ] `.claude/plans/` existe
+- [ ] `docs/specs/` existe avec son index `README.md`
 - [ ] Aucun autre fichier de `.claude/skills/` ne contient de placeholders `<!-- ... -->`
 
 Affiche un recap :
@@ -36,8 +37,18 @@ Si `CLAUDE.md` n'existe pas, genere-le avec le strict minimum :
 - Stack principale (detectee depuis package.json, Cargo.toml, go.mod, etc.)
 - Regles critiques evidentes (monorepo, strict mode, etc.)
 - Section **Git** : utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` et inclure les regles clefs dans le CLAUDE.md (format de commit, format de branche, pas de signature `Co-Authored-By`)
+- Section **Specs** : le pointeur qui rend la doc de features decouvrable — sans lui, personne ne va la lire
 
-Si `CLAUDE.md` existe deja, verifie qu'il contient une section Git avec les regles de `git-conventions`. Si elle manque, propose de l'ajouter.
+```markdown
+## Specs
+
+Chaque feature a une spec dans `docs/specs/` : intention, comportement attendu, hors-scope,
+decisions et points d'entree techniques. **Avant de modifier une feature, lire sa spec**
+(index : `docs/specs/README.md`) plutot que de parcourir le code.
+Les specs sont ecrites et maintenues par `/pipe-spec`.
+```
+
+Si `CLAUDE.md` existe deja, verifie qu'il contient ces deux sections (Git et Specs). Si l'une manque, propose de l'ajouter.
 
 ## Etape 2 — workflow-config
 
@@ -64,11 +75,14 @@ Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md` pour les temp
 
 Genere `.claude/settings.json` avec les hooks adaptes au projet. Utilise les commandes definies dans `workflow-config` pour les hooks PostToolUse et Stop.
 
-La structure complete des hooks est dans `hooks-reference.md` (deja charge). Genere les 3 types :
+La structure complete des hooks est dans `hooks-reference.md` (deja charge). Genere les 4 types :
 
+- **SessionStart** — injecte l'index des specs (`docs/specs/README.md`) dans le contexte de chaque session
 - **PreToolUse** (Bash) — bloque les commandes dangereuses
 - **PostToolUse** (Write|Edit) — lint/format automatique avec la commande de `workflow-config`
 - **Stop** — tests avant de terminer
+
+Le hook SessionStart est ce qui rend les specs **effectivement** lues : sans lui, leur consultation depend de la bonne volonte du LLM. Le script est inerte tant que `docs/specs/README.md` n'existe pas — genere-le meme sur un projet qui n'a pas encore de spec. Il requiert `jq` : si l'outil est absent du systeme, signale-le et installe le hook quand meme (il sortira en erreur silencieuse).
 
 Si un `.claude/settings.json` existe deja, merge les hooks sans ecraser les permissions ou MCP existants.
 
@@ -80,8 +94,11 @@ Cree les repertoires manquants :
 
 - `.claude/plans/` — pour les plans generes par `/pipe-plan`
 - `.claude/rules/` — pour les rules contextuelles futures
+- `docs/specs/` — pour les specs de features generees par `/pipe-spec`
 
-Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres).
+Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont des documents de travail ephemeres). `docs/specs/`, au contraire, est **versionne** : ne jamais l'ignorer.
+
+Cree l'index `docs/specs/README.md` s'il manque, en chargeant le format depuis `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (section « Index »). Sur un projet existant qui a deja des features, ne les documente pas ici : les specs se remplissent au fil des cycles, ou a la demande via `/pipe-spec <nom de feature>`.
 
 ## Etape 5 — Recap final
 
@@ -91,17 +108,18 @@ Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas deja fait (les plans sont
 ### Configure
 - ✅ CLAUDE.md
 - ✅ workflow-config (lint: [cmd], test: [cmd], ...)
-- ✅ hooks (PreToolUse, PostToolUse, Stop)
+- ✅ hooks (SessionStart, PreToolUse, PostToolUse, Stop)
 - ✅ .claude/plans/
 - ✅ .claude/rules/
+- ✅ docs/specs/ (+ index)
 
 ### Pipeline disponible
-Cycle : /pipe-plan → /pipe-test → [review humaine des tests] → /pipe-code (session neuve) → /pipe-review (session neuve, review humaine) → /pipe-commit → /pipe-pr
+Cycle : /pipe-spec → /pipe-plan → /pipe-test → [review humaine des tests] → /pipe-code (session neuve) → /pipe-review (session neuve, review humaine) → /pipe-commit → /pipe-pr
 Reprise a tout moment : /pipe-ship [ticket]
 Release : /pipe-release → [merge + deploiement] → /pipe-tag
 
 ### Prochaine etape
-Lance `/pipe-plan [ticket]` pour demarrer un cycle.
+Lance `/pipe-spec [ticket]` pour demarrer un cycle par le cadrage de la feature.
 ```
 
 ---
