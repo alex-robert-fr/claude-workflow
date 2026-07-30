@@ -9,6 +9,7 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 |---------|------|---------------|
 | CHANGELOG et release | [`changelog-et-release.md`](changelog-et-release.md) | Un CHANGELOG oriente consommateur, puis version, PR de production et tag |
 | Configuration d'un projet | [`configuration-d-un-projet.md`](configuration-d-un-projet.md) | Diagnostique ce qui manque au projet, puis n'installe que ce qui manque |
+| Creation d'issues | [`creation-d-issues.md`](creation-d-issues.md) | Transforme une demande libre en issues decoupees et acceptables |
 | Cycle de vie d'une spec | [`cycle-de-vie-d-une-spec.md`](cycle-de-vie-d-une-spec.md) | Comment une spec nait, se met a jour, se verifie et se deprecie |
 | Developpement guide par les tests | [`developpement-guide-par-les-tests.md`](developpement-guide-par-les-tests.md) | Tests valides puis figes : le dev les suit en session dediee |
 | Fichier de pilotage | [`fichier-de-pilotage.md`](fichier-de-pilotage.md) | Porte l'etat d'un ticket et rend son cycle reprenable en session neuve |
