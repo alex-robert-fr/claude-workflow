@@ -19,7 +19,7 @@ Lecture de tickets compatible **GitHub** et **Jira** (hierarchie epic → versio
 Dans Claude Code :
 
 ```
-/plugin marketplace add ToolsForSaaS/claude-workflow
+/plugin marketplace add alex-robert-fr/claude-workflow
 /plugin install claude-workflow
 ```
 
@@ -32,7 +32,7 @@ Puis recharger les plugins :
 ### Via clone local (dev / contribution)
 
 ```bash
-git clone git@github.com:ToolsForSaaS/claude-workflow.git
+git clone git@github.com:alex-robert-fr/claude-workflow.git
 ```
 
 Puis dans `.claude/settings.json` du projet cible :
@@ -221,5 +221,5 @@ Ces fichiers ne sont jamais ecrases par une mise a jour du plugin.
 ## Ressources
 
 - [CHANGELOG.md](CHANGELOG.md) — historique des versions et evolutions du plugin
-- [Repository GitHub](https://github.com/ToolsForSaaS/claude-workflow)
+- [Repository GitHub](https://github.com/alex-robert-fr/claude-workflow)
 - [Conventions du plugin](CLAUDE.md) — regles internes pour contribuer
