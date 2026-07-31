@@ -30,4 +30,5 @@ Ecrites et maintenues par `/pipe-spec`, verifiees a chaque `/pipe-review`.
 | Configuration d'un projet | [`configuration-d-un-projet.md`](configuration-d-un-projet.md) | Diagnostique ce qui manque au projet, puis n'installe que ce qui manque |
 | Creation d'issues | [`creation-d-issues.md`](creation-d-issues.md) | Transforme une demande libre en issues decoupees et acceptables |
 | Garde-fous outilles | [`garde-fous-outilles.md`](garde-fous-outilles.md) | Des scripts deployes par /setup qui font respecter les regles sans le LLM |
+| Sorties vers l'humain | [`sorties-vers-l-humain.md`](sorties-vers-l-humain.md) | Telegraphique pour les faits, developpe des qu'une decision est attendue |
 | Worktrees paralleles | [`worktrees-paralleles.md`](worktrees-paralleles.md) | Plusieurs branches cote a cote, sans remiser le travail en cours |
