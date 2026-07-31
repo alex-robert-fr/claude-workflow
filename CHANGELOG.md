@@ -9,6 +9,12 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-07-31
+
+### Changed
+
+- Le dépôt du plugin a déménagé vers `alex-robert-fr/claude-workflow` : c'est désormais cette adresse qu'il faut utiliser pour `/plugin marketplace add`. Les installations existantes continuent de fonctionner par redirection GitHub ([`954556b`](https://github.com/alex-robert-fr/claude-workflow/commit/954556b))
+
 ## [1.6.2] - 2026-07-30
 
 ### Changed
@@ -263,7 +269,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.5.0...v1.6.0

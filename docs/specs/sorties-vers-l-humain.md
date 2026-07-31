@@ -48,9 +48,9 @@ Les maquettes de rendu reellement variables — celles qu'un skill n'affiche que
 
 | Version | Ticket | Decision | Raison | Alternative ecartee |
 |---------|--------|----------|--------|---------------------|
-| 1.7.0 (a venir) | — | Deux regimes : constat dense, sollicitation developpee | Une densite uniforme a produit des questions cryptiques : options telegraphiques, jargon non defini, consequences absentes | Garder la densite prioritaire partout et ne corriger que les abus — le fond serait revenu |
-| 1.7.0 (a venir) | — | Les options d'une sollicitation se formulent en comportement | Un libelle qui nomme un fichier oblige a connaitre le code pour repondre, ce qui deplace la charge sur l'humain | Nommer la couche ou le module concerne |
-| 1.7.0 (a venir) | — | La spec ne prescrit aucun moyen de mise en oeuvre | Frontiere spec/plan : un outil ou un script d'apprentissage se choisit au plan et peut changer sans que la regle bouge | Engager des le cadrage un garde-fou outille |
+| 1.6.3 | — | Deux regimes : constat dense, sollicitation developpee | Une densite uniforme a produit des questions cryptiques : options telegraphiques, jargon non defini, consequences absentes | Garder la densite prioritaire partout et ne corriger que les abus — le fond serait revenu |
+| 1.6.3 | — | Les options d'une sollicitation se formulent en comportement | Un libelle qui nomme un fichier oblige a connaitre le code pour repondre, ce qui deplace la charge sur l'humain | Nommer la couche ou le module concerne |
+| 1.6.3 | — | La spec ne prescrit aucun moyen de mise en oeuvre | Frontiere spec/plan : un outil ou un script d'apprentissage se choisit au plan et peut changer sans que la regle bouge | Engager des le cadrage un garde-fou outille |
 
 ## Points d'entree
 
