@@ -7,15 +7,26 @@
 # Detecte les ecarts a la doctrine maison qu'aucune relecture ne rattrape :
 #   - une description trop longue : elle est injectee dans le prompt systeme de
 #     CHAQUE session, c'est un cout permanent
-#   - une DIRECTIVE DE CHARGEMENT citant un fichier support sans chemin qualifie :
-#     Read exige un chemin absolu, un nom nu n'est resolvable que depuis le cwd de
-#     ce repo, pas depuis un plugin installe
+#   - une DIRECTIVE DE CHARGEMENT citant un fichier support OU un autre skill sans
+#     chemin qualifie : Read exige un chemin absolu, un nom nu n'est resolvable que
+#     depuis le cwd de ce repo, pas depuis un plugin installe
 #   - un skill invocable sans $ARGUMENTS : l'argument utilisateur est perdu
 #   - un corps trop long sans fichier support : le seuil de delegation n'est pas tenu
 #   - le diagramme du pipeline divergent entre ses trois copies
 
 ROOT="${CLAUDE_PROJECT_DIR:-.}"
 status=0
+
+# Noms des skills distribues, pour le check 2. Sans cette liste, la detection ne
+# porterait que sur les fichiers annexes (reference.md, guide.md) et laisserait
+# passer un chargement par nom de skill nu — l'ecart le plus silencieux, puisqu'il
+# echoue seulement une fois le plugin installe ailleurs.
+skill_names=""
+for d in "$ROOT"/skills/*/; do
+  [ -d "$d" ] || continue
+  skill_names="$skill_names|$(basename "$d")"
+done
+skill_names="${skill_names#|}"
 
 for skill in "$ROOT"/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md; do
   [ -f "$skill" ] || continue
@@ -35,11 +46,21 @@ for skill in "$ROOT"/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md; do
   # produit aucun Read : la signaler serait du bruit, et le bruit fait ignorer
   # le check. On exige ensuite un chemin sur la ligne : ${CLAUDE_SKILL_DIR}/,
   # skills/... ou .claude/...
+  #
+  # Deux formes de nom nu sont cherchees : un fichier support (reference.md,
+  # guide.md) et un AUTRE skill cite en backticks (`git-conventions`). Le nom du
+  # skill courant est exclu — il se cite lui-meme sans rien charger. Les backticks
+  # sont exiges colles au nom, ce qui laisse passer `/pipe-commit` : une invocation
+  # de commande n'est pas un chargement de fichier.
+  others=$(printf '%s' "$skill_names" | tr '|' '\n' | grep -vx "$name" | paste -sd'|' -)
+  motif='(reference|guide)\.md'
+  [ -n "$others" ] && motif="$motif|\`($others)\`"
+
   while IFS=: read -r ln text; do
     [ -z "$ln" ] && continue
     echo "SKILL $name — chargement a chemin nu ligne $ln : $(printf '%s' "$text" | sed 's/^[ \t*-]*//' | cut -c1-60)"
     status=1
-  done < <(grep -nE '(reference|guide)\.md' "$skill" \
+  done < <(grep -nE "$motif" "$skill" \
     | grep -E 'Read|charge|charger' \
     | grep -vE '\$\{CLAUDE_SKILL_DIR\}|(^|[^a-z])(skills|\.claude)/')
 

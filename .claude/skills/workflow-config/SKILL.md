@@ -11,7 +11,7 @@ disable-model-invocation: true
 
 ## Plateforme
 
-- **Git hosting** : GitHub (`OnVaEtreMillionnaire/claude-workflow`)
+- **Git hosting** : GitHub (`alex-robert-fr/claude-workflow`)
 - **Issue tracker** : GitHub Issues
 - **Branche par defaut** : `develop` — base des features et cible de leurs PRs
 - **Branche de production** : `main` — cible des PRs de release
