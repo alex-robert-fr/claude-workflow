@@ -8,7 +8,7 @@ Configurer un workflow AI-Driven Development de zero, c'est des dizaines d'heure
 
 **Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (un seul geste a retenir : `/pipe-ship <ticket>` reprend le cycle ou il en est), l'humain qui n'intervient qu'aux vrais points de decision (le plan, les tests, le code), une qualite garantie par les vrais outils et les hooks (pas par des instructions au LLM), et une coherence entre les sessions et les projets menes en parallele.
 
-**15 skills** distribues : chaque etape du cycle est un skill invocable independamment, et `/pipe-ship` les enchaine depuis le fichier de pilotage.
+**16 skills** distribues : chaque etape du cycle est un skill invocable independamment, et `/pipe-ship` les enchaine depuis le fichier de pilotage.
 
 Lecture de tickets compatible **GitHub** et **Jira** (hierarchie epic → version → demande) — la creation d'issues et de Pull Requests reste sur **GitHub** uniquement.
 
@@ -166,6 +166,7 @@ Commandes invocables a tout moment, hors du flow principal du pipeline.
 | [`setup`](skills/setup/SKILL.md) | Configuration complete du projet, one-shot (slash-only) |
 | [`create-issue`](skills/create-issue/SKILL.md) | Issues GitHub structurees avec decoupage |
 | [`worktree`](skills/worktree/SKILL.md) | Creer, lister, supprimer et basculer entre worktrees git |
+| [`audit-conformity`](skills/audit-conformity/SKILL.md) | Auditer le code contre un document de reference (spec, regle, skill) et planifier la remediation |
 
 ### Referentiels (consultables, non-invocables)
 
@@ -189,7 +190,7 @@ claude-workflow/
 ├── CLAUDE.md                # conventions du plugin
 ├── CHANGELOG.md             # historique des versions
 └── skills/
-    ├── <nom>/               # 15 skills, un repertoire par skill
+    ├── <nom>/               # 16 skills, un repertoire par skill
     │   ├── SKILL.md         # point d'entree (frontmatter + flow)
     │   └── reference.md     # referentiel detaille (optionnel)
     └── setup/scripts/       # scripts universels, copies tels quels par /setup

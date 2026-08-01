@@ -70,4 +70,4 @@ La version du plugin se resout par ordre de priorite : le champ de `plugin.json`
 - **Ne pas bumper la version est une panne totale et silencieuse.** Elle sert de cle de cache : pousser des commits ne suffit pas, la mise a jour repond que tout est deja a jour et personne ne recoit rien. Aucun test, aucun lint et aucune review ne rattrapent cet oubli
 - **Aucun skill ne declenche le bump** : la chaine de release l'ignore, il reste a lancer a la main
 - **Ni l'entree marketplace ni le champ de compatibilite ascendante ne doivent revenir** : ils ne cassent rien, ils mentent — une version affichee qui n'est jamais celle qui s'applique
-- **La cible d'installation declaree dans le marketplace differe du remote de ce repo**, et le schema qu'il declare est introuvable. A verifier avant la prochaine publication
+- **La cible d'installation du marketplace doit suivre le remote** : `repo`, `homepage` et `repository` pointent vers le depot reel, sinon l'installation vise un autre depot que celui publie

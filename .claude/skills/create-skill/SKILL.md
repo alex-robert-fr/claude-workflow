@@ -13,7 +13,7 @@ argument-hint: [description du skill a creer]
 ### Conventions de ce repo
 
 - Nommage : `kebab-case`, chaque skill est un repertoire `nom/SKILL.md`
-- Prefixes : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `*-conventions` (expertise)
+- Prefixes : `pipe-*` (pipeline), `create-*` (artefacts), `audit-*` (conformite), `setup-*` (config), `*-conventions` (expertise)
 - Skills invocables : `user-invocable: true` (defaut). Skills expertise : `user-invocable: false`
 - `$ARGUMENTS` toujours en fin de skill invocable
 - Pas de champ `model` dans le frontmatter : il bascule reellement le modele pour le reste du tour (auto-invocation comprise) et peut retrograder la session. Voir `reference.md` section `model`
