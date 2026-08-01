@@ -8,6 +8,7 @@
 # Restent ignores par la regle ci-dessus, listes ici pour l'intention :
 #   .claude/settings.local.json  — permissions propres a la machine
 #   .claude/plans/               — fichiers de pilotage, ephemeres, supprimes a la PR
+#   .claude/audits/              — rapports d'audit de conformite, ephemeres
 #   .claude/hooks/               — copies produites par /setup depuis skills/setup/scripts/
 
 # Ne jamais utiliser de motif nu comme `settings.json` : non ancre, il ignorerait
