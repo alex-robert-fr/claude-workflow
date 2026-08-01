@@ -24,7 +24,7 @@ Deux documents, deux durees de vie — ne jamais les confondre. La **spec** (`do
 
 - Les fichiers de `skills/` sont **partages** — distribues via le plugin. `.claude/` porte l'outillage local du repo (create-skill, scripts de check) et n'est jamais distribue
 - Les templates projet-specifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
-- **Un script est un fichier, jamais un bloc de code dans un markdown.** Les scripts sans variable projet vivent dans `skills/setup/scripts/*.sh` et sont **copies** par `/setup` (`cp` + `chmod +x`). Faire recopier un script par le LLM depuis un markdown, c'est lui confier un travail deterministe — avec le risque d'erreur d'echappement en prime. Les markdown ne gardent que les templates reellement variables (commandes de lint, format, test) et l'explication des scripts, pas leur code
+- **Un script est un fichier, jamais un bloc de code dans un markdown** : les scripts sans variable projet vivent dans `skills/setup/scripts/*.sh` et sont **copies** par `/setup`. Seuls les templates reellement variables (commandes de lint, format, test) restent dans les markdown — le pourquoi est dans `README.md`
 - La qualite est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM. Les garde-fous outilles : `.claude/scripts/check-skills.sh` (budget et coherence des skills), `skills/setup/scripts/check-specs.sh` (coherence des specs, lance par `/pipe-review`)
 - Ne jamais mettre de logique specifique a un projet dans les skills partages
 - Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
@@ -35,4 +35,4 @@ Deux documents, deux durees de vie — ne jamais les confondre. La **spec** (`do
 
 - Ecrire ou modifier un skill : `.claude/skills/create-skill/` (conventions de nommage, frontmatter, seuils de delegation)
 - Commits, branches, Pull Requests : `skills/git-conventions/SKILL.md` — a respecter systematiquement
-- Publier une version : `/pipe-release` puis `/pipe-tag`. La version de `plugin.json` est la **cle de cache des mises a jour** : sans bump, aucun utilisateur ne recoit quoi que ce soit et `/plugin update` repond « already at the latest version ». Panne totale et silencieuse, qu'aucun test ne rattrape — lancer `.claude/scripts/bump-version.sh X.Y.Z`, jamais editer a la main
+- Publier une version : `/pipe-release` puis `/pipe-tag`. La version de `plugin.json` est la **cle de cache des mises a jour** : sans bump, aucun utilisateur ne recoit quoi que ce soit et `/plugin update` repond « already at the latest version ». Panne totale et silencieuse, qu'aucun test ne rattrape — lancer `.claude/scripts/bump-version.sh X.Y.Z`, jamais editer a la main. Meme exigence pour la cible d'installation de `marketplace.json` (`repo`, `homepage`, `repository`) : divergente du remote, elle fait installer un autre depot que celui publie
