@@ -9,6 +9,17 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-08-01
+
+### Added
+
+- Nouveau skill `/audit-conformity` : auditer la conformité du code à un document de référence (spec, règle, skill, `CLAUDE.md`) et planifier la remédiation ([#59](https://github.com/alex-robert-fr/claude-workflow/pull/59))
+
+### Fixed
+
+- Le marketplace pointe désormais sur le dépôt réellement publié : `/plugin install` et `/plugin update` installent bien ce plugin ([#59](https://github.com/alex-robert-fr/claude-workflow/pull/59))
+- `/pipe-code` charge à nouveau les conventions git depuis un plugin installé, et non plus seulement depuis le dépôt source ([#59](https://github.com/alex-robert-fr/claude-workflow/pull/59))
+
 ## [1.6.3] - 2026-07-31
 
 ### Changed
@@ -269,7 +280,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.3...v1.7.0
 [1.6.3]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/ToolsForSaaS/claude-workflow/compare/v1.6.0...v1.6.1
