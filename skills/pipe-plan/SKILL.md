@@ -85,9 +85,9 @@ Structure le plan selon le template dans `${CLAUDE_SKILL_DIR}/reference.md`. Le 
 Un plan est une **feuille de route**, pas du code.
 
 - **Budget : 80-120 lignes** pour un ticket simple, jusqu'a 150 pour un ticket decompose
-- **Pas de blocs de code** dans le plan. Les signatures de fonctions, noms de types et descriptions textuelles suffisent
+- **Pas de code implemente** dans le plan (pas de corps de fonction, pas de logique). Un bloc ``` reste autorise par etape pour lister signatures et comportements de facon structuree (`Label : valeur`), precede d'une phrase d'intro en langage naturel — voir `${CLAUDE_SKILL_DIR}/reference.md`
 - **La section Tests du plan compte double** : c'est elle que `/pipe-test` transforme en tests unitaires — comportements attendus et cas limites y sont explicites
-- **Terminer par un tableau recapitulatif** des fichiers (nom lie | action | description courte) — scannable en 5 secondes
+- **Tableau recapitulatif des fichiers** (nom lie | action | description courte) a la fin du plan, **seulement au-dela de 4-5 fichiers** — en-deca, les en-tetes des etapes (`#### N. [fichier] — action`) portent deja la meme info, le tableau ferait doublon
 
 ### Decomposition
 
@@ -113,6 +113,8 @@ S'il n'existe pas (le ticket ne concernait aucune feature, ou `/pipe-plan` a ete
 - Remplis l'en-tete : ticket (source, version cible, epic, lien) et spec liee (chemin, ou `sans objet`)
 
 Dans les deux cas, ajoute les decisions du Q/R et le plan redige a l'etape 6, puis assure-toi que `Spec a jour` est cochee : soit la spec est validee, soit le ticket ne concerne aucune feature. Ne recopie jamais le contenu de la spec dans le pilotage — seulement son chemin.
+
+La section `## Tests` du pilotage (distincte de la section Tests **a l'interieur** du plan redige a l'etape 6) reste `[a completer par /pipe-test]` : c'est `/pipe-test` qui la remplit avec les fichiers reellement ecrits, jamais `/pipe-plan` — la remplir ici ferait doublon avec la section Tests du plan.
 
 Presente le plan a l'utilisateur. Coche `Plan valide` dans l'etat **uniquement apres son accord explicite** — sinon itere.
 

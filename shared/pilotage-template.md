@@ -42,7 +42,7 @@ Il est **ouvert par `/pipe-spec`** des que la feature est identifiee — avant m
 [le plan technique — template « Template de plan technique » de /pipe-plan]
 
 ## Tests
-- `chemin/fichier.spec.ts` — comportements couverts, en une ligne
+[a completer par /pipe-test — comportements couverts par fichier, un par ligne]
 
 ## Notes de reprise
 - **3 lignes max.** Uniquement ce qui ne figure nulle part ailleurs (pas de redite de Decisions ou Points d'attention) et qui sert a la session suivante
@@ -57,5 +57,6 @@ Regles :
 - La section Decisions est un journal : on ajoute, on ne reecrit pas
 - Format d'une decision : `- [tag] **Decision en quelques mots** : raison en une ligne`. Le gras porte le choix, les deux-points introduisent le pourquoi — jamais de paragraphe, jamais le contexte deja connu (le ticket, la stack) rappele en toutes lettres
 - Notes de reprise : 3 lignes max, jamais une redite de Decisions ou de Points d'attention
+- La section `## Tests` n'est remplie que par `/pipe-test`, jamais par `/pipe-plan` (qui redige deja sa propre section Tests **a l'interieur** du plan) — doublon sinon
 - `Spec a jour` est cochee par `/pipe-spec` apres validation humaine de la spec, ou par `/pipe-plan` quand le ticket ne concerne aucune feature (`sans objet`). Le contenu de la spec vit dans `docs/specs/`, jamais recopie ici — le pilotage n'en porte que le chemin
 - Un pilotage ouvert par `/pipe-spec` est **supprime** si `/pipe-plan` bascule ensuite le ticket en voie rapide : pas de cycle, pas de pilotage

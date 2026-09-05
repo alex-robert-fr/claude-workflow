@@ -79,8 +79,14 @@ Template, nommage et regles de tenue : `${CLAUDE_SKILL_DIR}/../../shared/pilotag
 ### Etapes d'implementation
 
 #### 1. [fichier.ts](chemin/vers/fichier.ts) — creer | modifier | supprimer
-- Comportement attendu, en langage simple, un point par ligne
-- `nomFonction(param: Type): TypeRetour` — signature technique, en derniere ligne
+
+Une phrase : a quoi sert ce fichier, dans le langage du produit.
+
+```
+Label aligne      : valeur ou signature
+Si condition      : comportement
+nomFonction(param: Type): TypeRetour
+```
 
 #### 2. [autre.ts](chemin/vers/autre.ts) — creer | modifier | supprimer
 ...
@@ -112,7 +118,7 @@ Template, nommage et regles de tenue : `${CLAUDE_SKILL_DIR}/../../shared/pilotag
 - Si un fichier n'existe pas encore, indique-le : `(a creer)`
 - Pas d'etape floue — si tu ne sais pas comment implementer quelque chose, dis-le explicitement
 - Ordre des etapes = ordre logique d'implementation (dependances d'abord)
-- **Pas de blocs de code** dans le plan. Decrire les changements en langage naturel avec les noms de fonctions, types et signatures. Le code sera ecrit par `/pipe-code`
+- **Pas de code implemente** dans le plan (pas de corps de fonction, pas de logique) — le code sera ecrit par `/pipe-code`. Un bloc ``` est en revanche autorise par etape pour lister signatures et comportements de facon structuree (format `Label : valeur`, un par ligne) : plus lisible qu'une liste a puces quand plusieurs signatures ou branches de comportement s'enchainent. La phrase d'intro en langage naturel reste obligatoire avant le bloc
 - **Pas de schema** dans le plan — contrairement a la spec, ca embrouille plus que ca n'aide ici
 - **Budget : 80-120 lignes** pour un ticket simple, 150 max pour un ticket decompose. Si le plan depasse, c'est probablement qu'il contient du code ou des details d'implementation qui appartiennent a `/pipe-code`
 
