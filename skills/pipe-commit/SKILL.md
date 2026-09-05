@@ -37,7 +37,7 @@ Des commits ont pu etre crees au fil du dev (`/pipe-code` committe les unites te
 
 ### Etape 2 — Presenter puis committer
 
-Affiche le plan de decoupage complet (un bloc par commit : message, body, fichiers), puis committe changeset par changeset sans redemander — un commit local est reversible.
+Affiche le plan de decoupage complet (un bloc par commit : message, body, fichiers) et attends la validation explicite de l'utilisateur avant de committer. Une fois valide, committe changeset par changeset sans redemander a chaque commit individuel.
 
 - Stage par chemins explicites, jamais `git add .`
 - Exclus les fichiers sensibles (.env, credentials) et signale tout fichier sans rapport avec le cycle
@@ -64,7 +64,7 @@ N commits crees. Suite : `/pipe-pr [ticket]`.
 
 A partir des changements stages et de l'argument utilisateur (si fourni), determine type, scope, description et body selon `git-conventions` (le body est obligatoire des que le changement n'est pas trivial — c'est lui qui documente le detail technique).
 
-Committe directement, sans demander confirmation — un commit local est reversible (`git reset --soft HEAD~1`), la confirmation systematique est de la friction inutile.
+Affiche le message complet (titre + body) et attends la validation explicite de l'utilisateur avant de committer.
 
 Affiche le recap apres coup :
 
