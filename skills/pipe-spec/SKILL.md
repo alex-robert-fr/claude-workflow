@@ -37,6 +37,8 @@ Pas de spec pour : typo, libelle, casse, config triviale, bump de dependance, co
 
 Un ticket **technique** (refactor, migration) ne cree generalement pas de spec, mais peut en **modifier** une existante — notamment la section Fonctionnement technique, les points d'entree et les decisions. Traite-le comme une mise a jour.
 
+Exception : un ticket technique qui **expose un nouveau contrat observable** (endpoint public, commande, format d'export) merite une spec malgre l'absence d'impact utilisateur direct — le comportement attendu, les cas limites et les couplages avec d'autres features restent a documenter, meme quand personne d'autre que la CI ou le monitoring ne consomme ce contrat. Ne pas trancher seul dans ce cas : proposer l'option et laisser l'utilisateur decider, plutot que de presumer que « technique » vaut « sans spec ».
+
 ## Etape 2 — Identifier la feature et ouvrir le pilotage
 
 Utilise Read pour charger `docs/specs/README.md` (l'index). S'il n'existe pas, aucune spec n'a encore ete ecrite : c'est une creation.

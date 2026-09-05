@@ -28,7 +28,6 @@ Interdits dans une spec :
 # <Nom de la feature>
 
 > **Statut** : active | experimentale | depreciee
-> **Tickets** : PROJ-42, PROJ-58
 > **Retrait** : 2.1.0 — raison en une ligne _(uniquement si depreciee)_
 
 ## En une phrase
@@ -52,24 +51,24 @@ Si rien ne s'impose, supprimer la section — c'est le cas le plus frequent.
 Les garanties observables, **une ligne chacune, en langage simple**. Regles metier, cas limites, comportement en erreur.
 - Ce que la feature garantit, formule comme une regle
 
+Exception au format en puces : une feature qui expose plusieurs endpoints de forme parallele (meme triptyque route / reponse / cas d'echec) se documente mieux dans un tableau `Endpoint | Reponse | Cas d'echec` — plus scannable que N puces quasi identiques. Les regles transverses aux endpoints (auth, quota) restent en puces sous le tableau.
+
 ## Hors scope
 
 Ce que la feature ne fait **pas**, avec la raison. **Une ligne par exclusion.**
 Elle evite qu'une session future « complete » la feature dans une direction ecartee volontairement.
 - Ce qui est exclu — pourquoi
 
-## Fonctionnement
+## Fonctionnement technique
 
-**Un schema du mecanisme**, fait de questions oui/non enchainees, en langage naturel — comme on l'expliquerait a quelqu'un hors dev, sans jargon technique. **5-10 lignes.**
+**Le mecanisme reel**, en prose dense — jargon du projet autorise, contrairement au reste de la spec : c'est la seule section ecrite pour quelqu'un qui va toucher le code, pas pour un lecteur hors dev. **5-15 lignes.**
 
-- **Question oui/non, en gras ?**
-  - Oui → consequence, ou question suivante
-  - Non → consequence, ou question suivante
-- **Question suivante, en gras ?**
-  - Oui → consequence
-  - Non → consequence
+Alternative a la prose, quand le mecanisme est un enchainement de decisions binaires paralleles (plusieurs endpoints independants, chacun avec sa propre bifurcation) : un diagramme Mermaid (` ```mermaid flowchart TD ``` `) le montre souvent plus directement qu'un paragraphe. Si diagramme :
+- Un diagramme par mecanisme independant — jamais deux branches paralleles cote a cote dans le meme diagramme, ca force un rendu large qui scroll horizontalement dans la plupart des lecteurs markdown. Enchainer les noeuds verticalement a la place
+- Ne diagrammer que ce qui bifurque reellement (un code retour qui varie, par exemple) — un endpoint qui repond toujours la meme chose ne merite pas de diagramme, une phrase suffit
+- Ne jamais reproduire ce que le tableau Comportement attendu dit deja : le diagramme montre le *mecanisme* qui produit le resultat, pas le resultat lui-meme
 
-_Les fichiers ne figurent jamais dans le schema : mentionnes ici en italique, discretement — liste complete dans Points d'entree._
+_Les fichiers ne figurent jamais dans cette section : mentionnes en italique ou en note, discretement — liste complete dans Points d'entree._
 
 ## Dependances
 
@@ -108,11 +107,14 @@ Un couplage invisible, un invariant a maintenir ailleurs. Pas de conseil general
 - **Pas de paragraphes d'introduction ni de transition.** On entre directement dans le contenu de chaque section.
 - **Supprimer les sections vides ou faibles** plutot que d'ecrire « N/A » ou de les meubler. Seules « En une phrase », « Comportement attendu » et « Points d'entree » sont obligatoires.
 - **Points d'entree** : uniquement des chemins reels, verifies pendant l'exploration. Un chemin faux coute plus cher que pas de chemin du tout. Marquer `(a creer)` si le fichier n'existe pas encore.
+- **Reference a un fichier reel** : afficher uniquement son nom, en lien markdown vers son chemin complet (`[nom.ts](../../chemin/vers/nom.ts)`) — jamais le chemin entier en texte visible, dans Points d'entree comme ailleurs dans le corps. Le lien est relatif au fichier de la spec (`docs/specs/`), donc prefixe typiquement `../../`. Le marqueur `(a creer)` se pose juste apres le lien, jamais noye dans la colonne Role.
 - **Pas de dates** dans le corps : git porte l'historique. Les reperes temporels utiles sont la **version** et le **ticket**, dans le journal des decisions.
-- **Colonne Version du journal** : la version dans laquelle la decision est livree. Source, par ordre de priorite — la « Version cible » du pilotage, sinon la version en preparation (`Unreleased` du CHANGELOG, ou version courante du projet incrementee), notee `X.Y.Z (a venir)` tant qu'elle n'est pas publiee. Inconnue ou projet sans versioning → `—`. Ne jamais deviner une version passee : une decision heritee dont on ignore l'origine prend `—`.
+- **Colonne Version du journal** : la version dans laquelle la decision est livree. Source, par ordre de priorite — la « Version cible » du pilotage, sinon la version en preparation (`Unreleased` du CHANGELOG, ou version courante du projet incrementee), notee `X.Y.Z (a venir)` tant qu'elle n'est pas publiee. Inconnue ou projet sans versioning → `—`. Ne jamais deviner une version passee : une decision heritee dont on ignore l'origine prend `—`. **Avant de reporter la version courante du projet telle quelle, verifier qu'elle n'est pas deja publiee** (une entree datee dans `CHANGELOG.md`, hors `[Unreleased]`) — sinon l'incrementer d'un cran.
 - Au moment d'une release, les entrees `(a venir)` de la version livree perdent leur mention — c'est le seul cas ou l'on modifie une ligne existante du journal.
+- **Cellule Decision du journal, affirmative et sans negation** : elle dit ce qui est fait, pas ce qui ne l'est pas — l'alternative rejetee est deja portee par la colonne Alternative ecartee. « Version lue depuis `package.json` a l'execution » suffit ; ne pas ajouter « , pas importee comme module ».
 - **Nommage du fichier** : `kebab-case` du nom de la feature, sans prefixe ni numero de ticket — `docs/specs/export-csv.md`, jamais `spec-42.md`.
 - **Une spec = une feature**, pas un module ni un ticket. Si deux specs se citent en permanence, elles n'en font probablement qu'une.
+- **Dependance ajoutee entre deux specs existantes** : reporter la reference dans les deux fichiers (`Dependants` d'un cote, `Internes` ou `Dependants` de l'autre) — un couplage documente dans un seul sens se redecouvre a la dure au prochain changement de l'autre spec.
 
 ## Index — `docs/specs/README.md`
 
