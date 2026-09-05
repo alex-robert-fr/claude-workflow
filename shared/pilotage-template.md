@@ -60,3 +60,4 @@ Regles :
 - La section `## Tests` n'est remplie que par `/pipe-test`, jamais par `/pipe-plan` (qui redige deja sa propre section Tests **a l'interieur** du plan) — doublon sinon
 - `Spec a jour` est cochee par `/pipe-spec` apres validation humaine de la spec, ou par `/pipe-plan` quand le ticket ne concerne aucune feature (`sans objet`). Le contenu de la spec vit dans `docs/specs/`, jamais recopie ici — le pilotage n'en porte que le chemin
 - Un pilotage ouvert par `/pipe-spec` est **supprime** si `/pipe-plan` bascule ensuite le ticket en voie rapide : pas de cycle, pas de pilotage
+- Ticket d'investigation (spike) : `/pipe-spec` coche d'office `Plan valide`, `Tests ecrits`, `Tests valides`, `Dev termine` et `Code valide` avec la mention `(sans objet — spike)`, et la section Branche porte les deux branches — `spike/` pour l'exploration jetable, `docs/` pour la livraison de la spec. `/pipe-ship` enchaine alors du cadrage aux commits

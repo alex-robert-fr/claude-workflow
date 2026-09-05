@@ -29,11 +29,13 @@ type/identifiant-titre-court
 | `perf/` | Optimisation performance |
 | `docs/` | Documentation |
 | `chore/` | Maintenance / config |
+| `spike/` | Exploration jetable d'un ticket d'investigation — jamais mergee |
 
 ### Regles
 
 - Le titre court est en **kebab-case**, en **anglais**, **max 5 mots**
 - L'identifiant correspond au numero de l'issue (`feat/42-add-export`) ou a la cle du ticket externe (`feat/PROJ-42-add-export`)
+- Une branche `spike/` ne fait **jamais** l'objet d'une PR : elle porte le code d'exploration d'un ticket d'investigation, poussee pour sauvegarde, jamais nettoyee pour etre livree. Son seul livrable est la spec, qui part sur une branche `docs/` du meme identifiant. La branche `spike/` est supprimee une fois la spec mergee — le traitement complet est dans `/pipe-spec`, section « Ticket d'investigation »
 
 ---
 

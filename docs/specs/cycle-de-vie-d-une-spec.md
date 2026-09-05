@@ -31,6 +31,7 @@ Reussi quand modifier une feature commence par lire une page au lieu d'explorer 
 - Une spec depreciee conserve son corps entier, quitte l'index actif et cesse d'etre injectee dans les sessions
 - Un projet dont les features preexistent dispose d'un mode inventaire priorise, une feature par passe
 - Aucune spec n'est ecrite sans accord explicite de l'utilisateur
+- Un ticket d'investigation (spike) a pour seul livrable une spec : son code d'exploration vit sur une branche jetable, jamais mergee, et le dev qui en decoule repart de nouveaux tickets
 
 ## Hors scope
 
@@ -41,7 +42,7 @@ Reussi quand modifier une feature commence par lire une page au lieu d'explorer 
 
 ## Fonctionnement technique
 
-L'ecriture n'a que deux declencheurs : le cadrage en debut de cycle, et le mode inventaire sans argument. Le plan d'un ticket detecte l'absence de spec et route vers le cadrage ; il ne bloque pas si le projet n'en a aucune.
+L'ecriture n'a que deux declencheurs : le cadrage en debut de cycle, et le mode inventaire sans argument. Le plan d'un ticket detecte l'absence de spec et route vers le cadrage ; il ne bloque pas si le projet n'en a aucune. Un ticket d'investigation suit le meme cadrage, mais son cycle s'arrete a la spec : le pilotage marque plan, tests, dev et code sans objet, et la livraison ne porte que la spec, sur une branche de documentation distincte de la branche d'exploration.
 
 L'index est le point d'entree unique : trie alphabetiquement, il porte une phrase par feature et une section terminale pour les features retirees. Le garde-fou de session l'injecte a chaque demarrage en s'arretant a cette section — d'ou son titre, qui est un contrat et non une preference de redaction.
 
@@ -62,6 +63,7 @@ La verification de fraicheur se fait a deux niveaux, appeles depuis la review de
 | — | — | La priorisation de l'inventaire suit le churn | Une spec rapporte proportionnellement au nombre de fois ou la feature sera rouverte, et le passe le predit mieux que l'intuition | Suivre l'ordre alphabetique ou la taille |
 | — | — | La phrase de l'index est bornee a 80 caracteres et le plafond est outille | L'index est le seul poste de contexte qui grossit avec le projet : une colonne libre le fait grossir deux fois | Compter sur la concision du modele |
 | — | — | Le mode inventaire vit dans un fichier separe des references | Il enchaine sur le flow normal, qui charge deja les references : un fichier unique se faisait lire deux fois par invocation | Tout garder dans un fichier |
+| 1.8.0 (a venir) | — | Le livrable d'un ticket d'investigation est la spec, son code est jete | Un prototype explore plusieurs pistes et n'en garde qu'une : le nettoyer pour le livrer coute plus qu'une reecriture depuis la spec, et traine des choix anterieurs a la decision | Merger la branche d'exploration apres nettoyage |
 
 ## Points d'entree
 

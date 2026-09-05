@@ -139,6 +139,8 @@ Le cycle complet se justifie quand il y a un **comportement a valider**. Regle d
 
 **Tickets techniques** (changement d'architecture, migration, mise a jour majeure avec breaking changes) : cycle complet. Ils ne creent pas de spec — mais mettent a jour celle des features touchees (fonctionnement technique, points d'entree, decisions). `pipe-plan` les classifie `technique` (questions orientees architecture), et le contrat de `pipe-test` devient **les tests existants qui doivent rester verts**, completes de tests de caracterisation si la zone est mal couverte. Cote tracker, rattache-les au ticket de version comme les demandes metier (avec un label `tech`) — le CHANGELOG les exclut deja par defaut, sauf impact consommateur.
 
+**Tickets d'investigation** (label `question`, `spike`, titre en « Investiguer ») : la reponse n'existe pas encore, donc rien n'est planifiable. `pipe-spec` les traite en **spike** : le livrable est la spec de la feature concernee, jamais du code. L'exploration (prototype, stories, variantes d'ecran) vit sur une branche `spike/`, poussee pour sauvegarde et jamais mergee ; la spec part seule sur une branche `docs/`, par `/pipe-commit` puis `/pipe-pr`. Une fois mergee, la branche `spike/` est supprimee, le ticket est clos en pointant la spec, et le dev repart de nouveaux tickets (`/create-issue`) avec un cycle complet — on ne nettoie pas un prototype pour le livrer, on le reecrit depuis la spec. `pipe-plan` renvoie vers `pipe-spec` s'il recoit un tel ticket.
+
 ## Skills
 
 ### Pipeline (`pipe-*`)

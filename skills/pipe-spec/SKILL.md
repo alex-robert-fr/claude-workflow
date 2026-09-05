@@ -37,6 +37,17 @@ Pas de spec pour : typo, libelle, casse, config triviale, bump de dependance, co
 
 Un ticket **technique** (refactor, migration) ne cree generalement pas de spec, mais peut en **modifier** une existante — notamment la section Fonctionnement technique, les points d'entree et les decisions. Traite-le comme une mise a jour.
 
+### Ticket d'investigation (spike)
+
+Un ticket dont la reponse n'est pas connue — label `question`, `spike` ou `investigation`, titre en « Investiguer », « Explorer », « Comparer », ou l'utilisateur le dit — n'est pas encore une feature a developper : c'est une question a trancher. Son livrable est la **spec** de la feature concernee (creation ou mise a jour, decisions et hors-scope compris), jamais du code livre.
+
+- Le code d'exploration (prototype, stories, variantes d'ecran) vit sur une branche `spike/<identifiant>-<titre-court>`, poussee pour sauvegarde et **jamais mergee**. Il sert a repondre aux questions de l'etape 4, pas a etre livre — on ne le nettoie pas pour le garder : un prototype porte les pistes ecartees autant que la piste retenue, et une reecriture depuis la spec coute moins cher que ce tri
+- Le cycle est raccourci : cadrage → spec validee → `/pipe-commit` puis `/pipe-pr` de la spec seule, sur une branche `docs/<identifiant>-<titre-court>` creee depuis la branche d'integration. Le pilotage marque les phases de plan, tests, dev et code comme sans objet (etape 2), pour que `/pipe-ship` enchaine directement sur les commits
+- Une fois la spec mergee : la branche `spike/` est supprimee, le ticket est clos avec un commentaire qui pointe la spec, et le dev qui en decoule fait l'objet de **nouveaux tickets** (`/create-issue`), lies au ticket d'investigation. Chacun repart de la branche d'integration avec un cycle complet, la spec en main
+- Exception : si la reponse tient en un changement evident, pas de nouveau ticket — le ticket d'investigation devient le ticket de dev (label et description mis a jour) et le cycle normal reprend a `/pipe-plan`, sur une branche `feat/` neuve
+
+Annonce le verdict en une ligne : « ticket d'investigation, livrable = spec `<feature>` ».
+
 Exception : un ticket technique qui **expose un nouveau contrat observable** (endpoint public, commande, format d'export) merite une spec malgre l'absence d'impact utilisateur direct — le comportement attendu, les cas limites et les couplages avec d'autres features restent a documenter, meme quand personne d'autre que la CI ou le monitoring ne consomme ce contrat. Ne pas trancher seul dans ce cas : proposer l'option et laisser l'utilisateur decider, plutot que de presumer que « technique » vaut « sans spec ».
 
 ## Etape 2 — Identifier la feature et ouvrir le pilotage
@@ -64,6 +75,8 @@ Le cadrage peut s'etaler sur plusieurs sessions. Ouvrir le pilotage **maintenant
 
 A ce stade, ne remplis **que** l'en-tete : Ticket (source, version cible, epic, lien), Spec (chemin vise) et l'Etat, toutes cases decochees. Le reste — branche, plan, tests — appartient aux skills suivants : ne les invente pas.
 
+**Ticket d'investigation** : coche d'office `Plan valide`, `Tests ecrits`, `Tests valides`, `Dev termine` et `Code valide` avec la mention `(sans objet — spike)`, et renseigne la section Branche avec les deux branches : `spike/<identifiant>-<titre-court>` pour l'exploration, `docs/<identifiant>-<titre-court>` pour la livraison de la spec. Seules `Spec a jour`, `Commits crees` et `PR creee` restent a cocher.
+
 Cree `.claude/plans/` si necessaire et verifie que le repertoire est dans `.gitignore`.
 
 ## Etape 3 — Explorer
@@ -73,6 +86,8 @@ Cree `.claude/plans/` si necessaire et verifie que le repertoire est dans `.giti
 **En creation** : explore le codebase (Read, Glob, Grep) pour reperer ce qui existe deja autour de la feature, les patterns en place et les modules qu'elle touchera.
 
 Dans les deux cas, l'exploration sert a poser de **vraies** questions a l'etape 4, et a remplir les sections Fonctionnement technique, Dependances et Points d'entree.
+
+**En ticket d'investigation**, l'exploration peut passer par du code jetable sur la branche `spike/` : prototype, stories, variantes d'ecran a comparer. Chaque piste essayee nourrit la spec — la retenue dans Comportement attendu, les ecartees dans Decisions avec leur raison. Commite l'exploration sur `spike/` au fil de l'eau (validation humaine comme pour tout commit, body facultatif : rien n'est livre), pour que la spec puisse partir seule sur `docs/` a l'etape 8.
 
 ## Etape 4 — Cadrer avec l'utilisateur (questions/reponses)
 
@@ -139,6 +154,15 @@ Une fois l'accord obtenu, et **seulement alors**, mets le pilotage a jour (s'il 
 ---
 Spec [creee | mise a jour] `docs/specs/<feature>.md` · pilotage `.claude/plans/plan-<identifiant>.md`.
 Suite : le plan — `/pipe-plan <ticket>` (cette session). `/pipe-ship <ticket>` reprend le cycle a tout moment.
+```
+
+**Ticket d'investigation** :
+
+```
+---
+Spec [creee | mise a jour] `docs/specs/<feature>.md` — livrable du ticket d'investigation · pilotage `.claude/plans/plan-<identifiant>.md`.
+Suite : `git switch -c docs/<identifiant>-<titre-court> <branche d'integration>` (la spec non commitee suit), puis `/pipe-commit` et `/pipe-pr`.
+Une fois la spec mergee : supprimer `spike/<identifiant>-<titre-court>`, clore le ticket en pointant la spec, creer les tickets de dev (`/create-issue`).
 ```
 
 **Usage autonome (sans ticket)** :

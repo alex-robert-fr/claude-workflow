@@ -20,6 +20,7 @@ Reussi quand relire l'historique d'une branche suffit a comprendre la feature et
 ## Comportement attendu
 
 - Une branche porte son type, l'identifiant de son ticket et un titre court en anglais
+- Une branche d'exploration (`spike/`) n'est jamais mergee ni proposee en Pull Request : poussee pour sauvegarde, supprimee une fois la spec du ticket livree par une branche de documentation
 - Un commit porte un emoji, un type, un scope metier obligatoire pour les changements de code, et une description en francais
 - Le corps est obligatoire des que le changement n'est pas trivial, et documente ce que le diff ne montre pas
 - Aucune signature automatique n'est ajoutee a un message de commit, a une description de Pull Request ni a un commentaire d'iteration
@@ -68,6 +69,7 @@ La Pull Request tire son contexte du pilotage, sinon de l'identifiant present da
 | — | — | La description de PR perd ses sections fichiers, commits, tests et points de review | Les listes de fichiers et de commits sont deja dans les onglets de la plateforme et vieillissent a chaque commit ; la CI dit deja si les tests passent ; les points de review recopiaient les corps de commit. Seul reste ce que rien ne couvre automatiquement : les verifications manuelles | Garder un body exhaustif |
 | — | — | La description de PR porte un bloc Changelog au format du CHANGELOG | L'entree CHANGELOG etait reconstruite a la release, des semaines apres, en repartant des commits : filtrer, classer, reformuler, fusionner. Ecrite dans la PR, elle l'est quand le contexte est frais, et la release n'a plus qu'a agreger. La PR y gagne la seule section qui dit ce qui change pour l'utilisateur | Une liste de commits dans la PR, derivation complete a la release |
 | — | — | Aucune signature automatique dans une PR, comme dans un commit | Un pied de page d'outillage n'apporte rien au lecteur et l'instruction runtime qui le demande n'est pas une convention du projet | Laisser l'outil signer |
+| 1.8.0 (a venir) | — | Un prefixe de branche dedie a l'exploration, hors de toute Pull Request | Sans prefixe distinct, une branche d'exploration ressemble a une feature inachevee et finit mergee ou nettoyee ; le prefixe dit d'emblee que rien n'en sortira sauf la spec | Explorer sur la branche `feat/` du futur ticket |
 
 ## Points d'entree
 

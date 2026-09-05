@@ -19,6 +19,7 @@ Consulte l'index `docs/specs/README.md` :
 - **Spec a jour pour la feature concernee** → continue, et charge-la a l'exploration (etape 4)
 - **Spec absente ou obsolete** (le ticket change le comportement, le perimetre ou une decision structurante) → annonce-le et lance `/pipe-spec` en chargeant `${CLAUDE_SKILL_DIR}/../pipe-spec/SKILL.md`, puis reviens ici une fois la spec validee
 - **Le ticket ne concerne aucune feature** (voie rapide, correction sans regle metier, chantier purement outillage) → note `sans objet` dans le pilotage et continue
+- **Le ticket est une question ouverte** (label `question`, `spike` ou `investigation`, titre en « Investiguer », « Explorer ») → il n'est pas planifiable : rien a decouper tant que la reponse n'existe pas. Renvoie vers `/pipe-spec`, qui le traite en ticket d'investigation (livrable = spec, code d'exploration jetable), et arrete-toi la
 
 Si le projet n'a pas de repertoire `docs/specs/`, ne bloque pas : propose la creation de la spec via `/pipe-spec`, et continue sans si l'utilisateur decline.
 

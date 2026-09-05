@@ -7,6 +7,7 @@
 | #42 `[Feature] Ajout authentification OAuth` | `feat/42-add-oauth-authentication` |
 | #17 `[Bug] Crash au login avec email +` | `fix/17-login-crash-email-plus` |
 | #8 `[Docs] Documentation API publique` | `docs/8-public-api-documentation` |
+| #31 `[Question] Investiguer le parcours de premiere visite` | `spike/31-first-visit-journey` pour l'exploration, `docs/31-first-visit-journey` pour la spec |
 
 ## Exemples de commits
 
