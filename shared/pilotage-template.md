@@ -45,7 +45,7 @@ Il est **ouvert par `/pipe-spec`** des que la feature est identifiee — avant m
 - `chemin/fichier.spec.ts` — comportements couverts, en une ligne
 
 ## Notes de reprise
-- Ecarts au plan, points ouverts, contexte utile pour la session suivante
+- **3 lignes max.** Uniquement ce qui ne figure nulle part ailleurs (pas de redite de Decisions ou Points d'attention) et qui sert a la session suivante
 ```
 
 Nommage : issue git → `plan-42.md` ; ticket JIRA → `plan-PROJ-42.md` ; texte libre → `plan-<slug>.md`.
@@ -55,5 +55,6 @@ Regles :
 - Chaque skill coche les cases de l'etat **en fin de phase**, jamais en avance
 - Les cases de review humaine (`Tests valides`, `Code valide`) ne se cochent qu'apres validation explicite de l'utilisateur
 - La section Decisions est un journal : on ajoute, on ne reecrit pas
+- Notes de reprise : 3 lignes max, jamais une redite de Decisions ou de Points d'attention
 - `Spec a jour` est cochee par `/pipe-spec` apres validation humaine de la spec, ou par `/pipe-plan` quand le ticket ne concerne aucune feature (`sans objet`). Le contenu de la spec vit dans `docs/specs/`, jamais recopie ici — le pilotage n'en porte que le chemin
 - Un pilotage ouvert par `/pipe-spec` est **supprime** si `/pipe-plan` bascule ensuite le ticket en voie rapide : pas de cycle, pas de pilotage

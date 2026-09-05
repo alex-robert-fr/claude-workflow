@@ -65,40 +65,45 @@ Template, nommage et regles de tenue : `${CLAUDE_SKILL_DIR}/../../shared/pilotag
 ```markdown
 ## Plan — [Titre du ticket] (#XX / PROJ-XX)
 
-### Vue d'ensemble
-Resume en 2-3 phrases de ce qu'on va faire et pourquoi.
-
 **Classification :** technique | metier | mixte
 **Source :** GitHub #42 | GitLab #42 | JIRA PROJ-42
 
+### Vue d'ensemble
+- **Avant** : ce qui pose probleme aujourd'hui
+- **Apres** : ce que ca donnera une fois fait
+
 ### Approche technique
-Raisonnement : quel pattern, quelle architecture, pourquoi ce choix.
-Alternatives ecartees si pertinent (1-2 lignes chacune, pas de dissertation).
+- Fonction cle et ou elle vit : `nomFonction()` dans [fichier.ts](chemin/relatif)
+- Alternative ecartee — pourquoi
 
 ### Etapes d'implementation
 
-#### 1. [Nom de l'etape]
-- `chemin/vers/fichier.ts` — creer | modifier | supprimer
-- Description textuelle des changements : noms de fonctions, signatures, logique
-- Pas de bloc de code — decrire en langage naturel ce que /pipe-code devra ecrire
+#### 1. [fichier.ts](chemin/vers/fichier.ts) — creer | modifier | supprimer
+- Comportement attendu, en langage simple, un point par ligne
+- `nomFonction(param: Type): TypeRetour` — signature technique, en derniere ligne
 
-#### 2. [Nom de l'etape]
+#### 2. [autre.ts](chemin/vers/autre.ts) — creer | modifier | supprimer
 ...
 
 ### Tests
-Quoi tester, ou, comment. 2-5 bullet points max.
+
+**[fichier.spec.ts](chemin/vers/fichier.spec.ts)**
+- Comportement teste, une ligne
+- Un autre comportement, une ligne
+
+**[autre.spec.ts](chemin/vers/autre.spec.ts)**
+- Comportement teste
 
 ### Points d'attention
-- Effets de bord potentiels
-- Zones sensibles
-- Contraintes techniques
+- **Idee cle en gras** — le reste de l'explication
+- **Effet de bord ou zone sensible** — pourquoi ca merite l'attention
 
 ### Recapitulatif des fichiers
 
 | Fichier | Action | Description |
 |---------|--------|-------------|
-| `chemin/fichier.ts` | creer | Breve description |
-| `chemin/autre.ts` | modifier | Ce qui change |
+| [fichier.ts](chemin/fichier.ts) | creer | Breve description |
+| [autre.ts](chemin/autre.ts) | modifier | Ce qui change |
 ```
 
 ## Regles
@@ -108,6 +113,7 @@ Quoi tester, ou, comment. 2-5 bullet points max.
 - Pas d'etape floue — si tu ne sais pas comment implementer quelque chose, dis-le explicitement
 - Ordre des etapes = ordre logique d'implementation (dependances d'abord)
 - **Pas de blocs de code** dans le plan. Decrire les changements en langage naturel avec les noms de fonctions, types et signatures. Le code sera ecrit par `/pipe-code`
+- **Pas de schema** dans le plan — contrairement a la spec, ca embrouille plus que ca n'aide ici
 - **Budget : 80-120 lignes** pour un ticket simple, 150 max pour un ticket decompose. Si le plan depasse, c'est probablement qu'il contient du code ou des details d'implementation qui appartiennent a `/pipe-code`
 
 ## Criteres de classification

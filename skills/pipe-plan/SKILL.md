@@ -87,7 +87,7 @@ Un plan est une **feuille de route**, pas du code.
 - **Budget : 80-120 lignes** pour un ticket simple, jusqu'a 150 pour un ticket decompose
 - **Pas de blocs de code** dans le plan. Les signatures de fonctions, noms de types et descriptions textuelles suffisent
 - **La section Tests du plan compte double** : c'est elle que `/pipe-test` transforme en tests unitaires — comportements attendus et cas limites y sont explicites
-- **Terminer par un tableau recapitulatif** des fichiers (chemin | action | description courte) — scannable en 5 secondes
+- **Terminer par un tableau recapitulatif** des fichiers (nom lie | action | description courte) — scannable en 5 secondes
 
 ### Decomposition
 

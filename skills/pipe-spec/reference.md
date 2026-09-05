@@ -37,17 +37,19 @@ Ce que la feature fait, du point de vue de celui qui l'utilise. Une phrase — c
 
 ## Intention
 
-Le probleme resolu et a quoi on reconnait que c'est reussi. **3-5 lignes.**
+Le probleme resolu et a quoi on reconnait que c'est reussi. **3-5 lignes, en puces.**
 Pas d'histoire du projet, pas de justification du besoin : le probleme, point.
+- Le probleme que la feature resout
+- Ce qui prouve que c'est reussi
 
 ## Philosophie
 
-Le principe qui tranche les arbitrages futurs : « ici on privilegie X sur Y ». **2-3 lignes.**
+Le principe qui tranche les arbitrages futurs, en une puce : « ici on privilegie X sur Y ».
 Si rien ne s'impose, supprimer la section — c'est le cas le plus frequent.
 
 ## Comportement attendu
 
-Les garanties observables, **une ligne chacune**. Regles metier, cas limites, comportement en erreur.
+Les garanties observables, **une ligne chacune, en langage simple**. Regles metier, cas limites, comportement en erreur.
 - Ce que la feature garantit, formule comme une regle
 
 ## Hors scope
@@ -56,14 +58,22 @@ Ce que la feature ne fait **pas**, avec la raison. **Une ligne par exclusion.**
 Elle evite qu'une session future « complete » la feature dans une direction ecartee volontairement.
 - Ce qui est exclu — pourquoi
 
-## Fonctionnement technique
+## Fonctionnement
 
-Flux principal, ou vit l'etat, ce qui declenche quoi. **5-10 lignes.**
-Assez pour comprendre sans ouvrir le code, jamais au niveau de la ligne de code.
+**Un schema du mecanisme**, fait de questions oui/non enchainees, en langage naturel — comme on l'expliquerait a quelqu'un hors dev, sans jargon technique. **5-10 lignes.**
+
+- **Question oui/non, en gras ?**
+  - Oui → consequence, ou question suivante
+  - Non → consequence, ou question suivante
+- **Question suivante, en gras ?**
+  - Oui → consequence
+  - Non → consequence
+
+_Les fichiers ne figurent jamais dans le schema : mentionnes ici en italique, discretement — liste complete dans Points d'entree._
 
 ## Dependances
 
-- **Internes** : autres features dont celle-ci depend → lien vers leur spec
+- **Internes** : autres features dont celle-ci depend → [nom-feature.md](nom-feature.md)
 - **Externes** : services, APIs, librairies structurantes, schema de base
 - **Dependants** : features qui reposent sur celle-ci (utile avant de la modifier)
 
@@ -81,18 +91,19 @@ ceux dont on se redemandera « pourquoi comme ca ? ».
 
 | Fichier | Role |
 |---------|------|
-| `chemin/reel.ts` | Ce qu'on y trouve, en quelques mots |
+| [reel.ts](chemin/reel.ts) | Ce qu'on y trouve, en quelques mots |
 
 ## Pieges et zones sensibles
 
 Uniquement le **non-devinable** : ce sur quoi on se casse les dents en modifiant la feature.
 Un couplage invisible, un invariant a maintenir ailleurs. Pas de conseil general.
+- **Idee cle en gras** — le reste de l'explication, pour se lire en balayant
 ```
 
 ## Regles de redaction
 
 - **Budget : 40-80 lignes.** Une spec qui gonfle contient du plan, du code ou du bavardage. Couper.
-- **Une info, un seul endroit.** Ne pas reformuler dans le hors-scope ce que le comportement dit deja, ni re-expliquer dans le fonctionnement technique ce qui est dans l'intention. La redondance entre sections est le premier facteur de verbosite.
+- **Une info, un seul endroit.** Ne pas reformuler dans le hors-scope ce que le comportement dit deja, ni re-expliquer dans le fonctionnement ce qui est dans l'intention. La redondance entre sections est le premier facteur de verbosite.
 - **Chaque phrase gagne sa place** : elle apporte une information qu'on ne peut pas deduire du reste de la spec ni du nom de la feature. Une phrase qui « pose le contexte » sans rien apprendre se supprime.
 - **Pas de paragraphes d'introduction ni de transition.** On entre directement dans le contenu de chaque section.
 - **Supprimer les sections vides ou faibles** plutot que d'ecrire « N/A » ou de les meubler. Seules « En une phrase », « Comportement attendu » et « Points d'entree » sont obligatoires.
