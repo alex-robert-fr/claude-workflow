@@ -20,6 +20,7 @@ L'impact consommateur tranche ; le prefixe du commit n'est qu'un indice. Un `ref
 ## Comportement attendu
 
 - Une entree tient sur une ligne, decrit un effet observable, et pointe vers sa PR ou son commit
+- Les blocs Changelog des Pull Requests mergees sont la source primaire des entrees, repris tels quels avec la PR pour reference ; la derivation depuis les commits ne s'applique qu'aux changements sans bloc
 - Plusieurs commits qui composent le meme changement vu du consommateur donnent une seule entree
 - Un artefact ajoute puis retire dans la meme release ne produit aucune entree : seul l'etat final est decrit
 - Un changement sans impact consommateur n'apparait pas — sa trace est le corps de son commit
@@ -42,7 +43,7 @@ La version du plugin se resout par ordre de priorite : le champ de `plugin.json`
 
 ## Dependances
 
-- **Internes** : la configuration du projet fournit les branches d'integration et de production
+- **Internes** : la configuration du projet fournit les branches d'integration et de production ; [`livraison-git.md`](livraison-git.md) fournit les blocs Changelog des Pull Requests
 - **Externes** : `git` et ses tags ; l'API de la plateforme pour associer les commits a leurs PRs, en un seul appel groupe
 - **Dependants** : les journaux de decisions de `docs/specs/`, dont les mentions de version sont figees au moment de la release
 
@@ -54,6 +55,7 @@ La version du plugin se resout par ordre de priorite : le champ de `plugin.json`
 | 1.6.0 | — | Le bump de version reste un geste local | La mecanique de publication d'un plugin est propre a ce repo ; un skill distribue ne peut pas la porter | Integrer le bump a la chaine de release distribuee |
 | 1.6.0 | — | L'audit de coherence ne tourne qu'a la publication | En mode brouillon il coutait plusieurs appels reseau par execution, pour un historique qui n'avait pas bouge | Auditer a chaque passage |
 | 1.6.0 | — | Le CHANGELOG est lu par bornes | Un fichier qui grossit a chaque release finit par couter plus cher que la seule section utile | Le charger puis en extraire la section |
+| — | — | Les blocs Changelog des PRs sont la source primaire | L'entree est ecrite par celui qui a fait le changement, quand le contexte est frais ; la release agrege au lieu de re-deriver. Les commits restent le repli pour tout ce qui n'a pas de bloc, dont l'historique anterieur | Tout re-deriver des commits a chaque release |
 
 ## Points d'entree
 

@@ -288,6 +288,18 @@ Exclus du CHANGELOG :
 - Les commits de revert immediatement suivis du recommit
 - Le contenu des commits verbatim (toujours reformuler)
 
+## Bloc Changelog d'une PR
+
+Chaque PR creee par `/pipe-pr` porte une section `## Changelog` dans son body, au format de ce referentiel (memes types, memes regles de redaction, references vers les commits). C'est l'entree CHANGELOG ecrite au moment ou le contexte est frais, par celui qui a fait le changement — voir `git-conventions/reference.md`.
+
+A la release, ces blocs sont la **source primaire** : leurs entrees sont reprises telles quelles, la reference devenant la PR. La derivation depuis les commits (filtrage, classement, reformulation) ne s'applique qu'au reste : PRs anterieures a cette convention, PRs sans bloc, commits directs.
+
+Ce que le bloc ne dispense pas de faire a la release :
+
+- **Consolider en etat final entre PRs** : deux PRs de la meme release qui touchent le meme artefact donnent une seule entree
+- **Notes de deploiement et `**BREAKING**`** : le bloc peut les porter, la release les remonte en blockquote sous l'en-tete de version si elles concernent toute la release
+- **Audit de coherence** : un bloc n'est qu'une source, la date de merge de la PR reste ce qui place l'entree dans une section
+
 ## Changesets (Turborepo) — optionnel
 
 Si le projet utilise Changesets :

@@ -33,7 +33,9 @@
 
 **Important** : `Closes #XX` est obligatoire, pas optionnel. Toujours present avec le bon numero d'issue. Si plusieurs issues sont liees : `Closes #12, Closes #15`.
 
-La PR est la porte d'entree, pas la doc technique : le detail (pourquoi, approche, alternatives) vit dans le body des commits. Pas de liste de fichiers (GitHub l'affiche deja), pas de section tests (la CI le dit deja), pas de points de review (ils recopieraient les commits).
+La PR est la porte d'entree, pas la doc technique : le detail (pourquoi, approche, alternatives) vit dans le body des commits. Pas de liste de fichiers ni de liste de commits (la plateforme les affiche deja dans ses onglets), pas de section tests (la CI le dit deja), pas de points de review (ils recopieraient les commits).
+
+Le bloc `## Changelog` est ecrit au format du CHANGELOG du projet, pret a y etre agrege a la release : memes types, memes regles de redaction (voir `pipe-changelog/reference.md`, sections « Types d'entrees », « Regles de contenu », « Rediger pour le consommateur »). Chaque entree se termine par ses references en liens Markdown explicites vers les commits (SHA court). Il decrit l'**etat final** de la branche : un commit ajoute en iteration reecrit l'entree concernee, il n'en ajoute pas une nouvelle. Les commits sans impact consommateur n'y figurent pas — ils restent visibles dans l'onglet Commits.
 
 ```markdown
 ## Contexte
@@ -44,12 +46,15 @@ Closes #XX
 
 ## Ce qui a ete fait
 
-Description claire de l'implementation. Pas une liste de fichiers — une explication de ce qui a change et pourquoi c'est fait comme ca.
+L'approche en prose, courte : le comment et les arbitrages, pas la liste des fichiers ni des commits.
 
-## Changesets
+## Changelog
 
-- `emoji type(scope): description du commit 1`
-- `emoji type(scope): description du commit 2`
+### Added
+- Effet observable pour le consommateur, une phrase ([`abc1234`](url/commit/abc1234), [`def5678`](url/commit/def5678))
+
+### Fixed
+- Effet observable pour le consommateur, une phrase ([`9a8b7c6`](url/commit/9a8b7c6))
 
 ## A verifier a la main
 

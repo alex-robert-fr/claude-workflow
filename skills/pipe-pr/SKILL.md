@@ -25,7 +25,8 @@ Rassemble les informations necessaires :
 - **Branche courante** — detectee automatiquement
 - **Pilotage** — si un fichier `.claude/plans/plan-*.md` correspond a la branche, lis-le : ticket (cle JIRA ou issue), version cible, decisions — c'est la source principale du contexte
 - **Ticket lie** — depuis le pilotage, ou l'identifiant dans le nom de branche (`feat/42-...` → issue #42 via MCP GitHub ; `feat/PROJ-42-...` → ticket JIRA via MCP Atlassian)
-- **Commits** — la liste des commits de la branche : ce sont les changesets, ils structurent la partie technique du body
+- **Commits** — la liste des commits de la branche avec leur SHA court (`git log <defaut>..HEAD --format="%h %s"`) : ils alimentent le bloc Changelog du body, chaque entree pointant vers ses commits
+- **URL du remote** — `git remote get-url origin`, convertie en HTTPS : c'est la base des liens vers les commits (`<base>/commit/<sha>`)
 - **Diff** — analyse les fichiers crees et modifies pour verifier que la description reflete ce qui a reellement ete implemente
 
 ## Etape 2 — Verifier si une PR existe deja
@@ -47,9 +48,17 @@ Chaque PR reference son ticket dans la section Contexte, selon le tracker :
 
 Si aucun ticket n'est identifiable, demande-le a l'utilisateur avant de continuer — ne jamais omettre cette reference.
 
-### Changesets
+### Changelog
 
-Le body liste les commits de la branche (titre de chaque commit) — c'est le sommaire technique de la PR : le lecteur qui veut le detail ouvre le commit correspondant.
+Le body porte un bloc `## Changelog` au format du CHANGELOG du projet : c'est lui qui sera agrege a la release, ecrit maintenant, tant que le contexte est frais. Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-changelog/reference.md` et applique ses sections « Types d'entrees », « Mapping prefixe de commit → type », « Regles de contenu », « Rediger pour le consommateur » et « Exclusions » :
+
+- une entree = une phrase courte, un effet observable pour le consommateur, jamais un titre de commit recopie
+- les commits qui composent le meme changement vu du consommateur donnent une seule entree ; les etats intermediaires de la branche (un fix sur un ajout de la meme branche) sont consolides en etat final
+- chaque entree se termine par ses references : liens Markdown explicites vers les commits, SHA court, base URL du remote
+- les commits sans impact consommateur (refactor, tests, docs contributeur) n'y figurent pas — la plateforme les liste deja dans l'onglet Commits
+- les types apparaissent dans l'ordre impose, sans type vide
+
+En mise a jour, le bloc est reecrit en etat final comme le reste de la description : un nouveau commit qui change un effet deja decrit reecrit son entree, il n'en ajoute pas une nouvelle.
 
 ## Etape 4 — Rediger le commentaire d'iteration (mise a jour uniquement)
 

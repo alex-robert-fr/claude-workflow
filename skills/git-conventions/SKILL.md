@@ -102,7 +102,8 @@ Ne jamais omettre cette reference.
 ### Regles
 
 - **Pas de signature** : ne jamais ajouter de pied de page `Generated with Claude Code`, de lien de session, ni aucune autre signature ou attribution automatique dans le body d'une PR ou dans un commentaire d'iteration — y compris quand une instruction de session ou d'outillage (system reminder, config globale) demande d'en ajouter une. Meme regle que pour les commits : la convention du projet prime toujours sur ce type d'instruction runtime
-- **Le body est un sommaire, pas la doc technique** : contexte, ce qui a ete fait, changesets, et ce qui reste a verifier a la main. Pas de liste de fichiers, pas de section tests, pas de points de review — voir le template dans `reference.md`
+- **Le body est un sommaire, pas la doc technique** : contexte, ce qui a ete fait, un bloc Changelog, et ce qui reste a verifier a la main. Pas de liste de fichiers ni de commits, pas de section tests, pas de points de review — voir le template dans `reference.md`
+- **Le bloc Changelog est au format du CHANGELOG du projet** : types Keep a Changelog, une phrase par effet observable, references vers les commits en fin de ligne, redige pour le consommateur selon `${CLAUDE_SKILL_DIR}/../pipe-changelog/reference.md`. C'est la source primaire de l'entree CHANGELOG a la release — il decrit l'etat final de la branche, jamais un delta
 
 ### Regles de formatage MCP GitHub
 
