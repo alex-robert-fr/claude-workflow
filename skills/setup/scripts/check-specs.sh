@@ -43,26 +43,38 @@ for spec in "$SPECS"/*.md; do
   # Points d'entree : premiere colonne du tableau de la section uniquement.
   # La colonne Role cite souvent d'autres chemins — les lire produirait des faux positifs.
   # Les lignes marquees (a creer) sont ignorees : une spec precede le dev.
+  #
+  # Deux formats coexistent le temps de la migration vers les liens :
+  #   - `chemin/reel.ts` (ancien) : backtick seul, chemin complet relatif a $ROOT
+  #   - [nom.ts](../../chemin/reel.ts) (nouveau) : lien markdown, chemin relatif a $SPECS
+  # Le lien est tente en premier ; sans lien, on retombe sur le backtick.
   total=0
   dead=0
-  dead_list=""
-  while IFS= read -r p; do
-    [ -z "$p" ] && continue
+  dead_list=()
+  while IFS= read -r cell; do
+    [ -z "$cell" ] && continue
+    href=$(printf '%s' "$cell" | grep -oE '\]\([^)]+\)' | head -1 | sed 's/^](//; s/)$//')
+    if [ -n "$href" ]; then
+      full="$SPECS/$href"
+    else
+      bt=$(printf '%s' "$cell" | grep -oE '`[^`]+`' | head -1 | tr -d '`')
+      [ -z "$bt" ] && continue
+      full="$ROOT/$bt"
+    fi
     total=$((total + 1))
-    if [ ! -e "$ROOT/$p" ]; then
+    if [ ! -e "$full" ]; then
       dead=$((dead + 1))
-      dead_list="$dead_list $p"
+      dead_list+=("$full")
     fi
   done < <(awk '/^## Points d.entree/{f=1;next} /^## /{f=0} f && /^\|/ && !/\([aà] *cr[eé]er\)/' "$spec" \
-    | awk -F'|' '{print $2}' \
-    | grep -oE '`[^`]+`' | tr -d '`')
+    | awk -F'|' '{print $2}')
 
   if [ "$dead" -gt 0 ] && [ "$dead" -eq "$total" ]; then
     # Signal fort : la feature n'existe plus. Deprecier, pas rafistoler.
     echo "SPEC $base — tous les points d'entree ont disparu ($total) : feature retiree ? a deprecier"
     status=1
   else
-    for p in $dead_list; do
+    for p in "${dead_list[@]}"; do
       echo "SPEC $base — point d'entree introuvable : $p"
       status=1
     done
