@@ -22,13 +22,14 @@ Reussi quand relire l'historique d'une branche suffit a comprendre la feature et
 - Une branche porte son type, l'identifiant de son ticket et un titre court en anglais
 - Un commit porte un emoji, un type, un scope metier obligatoire pour les changements de code, et une description en francais
 - Le corps est obligatoire des que le changement n'est pas trivial, et documente ce que le diff ne montre pas
-- Aucune signature automatique n'est ajoutee a un message de commit
+- Aucune signature automatique n'est ajoutee a un message de commit, a une description de Pull Request ni a un commentaire d'iteration
 - Les tests accompagnent le changeset du comportement qu'ils verifient ; une spec modifiee accompagne le changeset de sa feature
 - Une spec ecrite hors cycle est la seule a former son propre commit de documentation
 - Les fichiers sont stages par chemin explicite ; les fichiers sensibles sont exclus et signales
-- Un commit local est cree sans confirmation prealable, le recapitulatif vient apres — il est reversible
+- Un commit n'est jamais cree sans validation humaine : le message complet (titre + corps) est affiche et confirme avant chaque `git commit`, y compris en enchainement automatique
 - Un push n'a jamais lieu sans confirmation explicite
 - La description d'une Pull Request decrit toujours son etat complet actuel, jamais son delta
+- La description d'une Pull Request est un sommaire : contexte, ce qui a ete fait, changesets, et ce qui reste a verifier a la main — jamais de liste de fichiers, de section tests ni de points de review
 - Chaque Pull Request reference son ticket, avec fermeture automatique si la plateforme le permet
 - L'evolution d'une Pull Request deja ouverte passe par un commentaire d'iteration, pas par sa description
 - Le document de pilotage est supprime a la creation de la Pull Request
@@ -59,10 +60,12 @@ La Pull Request tire son contexte du pilotage, sinon de l'identifiant present da
 | Version | Ticket | Decision | Raison | Alternative ecartee |
 |---------|--------|----------|--------|---------------------|
 | — | — | Le corps du commit porte le detail technique | Le CHANGELOG doit rester court et non technique, et une description de PR est reecrite a chaque iteration : le commit est le seul emplacement stable | Un fichier de changements techniques |
-| — | — | Un commit local est cree sans confirmation | Il est reversible sans consequence, et demander a chaque fois est une friction qui n'achete rien | Confirmer chaque commit |
+| — | — | Chaque commit est valide par un humain avant sa creation | Un commit pousse est immuable et son corps est la doc technique du projet : une erreur de message ne se corrige pas apres coup. Cette decision remplace la precedente (commit sans confirmation, juge reversible) | Committer sans confirmation, recapituler apres |
 | — | — | Le decoupage groupe par unite logique, pas par nature de fichier | Un commit `tests` ne se lit pas seul : il decrit un contrat dont le comportement est ailleurs | Separer code, tests et documentation |
 | — | — | La description d'une PR est reecrite en etat complet | Une description qui accumule des mentions de nouveaute devient un journal illisible, alors qu'un commentaire d'iteration porte deja le delta | Ajouter les nouveautes en tete |
 | — | — | Le referentiel de conventions est retire des deux catalogues | Il n'est jamais invoque, seulement charge par chemin : sa description etait payee dans chaque session pour rien | Le laisser invocable |
+| — | — | La description de PR perd ses sections fichiers, tests et points de review | La liste de fichiers est deja dans l'onglet de la plateforme et vieillit a chaque commit ; la CI dit deja si les tests passent ; les points de review recopiaient les corps de commit. Seul reste ce que rien ne couvre automatiquement : les verifications manuelles | Garder un body exhaustif |
+| — | — | Aucune signature automatique dans une PR, comme dans un commit | Un pied de page d'outillage n'apporte rien au lecteur et l'instruction runtime qui le demande n'est pas une convention du projet | Laisser l'outil signer |
 
 ## Points d'entree
 

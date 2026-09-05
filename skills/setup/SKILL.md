@@ -48,7 +48,7 @@ Si `CLAUDE.md` n'existe pas, genere-le avec le strict minimum :
 - Description courte (une phrase)
 - Stack principale (detectee depuis package.json, Cargo.toml, go.mod, etc.)
 - Regles critiques evidentes (monorepo, strict mode, etc.)
-- Section **Git** : utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` et inclure les regles clefs dans le CLAUDE.md (format de commit, format de branche, pas de signature `Co-Authored-By`)
+- Section **Git** : utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` et inclure les regles clefs dans le CLAUDE.md (format de commit, format de branche, pas de signature `Co-Authored-By` dans les commits ni `Generated with Claude Code` dans les PR)
 - Section **Specs** : le pointeur qui rend la doc de features decouvrable — sans lui, personne ne va la lire
 
 ```markdown

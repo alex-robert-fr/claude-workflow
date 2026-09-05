@@ -33,6 +33,8 @@
 
 **Important** : `Closes #XX` est obligatoire, pas optionnel. Toujours present avec le bon numero d'issue. Si plusieurs issues sont liees : `Closes #12, Closes #15`.
 
+La PR est la porte d'entree, pas la doc technique : le detail (pourquoi, approche, alternatives) vit dans le body des commits. Pas de liste de fichiers (GitHub l'affiche deja), pas de section tests (la CI le dit deja), pas de points de review (ils recopieraient les commits).
+
 ```markdown
 ## Contexte
 
@@ -44,18 +46,14 @@ Closes #XX
 
 Description claire de l'implementation. Pas une liste de fichiers — une explication de ce qui a change et pourquoi c'est fait comme ca.
 
-## Fichiers modifies
+## Changesets
 
-- `chemin/fichier.ts` — ce qu'on y a fait
-- `chemin/fichier.ts` — idem
+- `emoji type(scope): description du commit 1`
+- `emoji type(scope): description du commit 2`
 
-## Points de review
+## A verifier a la main
 
-Ce sur quoi le reviewer doit porter son attention en priorite. Decisions techniques non triviales, zones sensibles, compromis acceptes.
-
-## Tests
-
-Ce qui a ete teste, comment. Si rien n'a ete teste, le dire explicitement avec la raison.
+Uniquement ce que ni les tests ni la CI ne couvrent (rendu navigateur, media query, parcours reel). Section omise s'il n'y a rien.
 ```
 
 ## Template PR — Commentaire d'iteration
