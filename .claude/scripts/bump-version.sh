@@ -12,7 +12,7 @@
 # et il ne peut pas savoir que la faute est la.
 #
 # Le CHANGELOG n'est pas ecrit ici (c'est le role de /pipe-changelog) : le script
-# verifie seulement que la section de la version existe deja.
+# verifie seulement que la section de la version existe déjà.
 #
 # Ce script est LOCAL a ce repo : la mecanique de publication d'un plugin n'a
 # rien a faire dans un skill distribue.

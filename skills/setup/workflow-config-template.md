@@ -7,12 +7,13 @@ disable-model-invocation: true
 
 <!-- Referentiel de config : lu par Read depuis les skills du pipeline, jamais
      invoque. Les deux drapeaux le retirent du catalogue de l'utilisateur ET de
-     celui du modele — sa description cesse d'etre payee dans chaque session. -->
+     celui du modele — sa description cesse d'être payee dans chaque session. -->
 
 ## Plateforme
 
 - **Git hosting** : <!-- ex: GitHub, GitLab, Gitea -->
 - **Issue tracker** : <!-- ex: GitHub Issues, Jira, Linear -->
+- **Statut ticket à la release** : <!-- ex: Done, Terminé, Shipped — uniquement si Issue tracker = Jira ou Linear -->
 - **Branche par defaut** : <!-- base du travail et cible des PRs de feature, ex: develop -->
 - **Branche de production** : <!-- cible des PRs de release, ex: main — vide si identique a la branche par defaut -->
 

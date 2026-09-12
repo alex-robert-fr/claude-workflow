@@ -9,6 +9,33 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-09-12
+
+### Added
+
+- Les specs, le plan et le pilotage utilisent des listes a puces avec liens plutot que des tableaux denses ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- Chaque commit exige une validation humaine explicite avant d'etre cree ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- La description de PR redevient un sommaire, sans signature automatique ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- La PR porte son entree de CHANGELOG, agregee automatiquement a la release ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- Les elements de code se nomment par leur identifiant dans les conventions git ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- `pipe-spec` documente les conventions issues du cadrage ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- `pipe-spec` traite les tickets d'investigation comme des spikes, livrable = spec seule ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- 3 nouveaux garde-fous automatiques du plugin (accents francais, pedagogie des reponses), actifs sans `/setup` ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- `pipe-review` juge les commentaires de code superflus via son sub-agent ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- `pipe-spec` verifie la qualite de la spec par un sub-agent independant avant de l'elaguer ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- `pipe-test` critique les tests par un sub-agent independant avant la review humaine ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- Les tickets Jira/Linear couverts par une release sont listes et synchronises automatiquement a la release et au tag ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+
+### Changed
+
+- Le pilotage ne porte plus que l'identifiant du ticket en en-tete ; les decisions de cycle se lisent dans le plan, plus dans un journal separe ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+
+### Fixed
+
+- `check-specs.sh` detecte a nouveau le nouveau format de lien ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- `check-specs.sh` tolere l'accent dans l'ancre « Points d'entree » au lieu de sortir silencieusement de sa boucle de verification ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+- De nombreux mots francais sans accent dans le corpus existant sont corriges, et la convention obsolete qui les autorisait est retiree de `workflow-config` ([#61](https://github.com/alex-robert-fr/claude-workflow/pull/61))
+
 ## [1.7.0] - 2026-08-01
 
 ### Added
@@ -280,7 +307,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.3...v1.7.0
 [1.6.3]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.1...v1.6.2

@@ -7,6 +7,7 @@
 | #42 `[Feature] Ajout authentification OAuth` | `feat/42-add-oauth-authentication` |
 | #17 `[Bug] Crash au login avec email +` | `fix/17-login-crash-email-plus` |
 | #8 `[Docs] Documentation API publique` | `docs/8-public-api-documentation` |
+| #31 `[Question] Investiguer le parcours de première visite` | `spike/31-first-visit-journey` pour l'exploration, `docs/31-first-visit-journey` pour la spec |
 
 ## Exemples de commits
 
@@ -31,36 +32,37 @@
 
 ## Template PR — Body
 
-**Important** : `Closes #XX` est obligatoire, pas optionnel. Toujours present avec le bon numero d'issue. Si plusieurs issues sont liees : `Closes #12, Closes #15`.
+Règles : voir SKILL.md, section Règles.
+
+Chaque entrée du bloc `## Changelog` se termine par ses references en liens Markdown explicites vers les commits (SHA court). Un commit ajoute en iteration reecrit l'entrée concernee, il n'en ajoute pas une nouvelle. Les commits sans impact consommateur n'y figurent pas — ils restent visibles dans l'onglet Commits.
 
 ```markdown
 ## Contexte
 
-Lien vers l'issue et resume en 1-2 phrases de pourquoi ce changement est necessaire.
+Lien vers l'issue et resume en 1-2 phrases de pourquoi ce changement est nécessaire.
 
 Closes #XX
 
 ## Ce qui a ete fait
 
-Description claire de l'implementation. Pas une liste de fichiers — une explication de ce qui a change et pourquoi c'est fait comme ca.
+L'approche en prose, courte : le comment et les arbitrages, pas la liste des fichiers ni des commits.
 
-## Fichiers modifies
+## Changelog
 
-- `chemin/fichier.ts` — ce qu'on y a fait
-- `chemin/fichier.ts` — idem
+### Added
+- Effet observable pour le consommateur, une phrase ([`abc1234`](url/commit/abc1234), [`def5678`](url/commit/def5678))
 
-## Points de review
+### Fixed
+- Effet observable pour le consommateur, une phrase ([`9a8b7c6`](url/commit/9a8b7c6))
 
-Ce sur quoi le reviewer doit porter son attention en priorite. Decisions techniques non triviales, zones sensibles, compromis acceptes.
+## A vérifier a la main
 
-## Tests
-
-Ce qui a ete teste, comment. Si rien n'a ete teste, le dire explicitement avec la raison.
+Uniquement ce que ni les tests ni la CI ne couvrent (rendu navigateur, media query, parcours reel). Section omise s'il n'y a rien.
 ```
 
 ## Template PR — Commentaire d'iteration
 
-Utilise uniquement lors de la mise a jour d'une PR existante. Liste tous les commits depuis la derniere mise a jour.
+Utilise uniquement lors de la mise a jour d'une PR existante. Liste tous les commits depuis la dernière mise a jour.
 
 ```markdown
 ## Mise a jour — [date]
@@ -79,4 +81,4 @@ Utilise uniquement lors de la mise a jour d'une PR existante. Liste tous les com
 Resume en une phrase de l'ensemble de cette iteration.
 ```
 
-S'il n'y a qu'un seul commit, le format reste identique — une seule entree dans la liste.
+S'il n'y a qu'un seul commit, le format reste identique — une seule entrée dans la liste.

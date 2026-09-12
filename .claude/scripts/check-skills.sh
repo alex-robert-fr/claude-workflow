@@ -5,7 +5,7 @@
 # .claude/skills/create-skill/ y renvoient.
 #
 # Detecte les ecarts a la doctrine maison qu'aucune relecture ne rattrape :
-#   - une description trop longue : elle est injectee dans le prompt systeme de
+#   - une description trop longue : elle est injectee dans le prompt système de
 #     CHAQUE session, c'est un cout permanent
 #   - une DIRECTIVE DE CHARGEMENT citant un fichier support OU un autre skill sans
 #     chemin qualifie : Read exige un chemin absolu, un nom nu n'est resolvable que
@@ -80,12 +80,12 @@ for skill in "$ROOT"/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md; do
 done
 
 # 5. Le diagramme du pipeline est reproduit a trois endroits : README.md (source),
-# CLAUDE.md (aide-memoire de session) et le recap de /setup. Ils avaient deja
+# CLAUDE.md (aide-memoire de session) et le recap de /setup. Ils avaient déjà
 # diverge une fois, le dernier ayant perdu une pause humaine — c'est-a-dire une
 # etape ou l'humain decide. On compare la SEQUENCE des skills pipe-*, pas la prose.
 #
 # Les zones comparees sont ancrees explicitement, jamais devinees : un simple
-# `sed '/pipe-spec/,/pipe-pr/p'` attraperait la premiere mention en prose du
+# `sed '/pipe-spec/,/pipe-pr/p'` attraperait la première mention en prose du
 # fichier et produirait une fausse divergence.
 #   - README.md et CLAUDE.md : bloc entre <!-- pipeline:debut --> et <!-- pipeline:fin -->
 #   - skills/setup/SKILL.md  : la ligne du recap, prefixee `Cycle : `
