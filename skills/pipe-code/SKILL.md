@@ -4,7 +4,7 @@ description: Implementer la feature en session dediee, guidee par les tests vali
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
-## Etape 0 — Verifications
+## Étape 0 — Verifications
 
 Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md`, puis localise le fichier de pilotage :
 
@@ -17,31 +17,31 @@ Verifie :
 - [ ] La branche courante est celle du pilotage (sinon `git checkout` dessus)
 - [ ] Les fichiers de tests listes dans le pilotage existent
 
-Lis le pilotage en entier : plan, decisions, notes de reprise — c'est tout le contexte de la session.
+Lis le pilotage en entier : plan, notes de reprise — c'est tout le contexte de la session.
 
-Si le pilotage reference une spec (`docs/specs/<feature>.md`), lis-la aussi : intention, philosophie, hors-scope, dependances et pieges. C'est le contexte global de la feature, celui qui evite de reparcourir le code et de reprendre une direction ecartee volontairement.
+Si le pilotage reference une spec (`docs/specs/<feature>.md`), lis-la aussi : intention, philosophie, hors-scope, dependances et pieges.
 
-## Etape 1 — Implementer
+## Étape 1 — Implementer
 
 Suis le plan, guide par les tests :
 
 - **Les tests valides sont le contrat.** Interdiction de les modifier pour les faire passer. Si un test semble faux, contradictoire ou impossible a satisfaire, stoppe et signale-le — c'est une decision humaine.
 - Boucle : coder → lancer les tests (commande de `workflow-config`) → corriger. L'implementation est terminee quand **tous** les tests passent — les nouveaux et les existants.
-- **Commits au fil de l'eau, uniquement par changesets propres.** Tu peux committer quand une unite logique est terminee et que les tests qui la couvrent passent — chaque commit suit les conventions de `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (utilise Read pour le charger) : titre limpide, body detaille, c'est de la doc technique. Ce qui ne forme pas encore une unite coherente reste dans le working tree — `/pipe-commit` decoupera le reste en fin de cycle. Jamais de commit fourre-tout ou "wip". **Avant chaque `git commit`, affiche le message complet (titre + body) et attends la validation explicite de l'utilisateur** — meme en enchainement, ne committe jamais sans confirmation prealable.
-- Respecte les conventions de `workflow-config` (stack, architecture, nommage). Pas de verification de style manuelle — c'est le role des hooks PostToolUse.
+- **Commits au fil de l'eau, uniquement par changesets propres.** Tu peux committer quand une unite logique est terminee et que les tests qui la couvrent passent — chaque commit suit les conventions de `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (utilise Read pour le charger). Ce qui ne forme pas encore une unite cohérente reste dans le working tree — `/pipe-commit` decoupera le reste en fin de cycle. Jamais de commit fourre-tout ou "wip". **Avant chaque `git commit`, affiche le message complet (titre + body) et attends la validation explicite de l'utilisateur** — meme en enchainement, ne committe jamais sans confirmation préalable.
+- Respecte les conventions de `workflow-config` (stack, architecture, nommage). Pas de verification de style manuelle — c'est le rôle des hooks PostToolUse.
 
-Si une etape revele un probleme non anticipe dans le plan (fichier manquant, dependance absente, incoherence), **stoppe et signale-le** avant de continuer :
+Si une étape revele un problème non anticipe dans le plan (fichier manquant, dependance absente, incohérence), **stoppe et signale-le** avant de continuer :
 
 ```
-Probleme detecte — [description precise]
+Problème detecte — [description précise]
 Option A : [approche]
 Option B : [approche]
 Comment tu veux proceder ?
 ```
 
-Consigne la decision prise dans la section Decisions du pilotage.
+Corrige le plan en place pour refleter la decision prise (étape ou point d'attention concerne) ; si elle survit au merge, elle rejoint aussi le journal de la spec.
 
-## Etape 2 — Cloture
+## Étape 2 — Cloture
 
 Une fois tous les tests verts :
 
@@ -52,7 +52,7 @@ Une fois tous les tests verts :
 ```
 **Dev termine — [ticket]** · tests ✅ N passent (dont M nouveaux)
 
-Commits crees (le reste attend `/pipe-commit`) :
+Commits créés (le reste attend `/pipe-commit`) :
 - emoji type(scope): description
 
 Fichiers — `+ chemin/nouveau.ts` · `~ chemin/modifie.ts`
@@ -61,7 +61,7 @@ Fichiers — `+ chemin/nouveau.ts` · `~ chemin/modifie.ts`
 Suite : la review, dans une **nouvelle session** — `/pipe-ship [ticket]`.
 ```
 
-`+` pour un fichier cree, `~` pour un fichier modifie : deux sections separees pour la meme information, c'est une section de trop.
+`+` pour un fichier crée, `~` pour un fichier modifie : deux sections séparées pour la meme information, c'est une section de trop.
 
 ---
 

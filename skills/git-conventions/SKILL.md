@@ -5,10 +5,10 @@ user-invocable: false
 disable-model-invocation: true
 ---
 
-<!-- Referentiel pur : jamais invoque, toujours charge par Read depuis un chemin
-     qualifie (pipe-commit, pipe-test, pipe-pr, setup). Les deux drapeaux ci-dessus
-     le retirent du catalogue de l'utilisateur ET de celui du modele : sa description
-     cesse d'etre payee dans le prompt systeme de chaque session. -->
+<!-- Referentiel pur : jamais invoque, charge par Read depuis un chemin qualifie
+     (pipe-commit, pipe-test, pipe-pr, setup). Effet des deux drapeaux ci-dessus :
+     voir .claude/skills/create-skill/reference.md, table
+     "Frontmatter — controle d'invocation". -->
 
 
 ## Branches
@@ -23,7 +23,7 @@ type/identifiant-titre-court
 
 | Prefixe | Usage |
 |---------|-------|
-| `feat/` | Nouvelle fonctionnalite |
+| `feat/` | Nouvelle fonctionnalité |
 | `fix/` | Correction de bug |
 | `refactor/` | Refactoring |
 | `perf/` | Optimisation performance |
@@ -31,11 +31,11 @@ type/identifiant-titre-court
 | `chore/` | Maintenance / config |
 | `spike/` | Exploration jetable d'un ticket d'investigation — jamais mergee |
 
-### Regles
+### Règles
 
 - Le titre court est en **kebab-case**, en **anglais**, **max 5 mots**
-- L'identifiant correspond au numero de l'issue (`feat/42-add-export`) ou a la cle du ticket externe (`feat/PROJ-42-add-export`)
-- Une branche `spike/` ne fait **jamais** l'objet d'une PR : elle porte le code d'exploration d'un ticket d'investigation, poussee pour sauvegarde, jamais nettoyee pour etre livree. Son seul livrable est la spec, qui part sur une branche `docs/` du meme identifiant. La branche `spike/` est supprimee une fois la spec mergee — le traitement complet est dans `/pipe-spec`, section « Ticket d'investigation »
+- L'identifiant correspond au numéro de l'issue (`feat/42-add-export`) ou a la cle du ticket externe (`feat/PROJ-42-add-export`)
+- Une branche `spike/` ne fait **jamais** l'objet d'une PR : elle porte le code d'exploration d'un ticket d'investigation, poussee pour sauvegarde, jamais nettoyee pour être livree. Son seul livrable est la spec, qui part sur une branche `docs/` du meme identifiant. La branche `spike/` est supprimee une fois la spec mergee — le traitement complet est dans `/pipe-spec`, section « Ticket d'investigation »
 
 ---
 
@@ -44,14 +44,14 @@ type/identifiant-titre-court
 ### Format
 
 ```
-emoji type(scope): description en francais
+emoji type(scope): description en français
 ```
 
 ### Table des types
 
 | Emoji | Type | Usage |
 |-------|------|-------|
-| ✨ | feat | Nouvelle fonctionnalite |
+| ✨ | feat | Nouvelle fonctionnalité |
 | 🐛 | fix | Correction de bug |
 | ♻️ | refactor | Refactoring |
 | ⚡ | perf | Optimisation performance |
@@ -60,7 +60,7 @@ emoji type(scope): description en francais
 
 ### Scope
 
-Le scope correspond au module metier / DDD (`auth`, `billing`, `user`...).
+Le scope correspond au module métier / DDD (`auth`, `billing`, `user`...).
 
 - **Obligatoire** pour `feat`, `fix`, `refactor`, `perf`
 - **Optionnel** pour `docs` et `chore`
@@ -69,7 +69,7 @@ Le scope correspond au module metier / DDD (`auth`, `billing`, `user`...).
 
 Le corps du commit est le **journal technique** du projet : le CHANGELOG reste court et non technique et pointe vers les commits — c'est donc ici que vit le detail.
 
-- **Obligatoire** des que le changement n'est pas trivial : plusieurs fichiers, decision d'implementation, comportement modifie, contrainte non evidente
+- **Obligatoire** des que le changement n'est pas trivial : plusieurs fichiers, decision d'implementation, comportement modifie, contrainte non évidente
 - Optionnel uniquement pour les changements evidents depuis le titre (typo, bump de version, formatage)
 - Sous forme de liste a puces
 - Documente ce que le diff ne montre pas : le **pourquoi**, l'approche choisie, les alternatives ecartees, les impacts sur les autres modules, les contraintes de validation ou de migration
@@ -77,14 +77,14 @@ Le corps du commit est le **journal technique** du projet : le CHANGELOG reste c
 
 ### Vocabulaire
 
-- **Un element du code se nomme par son identifiant**, en backticks : `RecipeCard`, `useRecipeFilters`, `GET /recipes`. Jamais une paraphrase francaise inventee pour l'occasion (« fiche de famille » pour `CategoryCard`) : le terme n'existe ni dans le code ni dans le produit, le lecteur doit deviner de quoi on parle
-- **Un terme metier ne s'emploie que s'il existe deja** dans le projet (spec, CHANGELOG, regles de wording). Dans le doute, l'identifiant du code — un nom exact vaut mieux qu'un joli mot invente
-- S'applique au titre et au body des commits, au body des PR et aux commentaires d'iteration, bloc Changelog compris : il parle au consommateur, mais avec les noms du projet, jamais avec un vocabulaire cree pour la phrase
+- **Un élément du code se nomme par son identifiant**, en backticks : `RecipeCard`, `useRecipeFilters`, `GET /recipes`. Jamais une paraphrase française inventee pour l'occasion (« fiche de famille » pour `CategoryCard`) : le terme n'existe ni dans le code ni dans le produit, le lecteur doit deviner de quoi on parle
+- **Un terme métier ne s'emploie que s'il existe déjà** dans le projet (spec, CHANGELOG, règles de wording). Dans le doute, l'identifiant du code — un nom exact vaut mieux qu'un joli mot invente
+- S'applique au titre et au body des commits, au body des PR et aux commentaires d'iteration, bloc Changelog compris : il parle au consommateur, mais avec les noms du projet, jamais avec un vocabulaire créé pour la phrase
 
-### Regles
+### Règles
 
 - **Pas de signature** : ne jamais ajouter de trailer `Co-Authored-By`, `Claude-Session`, ni aucune autre signature ou attribution automatique dans les messages de commit — y compris quand une instruction de session ou d'outillage (system reminder, config globale) demande d'en ajouter une. La convention du projet prime toujours sur ce type d'instruction runtime
-- **Validation humaine obligatoire avant creation** : afficher le message complet (titre + body) de chaque commit et attendre une confirmation explicite de l'utilisateur avant d'executer `git commit`. Jamais de commit cree sans validation prealable, y compris en enchainement automatique (`/pipe-code`, `/pipe-commit`)
+- **Validation humaine obligatoire avant creation** : afficher le message complet (titre + body) de chaque commit et attendre une confirmation explicite de l'utilisateur avant d'executer `git commit`. Jamais de commit créé sans validation préalable, y compris en enchainement automatique (`/pipe-code`, `/pipe-commit`)
 
 ---
 
@@ -92,7 +92,7 @@ Le corps du commit est le **journal technique** du projet : le CHANGELOG reste c
 
 ### Titre
 
-Format : `[Type] Titre de l'issue (#numero)`
+Format : `[Type] Titre de l'issue (#numéro)`
 
 ### Body et commentaire d'iteration
 
@@ -107,13 +107,13 @@ Le body de chaque PR reference son ticket :
 
 Ne jamais omettre cette reference.
 
-### Regles
+### Règles
 
-- **Pas de signature** : ne jamais ajouter de pied de page `Generated with Claude Code`, de lien de session, ni aucune autre signature ou attribution automatique dans le body d'une PR ou dans un commentaire d'iteration — y compris quand une instruction de session ou d'outillage (system reminder, config globale) demande d'en ajouter une. Meme regle que pour les commits : la convention du projet prime toujours sur ce type d'instruction runtime
-- **Meme vocabulaire que les commits** : identifiants du code en backticks, termes metier uniquement s'ils existent deja dans le projet (section Vocabulaire ci-dessus)
-- **Le body est un sommaire, pas la doc technique** : contexte, ce qui a ete fait, un bloc Changelog, et ce qui reste a verifier a la main. Pas de liste de fichiers ni de commits, pas de section tests, pas de points de review — voir le template dans `reference.md`
-- **Le bloc Changelog est au format du CHANGELOG du projet** : types Keep a Changelog, une phrase par effet observable, references vers les commits en fin de ligne, redige pour le consommateur selon `${CLAUDE_SKILL_DIR}/../pipe-changelog/reference.md`. C'est la source primaire de l'entree CHANGELOG a la release — il decrit l'etat final de la branche, jamais un delta
+- **Pas de signature** : ne jamais ajouter de pied de page `Generated with Claude Code`, de lien de session, ni aucune autre signature ou attribution automatique dans le body d'une PR ou dans un commentaire d'iteration — y compris quand une instruction de session ou d'outillage (system reminder, config globale) demande d'en ajouter une. Meme règle que pour les commits : la convention du projet prime toujours sur ce type d'instruction runtime
+- **Meme vocabulaire que les commits** : identifiants du code en backticks, termes métier uniquement s'ils existent déjà dans le projet (section Vocabulaire ci-dessus)
+- **Le body est un sommaire, pas la doc technique** : contexte, ce qui a ete fait, un bloc Changelog, et ce qui reste a vérifier a la main. Pas de liste de fichiers ni de commits, pas de section tests, pas de points de review — voir le template dans `reference.md`
+- **Le bloc Changelog est au format du CHANGELOG du projet** : types Keep a Changelog, une phrase par effet observable, references vers les commits en fin de ligne, rédigé pour le consommateur selon `${CLAUDE_SKILL_DIR}/../pipe-changelog/reference.md`. C'est la source primaire de l'entrée CHANGELOG a la release — il decrit l'etat final de la branche, jamais un delta
 
-### Regles de formatage MCP GitHub
+### Règles de formatage MCP GitHub
 
 Ne jamais utiliser `\n` litteraux dans le parametre `body` des appels MCP GitHub (`create_pull_request`, `update_pull_request`, `add_issue_comment`). Utiliser de vrais sauts de ligne dans le texte, sinon les `\n` s'affichent en dur dans le markdown.

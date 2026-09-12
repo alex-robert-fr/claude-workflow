@@ -15,7 +15,7 @@ allowed-tools: Read, Bash(git *)
 
 ## Convention d'emplacement
 
-Les worktrees sont crees dans un repertoire frere du repo :
+Les worktrees sont créés dans un repertoire frere du repo :
 
 ```
 <parent>/
@@ -30,51 +30,44 @@ Exemple : `feat/123-login` devient `feat-123-login`.
 
 ---
 
-## Etape 1 — Router l'action
+## Étape 1 — Router l'action
 
 Determine l'action depuis `$0` :
 
 | `$0` | Action |
 |------|--------|
-| `create` | Aller a l'Etape 2 |
-| `list` | Aller a l'Etape 3 |
-| `remove` | Aller a l'Etape 4 |
-| `switch` | Aller a l'Etape 5 |
-| _(vide)_ | Aller a l'Etape 3 (list par defaut) |
+| `create` | Aller a l'Étape 2 |
+| `list` | Aller a l'Étape 3 |
+| `remove` | Aller a l'Étape 4 |
+| `switch` | Aller a l'Étape 5 |
+| _(vide)_ | Aller a l'Étape 3 (list par defaut) |
 
 Si `$0` ne correspond a aucune action connue, affiche les actions disponibles et arrete-toi.
 
 ---
 
-## Etape 2 — Create
+## Étape 2 — Create
 
-**Prerequis** : `$1` doit etre fourni (nom de branche).
+**Prerequis** : `$1` doit être fourni (nom de branche).
 
-1. Calcule le slug : remplacer `/` par `-` dans `$1`
-2. Calcule le chemin : `<parent-du-repo>/<nom-repo>-worktrees/<slug>/`
-3. Verifie que le worktree n'existe pas deja dans la liste des worktrees actifs
-4. Determine si la branche `$1` existe deja :
+1. Calcule le slug et le chemin cible (cf. Convention d'emplacement)
+2. Verifie que le worktree n'existe pas déjà dans la liste des worktrees actifs
+3. Determine si la branche `$1` existe déjà :
    - **Existe** : `git worktree add <chemin> $1`
    - **N'existe pas** : `git worktree add -b $1 <chemin>`
-5. Confirme la creation :
+4. Confirme la creation :
 
 ```
-Worktree cree :
+Worktree créé :
   Branche : $1
   Chemin  : <chemin>
 ```
 
-6. Propose la suite :
-
-```
-Tu peux maintenant :
-- `/worktree switch $1` pour basculer Claude Code vers ce worktree (via EnterWorktree)
-- Lancer `/pipe-code` dans ce worktree pour implementer une issue en parallele
-```
+Suite : `/worktree switch $1` pour basculer, ou `/pipe-code` dans ce worktree pour implementer en parallele.
 
 ---
 
-## Etape 3 — List
+## Étape 3 — List
 
 Affiche les worktrees actifs sous forme de tableau lisible :
 
@@ -90,14 +83,14 @@ Worktrees actifs :
 Si aucun worktree supplementaire (seulement le repo principal), indique :
 
 ```
-Aucun worktree supplementaire. Utilise `/worktree create <branche>` pour en creer un.
+Aucun worktree supplementaire. Utilise `/worktree create <branche>` pour en créer un.
 ```
 
 ---
 
-## Etape 4 — Remove
+## Étape 4 — Remove
 
-**Prerequis** : `$1` doit etre fourni (nom de branche).
+**Prerequis** : `$1` doit être fourni (nom de branche).
 
 1. Calcule le slug et le chemin cible
 2. Verifie que le worktree existe dans la liste des worktrees actifs
@@ -110,14 +103,14 @@ Aucun worktree supplementaire. Utilise `/worktree create <branche>` pour en cree
 
 ```
 Worktree supprime : $1
-Prochaine etape : `/worktree list` pour verifier.
+Prochaine étape : `/worktree list` pour vérifier.
 ```
 
 ---
 
-## Etape 5 — Switch
+## Étape 5 — Switch
 
-**Prerequis** : `$1` doit etre fourni (nom de branche).
+**Prerequis** : `$1` doit être fourni (nom de branche).
 
 1. Calcule le slug et le chemin cible
 2. Verifie que le worktree existe dans la liste des worktrees actifs
@@ -128,9 +121,9 @@ Prochaine etape : `/worktree list` pour verifier.
 Contexte bascule vers le worktree :
   Branche : $1
   Chemin  : <chemin>
-
-Tu travailles maintenant dans ce worktree. Utilise `ExitWorktree` ou `/worktree list` pour revenir.
 ```
+
+Suite : `ExitWorktree` ou `/worktree list` pour revenir au repo principal.
 
 ---
 
