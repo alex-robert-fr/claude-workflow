@@ -4,11 +4,11 @@ Plugin Claude Code pour le workflow AI-Driven Development. Fournit un pipeline c
 
 ## Pourquoi ce plugin ?
 
-Configurer un workflow AI-Driven Development de zero, c'est des dizaines d'heures de redaction de skills, hooks et conventions — et autant de risques de derive sur la duree. Ce plugin package un pipeline pret a l'emploi qui couvre tout le cycle, de la planification d'une issue jusqu'au tag de release.
+Configurer un workflow AI-Driven Development de zero, c'est des dizaines d'heures de rédaction de skills, hooks et conventions — et autant de risques de derive sur la duree. Ce plugin package un pipeline pret a l'emploi qui couvre tout le cycle, de la planification d'une issue jusqu'au tag de release.
 
-**Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (un seul geste a retenir : `/pipe-ship <ticket>` reprend le cycle ou il en est), l'humain qui n'intervient qu'aux vrais points de decision (le plan, les tests, le code), une qualite garantie par les vrais outils et les hooks (pas par des instructions au LLM), et une coherence entre les sessions et les projets menes en parallele.
+**Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (un seul geste a retenir : `/pipe-ship <ticket>` reprend le cycle ou il en est), l'humain qui n'intervient qu'aux vrais points de decision (le plan, les tests, le code), une qualité garantie par les vrais outils et les hooks (pas par des instructions au LLM), et une cohérence entre les sessions et les projets menes en parallele.
 
-**16 skills** distribues : chaque etape du cycle est un skill invocable independamment, et `/pipe-ship` les enchaine depuis le fichier de pilotage.
+**16 skills** distribues : chaque étape du cycle est un skill invocable independamment, et `/pipe-ship` les enchaine depuis le fichier de pilotage.
 
 Lecture de tickets compatible **GitHub** et **Jira** (hierarchie epic → version → demande) — la creation d'issues et de Pull Requests reste sur **GitHub** uniquement.
 
@@ -53,7 +53,7 @@ Les skills sont accessibles avec le namespace `claude-workflow:` (ex: `/claude-w
 
 ## Pipeline
 
-Le cycle d'une demande metier est pilote par un **fichier de pilotage** (`.claude/plans/`, gitignore, ouvert des le cadrage et supprime a la PR) qui porte le plan, les decisions et l'etat d'avancement — c'est lui qui permet de reprendre dans une session neuve, a n'importe quelle phase. L'humain intervient a trois pauses : la **validation de la spec** (les attentes, avant tout dev), la **review des tests** (le contrat de la fonctionnalite) et la **review du code**.
+Le cycle d'une demande métier est pilote par un **fichier de pilotage** (`.claude/plans/`, gitignore, ouvert des le cadrage et supprime a la PR) qui porte le plan, les decisions et l'etat d'avancement — c'est lui qui permet de reprendre dans une session neuve, a n'importe quelle phase. L'humain intervient a trois pauses : la **validation de la spec** (les attentes, avant tout dev), la **review des tests** (le contrat de la fonctionnalité) et la **review du code**.
 
 <!-- pipeline:debut -->
 ```
@@ -65,7 +65,7 @@ Le cycle d'une demande metier est pilote par un **fichier de pilotage** (`.claud
 ```
 <!-- pipeline:fin -->
 
-Ce diagramme est reproduit a l'identique dans `CLAUDE.md` (aide-memoire de session) et dans le recap de `/setup`. `.claude/scripts/check-skills.sh` verifie qu'ils ne divergent pas : les trois avaient deja diverge une fois, le dernier ayant perdu une pause humaine.
+Ce diagramme est reproduit a l'identique dans `CLAUDE.md` (aide-memoire de session) et dans le recap de `/setup`. `.claude/scripts/check-skills.sh` verifie qu'ils ne divergent pas : les trois avaient déjà diverge une fois, le dernier ayant perdu une pause humaine.
 
 ### Les specs, memoire de tes features
 
@@ -77,24 +77,24 @@ Le cycle demarre par le **cadrage** : `/pipe-spec` produit une spec par feature 
 | Duree de vie | Durable, versionnee | Ephemere, supprimee a la PR |
 | Portee | Une feature, alimentee par N tickets | Un ticket |
 
-Une spec porte l'intention, la philosophie qui tranche les arbitrages, le comportement attendu, le **hors-scope**, les dependances, les decisions prises et les **points d'entree techniques** (quels fichiers, pour quel role).
+Une spec porte l'intention, la philosophie qui tranche les arbitrages, le comportement attendu, le **hors-scope**, les dependances, les decisions prises et les **points d'entrée techniques** (quels fichiers, pour quel rôle).
 
-Deux benefices : les attentes sont alignees **avant** la premiere ligne de code, et les sessions suivantes chargent la spec au lieu de parcourir le codebase — moins de tokens brules, et un contexte global que l'exploration ne donne jamais. `/pipe-review` verifie a chaque cycle que la spec ne ment pas, `/pipe-plan` et `/pipe-code` la lisent.
+Deux benefices : les attentes sont alignees **avant** la première ligne de code, et les sessions suivantes chargent la spec au lieu de parcourir le codebase — moins de tokens brules, et un contexte global que l'exploration ne donne jamais. `/pipe-review` verifie a chaque cycle que la spec ne ment pas, `/pipe-plan` et `/pipe-code` la lisent.
 
 Pour que ce contexte soit reellement utilise et non simplement disponible, `/setup` installe un hook **SessionStart** qui injecte l'index des specs au demarrage de chaque session : la doc de tes features est presente d'office, sans dependre de la bonne volonte du modele. Cout : l'index seul, une ligne par feature.
 
-Une spec qui ment etant pire que pas de spec, la fraicheur est verifiee a deux niveaux : un script (`check-specs.sh`) lance par `/pipe-review` avec le format et les tests, qui detecte les points d'entree pointant vers des fichiers disparus et les specs oubliees de l'index ; et la review elle-meme, qui juge si le comportement decrit correspond encore au code livre.
+Une spec qui ment etant pire que pas de spec, la fraicheur est vérifiée a deux niveaux : un script (`check-specs.sh`) lance par `/pipe-review` avec le format et les tests, qui detecte les points d'entrée pointant vers des fichiers disparus et les specs oubliees de l'index ; et la review elle-meme, qui juge si le comportement decrit correspond encore au code livre.
 
 Quand une feature est **retiree**, sa spec ne se corrige pas : elle passe au statut `depreciee`, avec sa version de retrait et sa raison. Le corps est conserve — il repond a « pourquoi cette feature a existe, et pourquoi elle a disparu », ce qui evite de la reintroduire par erreur. Elle sort alors du contexte injecte et du controle des chemins, sans disparaitre de l'historique.
 
-**Projet existant ?** `/pipe-spec` sans argument inventorie les features deja livrees, les classe par valeur (les zones les plus retouchees du `git log` sont celles qu'on relira le plus) et en cadre une par passe. Sans ce rattrapage, les specs n'arriveraient qu'au rythme des futurs tickets — donc jamais pour le code deja ecrit.
+**Projet existant ?** `/pipe-spec` sans argument inventorie les features déjà livrees, les classe par valeur (les zones les plus retouchees du `git log` sont celles qu'on relira le plus) et en cadre une par passe. Sans ce rattrapage, les specs n'arriveraient qu'au rythme des futurs tickets — donc jamais pour le code déjà ecrit.
 
-`/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Sur un ticket qui n'a pas encore de pilotage, elle demarre le cycle par le cadrage — c'est donc aussi la commande d'entree, pas seulement de reprise. Chaque etape reste invocable individuellement.
+`/pipe-ship <ticket>` est la commande de reprise : dans chaque session, elle lit le pilotage, detecte la phase courante et deroule jusqu'a la prochaine pause humaine ou frontiere de session. Sur un ticket qui n'a pas encore de pilotage, elle demarre le cycle par le cadrage — c'est donc aussi la commande d'entrée, pas seulement de reprise. Chaque étape reste invocable individuellement.
 
 Quand assez de features sont mergees sur la branche d'integration :
 
 ```
-/pipe-release (CHANGELOG metier + PR develop → main) → [merge + deploiement] → /pipe-tag
+/pipe-release (CHANGELOG métier + PR develop → main) → [merge + deploiement] → /pipe-tag
 ```
 
 ## Une session type
@@ -125,19 +125,19 @@ Session 2 (dev) puis session 3 (review → PR) :
 Au moment de releaser :
 
 ```
-/claude-workflow:pipe-release 0.5.2  # CHANGELOG metier + PR develop → main
+/claude-workflow:pipe-release 0.5.2  # CHANGELOG métier + PR develop → main
 /claude-workflow:pipe-tag v0.5.2     # tag git annote SemVer (apres merge + deploiement)
 ```
 
-`pipe-spec`, `pipe-plan` et `pipe-ship` acceptent indifferemment un numero GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complete. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
+`pipe-spec`, `pipe-plan` et `pipe-ship` acceptent indifferemment un numéro GitHub (`#42`), une cle Jira (`PROJ-123`) ou une URL Jira complète. Le detail de chaque skill est dans son fichier `SKILL.md` (liens dans les tableaux ci-dessous).
 
 ## Voie rapide et tickets techniques
 
-Le cycle complet se justifie quand il y a un **comportement a valider**. Regle de tri : comportement a valider → ticket + cycle ; rien a tester → voie rapide.
+Le cycle complet se justifie quand il y a un **comportement a valider**. Règle de tri : comportement a valider → ticket + cycle ; rien a tester → voie rapide.
 
 **Voie rapide** — typo, libelle, casse, config triviale, bump mineur de dependance : ni ticket, ni pilotage, ni spec. Correction directe + `/pipe-commit` (mode simple), puis micro-PR groupee ou push direct selon la protection de branche. Une correction reperee pendant un cycle se fait sur la branche du ticket mais dans un **commit separe**, jamais melangee aux changesets de la feature. `pipe-plan` detecte les tickets trop petits et propose lui-meme cette voie.
 
-**Tickets techniques** (changement d'architecture, migration, mise a jour majeure avec breaking changes) : cycle complet. Ils ne creent pas de spec — mais mettent a jour celle des features touchees (fonctionnement technique, points d'entree, decisions). `pipe-plan` les classifie `technique` (questions orientees architecture), et le contrat de `pipe-test` devient **les tests existants qui doivent rester verts**, completes de tests de caracterisation si la zone est mal couverte. Cote tracker, rattache-les au ticket de version comme les demandes metier (avec un label `tech`) — le CHANGELOG les exclut deja par defaut, sauf impact consommateur.
+**Tickets techniques** (changement d'architecture, migration, mise a jour majeure avec breaking changes) : cycle complet. Ils ne creent pas de spec — mais mettent a jour celle des features touchees (fonctionnement technique, points d'entrée, decisions). `pipe-plan` les classifie `technique` (questions orientees architecture), et le contrat de `pipe-test` devient **les tests existants qui doivent rester verts**, complétés de tests de caracterisation si la zone est mal couverte. Cote tracker, rattache-les au ticket de version comme les demandes métier (avec un label `tech`) — le CHANGELOG les exclut déjà par defaut, sauf impact consommateur.
 
 **Tickets d'investigation** (label `question`, `spike`, titre en « Investiguer ») : la reponse n'existe pas encore, donc rien n'est planifiable. `pipe-spec` les traite en **spike** : le livrable est la spec de la feature concernee, jamais du code. L'exploration (prototype, stories, variantes d'ecran) vit sur une branche `spike/`, poussee pour sauvegarde et jamais mergee ; la spec part seule sur une branche `docs/`, par `/pipe-commit` puis `/pipe-pr`. Une fois mergee, la branche `spike/` est supprimee, le ticket est clos en pointant la spec, et le dev repart de nouveaux tickets (`/create-issue`) avec un cycle complet — on ne nettoie pas un prototype pour le livrer, on le reecrit depuis la spec. `pipe-plan` renvoie vers `pipe-spec` s'il recoit un tel ticket.
 
@@ -149,14 +149,14 @@ Le cycle complet se justifie quand il y a un **comportement a valider**. Regle d
 |-------|-------------|
 | [`pipe-ship`](skills/pipe-ship/SKILL.md) | Reprendre le cycle d'un ticket : detecte la phase et deroule jusqu'a la prochaine pause |
 | [`pipe-spec`](skills/pipe-spec/SKILL.md) | Cadrer la feature dans une spec durable (`docs/specs/`), ouvrir le pilotage ; sans argument, inventorier l'existant |
-| [`pipe-plan`](skills/pipe-plan/SKILL.md) | Co-construire le plan par Q/R (metier + architecture), completer le fichier de pilotage |
+| [`pipe-plan`](skills/pipe-plan/SKILL.md) | Co-construire le plan par Q/R (métier + architecture), completer le fichier de pilotage |
 | [`pipe-test`](skills/pipe-test/SKILL.md) | Ecrire les tests avant le dev, review humaine — ils deviennent le contrat |
 | [`pipe-code`](skills/pipe-code/SKILL.md) | Implementer en session dediee, guide par les tests, jusqu'a tests verts |
 | [`pipe-review`](skills/pipe-review/SKILL.md) | Checks outilles + review agent haute valeur + review humaine du code |
 | [`pipe-commit`](skills/pipe-commit/SKILL.md) | Decouper le travail en commits-changesets qui servent de doc technique |
 | [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour la PR (ticket, version cible, changesets) |
-| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG metier + PR develop → main (slash-only) |
-| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente metier) |
+| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG métier + PR develop → main (slash-only) |
+| [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente métier) |
 | [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer apres merge + deploiement (slash-only) |
 
 ### Utilitaires
@@ -165,10 +165,10 @@ Commandes invocables a tout moment, hors du flow principal du pipeline.
 
 | Skill | Description |
 |-------|-------------|
-| [`setup`](skills/setup/SKILL.md) | Configuration complete du projet, one-shot (slash-only) |
+| [`setup`](skills/setup/SKILL.md) | Configuration complète du projet, one-shot (slash-only) |
 | [`create-issue`](skills/create-issue/SKILL.md) | Issues GitHub structurees avec decoupage |
 | [`worktree`](skills/worktree/SKILL.md) | Creer, lister, supprimer et basculer entre worktrees git |
-| [`audit-conformity`](skills/audit-conformity/SKILL.md) | Auditer le code contre un document de reference (spec, regle, skill) et planifier la remediation |
+| [`audit-conformity`](skills/audit-conformity/SKILL.md) | Auditer le code contre un document de reference (spec, règle, skill) et planifier la remediation |
 
 ### Referentiels (consultables, non-invocables)
 
@@ -193,7 +193,7 @@ claude-workflow/
 ├── CHANGELOG.md             # historique des versions
 └── skills/
     ├── <nom>/               # 16 skills, un repertoire par skill
-    │   ├── SKILL.md         # point d'entree (frontmatter + flow)
+    │   ├── SKILL.md         # point d'entrée (frontmatter + flow)
     │   └── reference.md     # referentiel detaille (optionnel)
     └── setup/scripts/       # scripts universels, copies tels quels par /setup
 ```
@@ -202,20 +202,20 @@ Les scripts (hooks, checks) sont de **vrais fichiers** versionnes, pas des blocs
 
 **Chargement progressif** : chaque `SKILL.md` reste concis et charge `reference.md` a la demande, uniquement quand le flow en a besoin. Cette decoupe maintient le contexte leger pour les cas simples tout en conservant la profondeur quand elle est utile (exemples : `pipe-changelog`, `pipe-plan`, `pipe-review`).
 
-## Fichiers projet-specifiques
+## Fichiers projet-spécifiques
 
-Le plugin ne contient aucune info specifique a un projet. La config vit dans le `.claude/skills/` du projet cible, creee par `/setup` :
+Le plugin ne contient aucune info spécifique a un projet. La config vit dans le `.claude/skills/` du projet cible, créée par `/setup` :
 
-| Fichier | Role |
+| Fichier | Rôle |
 |---------|------|
 | `workflow-config/SKILL.md` | Source unique : plateforme, branches, commandes, stack, conventions |
 
 Et, hors `.claude/`, dans le repo du projet cible :
 
-| Fichier | Role |
+| Fichier | Rôle |
 |---------|------|
 | `docs/specs/<feature>.md` | Une spec par feature — versionnee, maintenue par `/pipe-spec` |
-| `docs/specs/README.md` | Index des specs : point d'entree unique pour savoir quelles features existent |
+| `docs/specs/README.md` | Index des specs : point d'entrée unique pour savoir quelles features existent |
 
 Les projets configures avant la 1.5.0 peuvent garder leur `tech-stack/SKILL.md` (lu en fallback legacy) ; `/setup` propose la migration vers `workflow-config`.
 
@@ -225,4 +225,4 @@ Ces fichiers ne sont jamais ecrases par une mise a jour du plugin.
 
 - [CHANGELOG.md](CHANGELOG.md) — historique des versions et evolutions du plugin
 - [Repository GitHub](https://github.com/alex-robert-fr/claude-workflow)
-- [Conventions du plugin](CLAUDE.md) — regles internes pour contribuer
+- [Conventions du plugin](CLAUDE.md) — règles internes pour contribuer

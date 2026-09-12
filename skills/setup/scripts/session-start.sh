@@ -8,7 +8,7 @@ INDEX="${CLAUDE_PROJECT_DIR:-.}/docs/specs/README.md"
 HEADER="Index des specs de features de ce projet (docs/specs/). Chaque spec porte l'intention, le comportement attendu, le hors-scope, les decisions et les points d'entree techniques d'une feature. AVANT de modifier une feature, lire sa spec plutot que de parcourir le code."
 
 # On s'arrete a la section des specs depreciees : une feature retiree ne doit pas
-# etre proposee comme contexte de reference. Pas de section → tout l'index est actif.
+# être proposee comme contexte de reference. Pas de section → tout l'index est actif.
 # Le test de depreciation ne peut pas s'ecrire `d[eé]pr[eé]ci` : sous LC_ALL=C la
 # classe designe des octets, et `é` en occupe deux — le motif echoue alors sur un
 # titre correctement accentue, et les specs depreciees repartent dans le contexte.
