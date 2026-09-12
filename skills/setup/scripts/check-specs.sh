@@ -3,16 +3,16 @@
 # Appele par /pipe-review dans ses checks outilles. Ce n'est pas un hook.
 #
 # Detecte ce qu'un agent repere mal :
-#   - un point d'entree qui pointe vers un fichier disparu
-#   - une spec dont TOUS les points d'entree ont disparu : la feature a
-#     probablement ete retiree, la spec doit etre depreciee et non corrigee
+#   - un point d'entrée qui pointe vers un fichier disparu
+#   - une spec dont TOUS les points d'entrée ont disparu : la feature a
+#     probablement ete retiree, la spec doit être dépréciée et non corrigee
 #   - une spec absente de l'index (donc jamais injectee dans le contexte)
 #   - une ligne d'index pointant vers une spec disparue : le seul ecart qui
 #     injecte de la FAUSSE information dans chaque session, pas de l'absence
 #   - une phrase d'index trop longue : l'index est injecte a chaque session,
 #     c'est le seul poste de contexte qui grossit tout seul
 #
-# Une spec au statut depreciee est exclue du controle des chemins : ses fichiers
+# Une spec au statut dépréciée est exclue du controle des chemins : ses fichiers
 # ont disparu par construction, la signaler eternellement serait du bruit.
 
 ROOT="${CLAUDE_PROJECT_DIR:-.}"
@@ -34,13 +34,13 @@ for spec in "$SPECS"/*.md; do
     status=1
   fi
 
-  # Statut depreciee : plus rien a verifier cote fichiers
+  # Statut dépréciée : plus rien a verifier cote fichiers
   # Meme precaution de locale que dans session-start.sh (voir son commentaire).
   awk '/^>/ { t = tolower($0); gsub(/[^ -~]/, "", t)
               if (t ~ /statut.*:.*de*pre*ci/) { found = 1; exit } }
        END { exit !found }' "$spec" && continue
 
-  # Points d'entree : premiere colonne du tableau de la section uniquement.
+  # Points d'entrée : première colonne du tableau de la section uniquement.
   # La colonne Role cite souvent d'autres chemins — les lire produirait des faux positifs.
   # Les lignes marquees (a creer) sont ignorees : une spec precede le dev.
   #
@@ -66,16 +66,21 @@ for spec in "$SPECS"/*.md; do
       dead=$((dead + 1))
       dead_list+=("$full")
     fi
-  done < <(awk '/^## Points d.entree/{f=1;next} /^## /{f=0} f && /^\|/ && !/\([aà] *cr[eé]er\)/' "$spec" \
+  done < <(awk '
+      { t = tolower($0); gsub(/[^ -~]/, "", t) }
+      t ~ /^## points d.entr/ { f = 1; next }
+      /^## / { f = 0 }
+      f && /^\|/ && !/\([aà] *cr[eé]er\)/
+    ' "$spec" \
     | awk -F'|' '{print $2}')
 
   if [ "$dead" -gt 0 ] && [ "$dead" -eq "$total" ]; then
     # Signal fort : la feature n'existe plus. Deprecier, pas rafistoler.
-    echo "SPEC $base — tous les points d'entree ont disparu ($total) : feature retiree ? a deprecier"
+    echo "SPEC $base — tous les points d'entrée ont disparu ($total) : feature retiree ? a déprécier"
     status=1
   else
     for p in "${dead_list[@]}"; do
-      echo "SPEC $base — point d'entree introuvable : $p"
+      echo "SPEC $base — point d'entrée introuvable : $p"
       status=1
     done
   fi
@@ -83,7 +88,7 @@ done
 
 if [ -f "$SPECS/README.md" ]; then
   # Sens inverse : une ligne d'index pointant vers une spec supprimee ou renommee
-  # continue d'etre injectee dans chaque session par le hook SessionStart.
+  # continue d'être injectee dans chaque session par le hook SessionStart.
   #
   # On ne retient que les CIBLES DE LIEN `](nom.md)` dont le nom est un simple
   # basename, jamais un chemin. Extraire tout ce qui ressemble a `*.md` ferait
@@ -98,7 +103,7 @@ if [ -f "$SPECS/README.md" ]; then
   done < <(grep -oE '\]\([A-Za-z0-9._-]+\.md\)' "$SPECS/README.md" \
     | sed 's/^](//; s/)$//' | sort -u)
 
-  # Plafond de la derniere colonne : l'index est injecte a chaque session, il ne
+  # Plafond de la dernière colonne : l'index est injecte a chaque session, il ne
   # peut pas grossir librement. Le message est formate en bash — l'apostrophe de
   # « d'index » ne passerait pas dans un programme awk entre quotes simples.
   while IFS=$'\t' read -r name len; do
