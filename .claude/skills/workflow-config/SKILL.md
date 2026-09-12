@@ -5,14 +5,15 @@ user-invocable: false
 disable-model-invocation: true
 ---
 
-<!-- Referentiel de config : lu par Read depuis les skills du pipeline, jamais
-     invoque. Les deux drapeaux le retirent du catalogue de l'utilisateur ET de
-     celui du modele — sa description cesse d'etre payee dans chaque session. -->
+<!-- Référentiel de config : lu par Read depuis les skills du pipeline, jamais
+     invoqué. Flags documentés dans .claude/skills/create-skill/reference.md,
+     section "Frontmatter — contrôle d'invocation". -->
 
 ## Plateforme
 
 - **Git hosting** : GitHub (`alex-robert-fr/claude-workflow`)
 - **Issue tracker** : GitHub Issues
+- **Statut ticket à la release** : sans objet — Issue tracker = GitHub Issues
 - **Branche par defaut** : `develop` — base des features et cible de leurs PRs
 - **Branche de production** : `main` — cible des PRs de release
 
@@ -20,15 +21,17 @@ disable-model-invocation: true
 
 - **Lint** : aucune — `shellcheck` n'est pas installe sur la machine
 - **Format** : aucune — ni `prettier`, ni `shfmt`, ni `markdownlint`
-- **Test** : `bash .claude/scripts/check-skills.sh` — ce repo n'a pas de suite de tests, ses checks de coherence en tiennent lieu. `bash .claude/scripts/check-specs.sh` complete la verification et est appele par `/pipe-review`
+- **Test** : `bash .claude/scripts/check-skills.sh` — ce repo n'a pas de suite de tests, ses checks de cohérence en tiennent lieu. `bash .claude/scripts/check-specs.sh` complète la verification et est appele par `/pipe-review`
 - **Build** : aucune — un plugin Claude Code est distribue tel quel
 - **Typecheck** : aucune
 
-Ces deux scripts sont l'outillage **local** du repo : ils ne sont pas distribues par le plugin, aucun skill ne peut donc les appeler par lui-meme.
+Outillage local du repo (voir Architecture) — aucun skill ne peut les appeler par lui-même.
 
 ## Stack technique
 
-Ni backend ni frontend. Le plugin est fait de markdown (les skills et leurs fichiers supports) et de bash (les hooks et les checks). Aucune dependance ni runtime a installer — seul `jq` est requis, par `session-start.sh` et `check-specs.sh`.
+- **Backend / Frontend** : aucun
+- **Langages** : markdown (skills, fichiers supports), bash (hooks, checks)
+- **Dépendances** : aucune — seul `jq` est requis (`session-start.sh`, `check-specs.sh`)
 
 ## Architecture
 
@@ -45,7 +48,7 @@ Ni backend ni frontend. Le plugin est fait de markdown (les skills et leurs fich
 | Code (variables, fonctions, proprietes) | bash : fonctions en `snake_case`, variables d'environnement et constantes en `MAJUSCULES` |
 | Identifiants (IDs) | sans objet — le plugin ne persiste rien |
 
-Le francais du repo s'ecrit **sans accents**, dans les skills comme dans la documentation.
+Le français du repo s'écrit avec ses accents, dans les skills comme dans la documentation — garanti par les hooks du plugin (`docs/specs/garde-fous-automatiques.md`), plus que par cette convention.
 
 ## Notifications
 

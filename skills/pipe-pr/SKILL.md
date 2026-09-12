@@ -4,77 +4,75 @@ description: Creer ou mettre a jour une Pull Request : titre, description, comme
 argument-hint: [rien — detecte automatiquement la branche courante]
 ---
 
-## Etape 0 — Verifications
+## Étape 0 — Verifications
 
 Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` (si absent, utilise Read pour charger `.claude/skills/tech-stack/SKILL.md` — config legacy). Puis verifie :
 
 - [ ] Le repo a un remote `origin` configure
-- [ ] La branche courante n'est pas la branche par defaut (on ne cree pas de PR depuis main/develop)
+- [ ] La branche courante n'est pas la branche par defaut (on ne crée pas de PR depuis main/develop)
 - [ ] Il y a au moins un commit d'avance sur la branche par defaut
 
 Si une verification echoue, signale-le clairement et arrete-toi.
 
 ### Push
 
-Si la branche n'est pas encore poussee sur le remote, pousse-la. Confirme avant de push si c'est le premier push de cette branche. Ne commente pas le push : la sortie de la commande le montre deja.
+Si la branche n'est pas encore poussee sur le remote, pousse-la. Confirme avant de push si c'est le premier push de cette branche. Ne commente pas le push : la sortie de la commande le montre déjà.
 
-## Etape 1 — Recuperer le contexte
+## Étape 1 — Récupérer le contexte
 
-Rassemble les informations necessaires :
+Rassemble les informations nécessaires :
 
 - **Branche courante** — detectee automatiquement
-- **Pilotage** — si un fichier `.claude/plans/plan-*.md` correspond a la branche, lis-le : ticket (cle JIRA ou issue), version cible, decisions — c'est la source principale du contexte
+- **Pilotage** — si un fichier `.claude/plans/plan-*.md` correspond a la branche, lis-le : identifiant du ticket, plan et ses points d'attention — c'est la source principale du contexte
 - **Ticket lie** — depuis le pilotage, ou l'identifiant dans le nom de branche (`feat/42-...` → issue #42 via MCP GitHub ; `feat/PROJ-42-...` → ticket JIRA via MCP Atlassian)
-- **Commits** — la liste des commits de la branche : ce sont les changesets, ils structurent la partie technique du body
-- **Diff** — analyse les fichiers crees et modifies pour verifier que la description reflete ce qui a reellement ete implemente
+- **Commits** — la liste des commits de la branche avec leur SHA court (`git log <defaut>..HEAD --format="%h %s"`) : ils alimentent le bloc Changelog du body, chaque entrée pointant vers ses commits
+- **URL du remote** — `git remote get-url origin`, convertie en HTTPS : c'est la base des liens vers les commits (`<base>/commit/<sha>`)
+- **Diff** — analyse les fichiers créés et modifies pour vérifier que la description reflete ce qui a reellement ete implemente
 
-## Etape 2 — Verifier si une PR existe deja
+## Étape 2 — Vérifier si une PR existe déjà
 
-Verifie via MCP GitHub si une PR ouverte existe deja sur la branche courante. Le resultat determine si on cree une nouvelle PR ou si on met a jour l'existante.
+Verifie via MCP GitHub si une PR ouverte existe déjà sur la branche courante. Le resultat determine si on crée une nouvelle PR ou si on met a jour l'existante.
 
-## Etape 3 — Rediger la description
+## Étape 3 — Rediger la description
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (section Pull Requests) puis redige la description.
+Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (section Pull Requests) puis rédige la description.
 
-Que ce soit pour une nouvelle PR ou une mise a jour, la description suit le format defini dans git-conventions et doit toujours refleter l'etat actuel complet de la PR — jamais de mention "ajoute", "mis a jour" ou "nouveau". C'est le role du commentaire d'iteration (etape 4).
+Que ce soit pour une nouvelle PR ou une mise a jour, la description suit le format defini dans git-conventions et doit toujours refleter l'etat actuel complet de la PR — jamais de mention "ajoute", "mis a jour" ou "nouveau". C'est le rôle du commentaire d'iteration (étape 4).
 
 ### Reference au ticket (obligatoire)
 
-Chaque PR reference son ticket dans la section Contexte, selon le tracker :
+Format et regle : voir `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (section "Reference au ticket"), déjà chargee ci-dessus — la reference se place dans la section Contexte.
 
-- **Issue native de la plateforme git** : `Closes #42` (ferme automatiquement l'issue au merge ; plusieurs issues → `Closes #12, Closes #15`)
-- **Ticket JIRA** : pas d'auto-close — reference la cle avec son lien (`Ticket : [PROJ-42](url)`), et si le pilotage indique une version cible, ajoute `Version cible : 0.5.2`
+Ajouts propres a ce skill : ticket JIRA rattache a une version cible (ticket parent) → ajoute aussi `Version cible : 0.5.2` ; aucun ticket identifiable → demande-le a l'utilisateur avant de continuer.
 
-Si aucun ticket n'est identifiable, demande-le a l'utilisateur avant de continuer — ne jamais omettre cette reference.
+### Changelog
 
-### Changesets
+Le body porte un bloc `## Changelog` au format du CHANGELOG du projet : c'est lui qui sera agrege a la release, ecrit maintenant, tant que le contexte est frais. Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-changelog/reference.md` et applique ses sections « Types d'entrées », « Mapping prefixe de commit → type », « Règles de contenu », « Rediger pour le consommateur » et « Exclusions ».
 
-Le body liste les commits de la branche (titre de chaque commit) — c'est le sommaire technique de la PR : le lecteur qui veut le detail ouvre le commit correspondant.
+## Étape 4 — Rediger le commentaire d'iteration (mise a jour uniquement)
 
-## Etape 4 — Rediger le commentaire d'iteration (mise a jour uniquement)
+Cette étape ne s'applique que si une PR existe déjà. Sinon, passe directement a l'étape 5.
 
-Cette etape ne s'applique que si une PR existe deja. Sinon, passe directement a l'etape 5.
+Recupere la liste complète des commits pushes depuis la dernière mise a jour de la PR. Redige le commentaire en suivant le format defini dans git-conventions.
 
-Recupere la liste complete des commits pushes depuis la derniere mise a jour de la PR. Redige le commentaire en suivant le format defini dans git-conventions.
-
-## Etape 5 — Recapituler et confirmer
+## Étape 5 — Recapituler et confirmer
 
 Affiche le contenu complet avant de soumettre et demande confirmation.
 
 **Nouvelle PR :**
 
 ```
-**PR a creer** — [Type] Titre de l'issue (#XX)
+**PR a créer** — [Type] Titre de l'issue (#XX)
 `type/XX-description` → `[branche par defaut du projet]`
 
 [body complet]
 
-Je cree cette PR ?
+Je crée cette PR ?
 ```
 
 **Mise a jour :** affiche la description reecrite + le commentaire d'iteration, puis demande confirmation.
 
-## Etape 6 — Soumettre via MCP GitHub
+## Étape 6 — Soumettre via MCP GitHub
 
 Une fois confirmation recue :
 
@@ -83,7 +81,7 @@ Une fois confirmation recue :
 - Cree la PR via MCP GitHub (base: branche par defaut definie dans `workflow-config`, head: branche courante)
 
 ```
-PR creee : [URL]
+PR créée : [URL]
 ```
 
 **Mise a jour :**
