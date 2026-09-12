@@ -48,7 +48,7 @@ Outillage local du repo (voir Architecture) — aucun skill ne peut les appeler 
 | Code (variables, fonctions, proprietes) | bash : fonctions en `snake_case`, variables d'environnement et constantes en `MAJUSCULES` |
 | Identifiants (IDs) | sans objet — le plugin ne persiste rien |
 
-Le français du repo s'ecrit **sans accents**, dans les skills comme dans la documentation.
+Le français du repo s'écrit avec ses accents, dans les skills comme dans la documentation — garanti par les hooks du plugin (`docs/specs/garde-fous-automatiques.md`), plus que par cette convention.
 
 ## Notifications
 
