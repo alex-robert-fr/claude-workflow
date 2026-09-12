@@ -1,12 +1,12 @@
 # Reference exhaustive — Skills Claude Code
 
-Documentation complete de tous les champs, syntaxes et patterns avances.
+Documentation complète de tous les champs, syntaxes et patterns avances.
 
 ---
 
-## allowed-tools — syntaxe complete
+## allowed-tools — syntaxe complète
 
-Declare les outils auto-approuves (sans prompt) pendant l'execution du skill.
+Declare les outils auto-approuves (sans prompt) pendant l'exécution du skill.
 
 | Syntaxe | Exemple | Matche |
 |---------|---------|--------|
@@ -16,7 +16,7 @@ Declare les outils auto-approuves (sans prompt) pendant l'execution du skill.
 | Bash exact | `Bash(npm run build)` | Commande exacte |
 | Bash pattern | `Bash(git * main)` | `git checkout main`, `git merge main` |
 | MCP tous | `mcp__github__*` | Tous les tools du serveur github |
-| MCP specifique | `mcp__github__create_issue` | Tool specifique |
+| MCP spécifique | `mcp__github__create_issue` | Tool spécifique |
 | WebFetch domain | `WebFetch(domain:github.com)` | Requetes vers github.com |
 
 ### Bash patterns — details
@@ -25,7 +25,7 @@ Le word boundary compte :
 - `Bash(ls *)` matche `ls -la` (espace avant `*`)
 - `Bash(ls*)` matche `ls -la` ET `lsof` (pas d'espace)
 
-Les wildcards peuvent etre n'importe ou :
+Les wildcards peuvent être n'importe ou :
 - `Bash(* --version)` matche `git --version`, `node --version`
 
 ---
@@ -36,8 +36,8 @@ Execute le skill dans un sous-agent isole avec son propre contexte.
 
 | Aspect | Sans fork | Avec `context: fork` |
 |--------|-----------|---------------------|
-| Contexte | Partage avec la conversation | Isole, fenetre separee |
-| Historique | Conversation complete | Depart a zero |
+| Contexte | Partage avec la conversation | Isole, fenetre séparée |
+| Historique | Conversation complète | Depart a zero |
 | Resultats | Inline dans le chat | Resumes, ajoutes au principal |
 | CLAUDE.md | Charge | Charge aussi dans le sous-agent |
 | Use case | Reference inline | Taches complexes isolees |
@@ -84,17 +84,17 @@ Si omis : `general-purpose` par defaut.
 
 **Comportement verifie (doc officielle)** : le champ `model` bascule reellement le modele quand le skill est actif, **pour le reste du tour courant** — y compris quand Claude auto-invoque le skill via le tool Skill. L'override n'est pas persiste : le modele de session reprend au prompt suivant.
 
-**Consequence** : ce n'est pas une "recommandation". Un `model: haiku` sur un skill d'expertise auto-invocable peut retrograder le reste d'un tour d'implementation vers Haiku ; un `model: opus` peut retrograder une session qui tourne sur un modele superieur.
+**Conséquence** : ce n'est pas une "recommandation". Un `model: haiku` sur un skill d'expertise auto-invocable peut retrograder le reste d'un tour d'implementation vers Haiku ; un `model: opus` peut retrograder une session qui tourne sur un modele superieur.
 
-**Regle du plugin** : ne pas declarer `model` dans les skills — le modele de la session est le choix de l'utilisateur. Pour controler le cout des sous-taches, passer `model` dans les appels au tool **Agent** (sub-agents), pas dans le frontmatter.
+**Règle du plugin** : ne pas declarer `model` dans les skills — le modele de la session est le choix de l'utilisateur. Pour controler le cout des sous-taches, passer `model` dans les appels au tool **Agent** (sub-agents), pas dans le frontmatter.
 
 ---
 
 ## Hierarchie de decouverte des skills
 
-Par ordre de priorite (le plus haut gagne en cas de conflit de noms) :
+Par ordre de priorité (le plus haut gagne en cas de conflit de noms) :
 
-| Priorite | Emplacement | Portee |
+| Priorité | Emplacement | Portee |
 |----------|-------------|--------|
 | 1 | `.claude/skills/<name>/SKILL.md` | Projet courant |
 | 2 | `~/.claude/skills/<name>/SKILL.md` | Tous les projets (personnel) |
@@ -126,20 +126,18 @@ Charge les skills depuis `../shared-config/.claude/skills/`.
 
 ## Budget des descriptions
 
-Les descriptions sont chargees dans le contexte pour que Claude sache quels skills existent — dans **chaque session de chaque projet** ou le plugin est actif.
+Les descriptions sont chargées dans le contexte pour que Claude sache quels skills existent — dans **chaque session de chaque projet** ou le plugin est actif.
+
+Regle des 130 caracteres et sa justification : voir guide.md, section « Description — cle du routage ».
 
 - La combinaison `description` + `when_to_use` est **tronquee a 1 536 caracteres** par skill dans le listing (doc officielle, v2.1.196+). C'est la limite de la plateforme, pas un budget : ecrire 1 500 caracteres de description est techniquement valide et economiquement absurde
-- Le budget du plugin est **130 caracteres par description**. C'est le poste le plus cher : le corps d'un skill ne se paie qu'a l'invocation, la description se paie a chaque session de chaque projet, meme celles qui n'invoquent jamais le skill. 100 caracteres retires d'une description valent plus que 1 000 retires d'un `reference.md`
-- Un skill jamais utilise coute donc son entree de listing a chaque session, pour zero benefice
 
 ### Verification
 
-- `.claude/scripts/check-skills.sh` — plafond de 130 caracteres, chemins de chargement qualifies, `$ARGUMENTS` present, seuil de delegation, concordance des trois copies du diagramme du pipeline. Outillage local, a lancer a la main
-- `/context` — la ligne Skills affiche la taille reelle du listing tel que recu par le modele
+- `/context` — la ligne Skills affiche la taille reelle du listing tel que reçu par le modele
 
 ### Optimisation
 
-- Descriptions a 130 caracteres max : verbe + objet + declencheur, sans enumerer les etapes du skill ni les sections du document produit
 - `disable-model-invocation: true` sur les skills rarement auto-charges
 - `user-invocable: false` sur les skills de reference pure
 
@@ -151,7 +149,7 @@ Les descriptions sont chargees dans le contexte pour que Claude sache quels skil
 |----------|--------|-----------------|-------|
 | `${CLAUDE_SKILL_DIR}` | Claude Code | Contenu du skill | Chemin absolu du repertoire du skill |
 | `${CLAUDE_SESSION_ID}` | Claude Code | Contenu du skill | UUID de la session |
-| Variables shell | Systeme/user | Commandes `!`...`` | `!`echo $HOME`` |
+| Variables shell | Système/user | Commandes `!`...`` | `!`echo $HOME`` |
 | Variables custom | `.claude/settings.json` `env` | Commandes `!`...`` | `!`echo $MY_VAR`` |
 
 ### Variables custom via settings
@@ -187,7 +185,7 @@ Si la commande echoue sans fallback, Claude recoit le message d'erreur et peut s
 - Descriptions cachees en memoire, contenu charge a la demande
 - **Pas de cache entre sessions** — chaque session relit les fichiers
 - Modifier un `SKILL.md` pendant une session : lancer `/reload-plugins` pour prendre en compte
-- Nouveaux skills crees pendant une session : visibles apres `/reload-plugins`
+- Nouveaux skills créés pendant une session : visibles apres `/reload-plugins`
 
 ---
 
@@ -199,11 +197,11 @@ Skill actif > CLAUDE.md > Defauts Claude Code
 
 Si CLAUDE.md dit "indentation 2 espaces" mais le skill dit "indentation 4 espaces", le skill gagne.
 
-### Partage de regles
+### Partage de règles
 
-- **Regles persistantes** (toute la session) -> CLAUDE.md
-- **Regles par tache** -> Skills
-- **Regles par chemin** -> `.claude/rules/*.md` avec frontmatter `paths:`
+- **Règles persistantes** (toute la session) -> CLAUDE.md
+- **Règles par tache** -> Skills
+- **Règles par chemin** -> `.claude/rules/*.md` avec frontmatter `paths:`
 
 ---
 
@@ -247,9 +245,9 @@ Si `$ARGUMENTS` n'est pas dans le contenu, Claude Code l'ajoute automatiquement 
 ## Anti-patterns
 
 - Description vague -> jamais charge auto
-- Description qui enumere les etapes ou les sections produites -> gonfle le prompt systeme de chaque session sans rien ajouter au routage
+- Description qui enumere les étapes ou les sections produites -> gonfle le prompt système de chaque session sans rien ajouter au routage
 - Description au-dela de 130 caracteres -> refusee par `.claude/scripts/check-skills.sh`
-- Skill au-dela de ~150 lignes sans fichiers supports -> deleguer le detail dans `reference.md`
+- Skill au-dela de ~150 lignes sans fichiers supports -> déléguer le detail dans `reference.md`
 - Frontmatter sans description -> routing impossible
 - `context: fork` avec guidelines sans tache explicite -> sous-agent inutile
 - `disable-model-invocation: true` sur un skill d'expertise -> jamais utilise
@@ -277,7 +275,7 @@ user-invocable: false
 ## Types
 | Emoji | Type | Usage |
 |-------|------|-------|
-| feat  | Nouvelle fonctionnalite |
+| feat  | Nouvelle fonctionnalité |
 | fix   | Correction de bug |
 ...
 ```
@@ -297,11 +295,11 @@ argument-hint: [environment]
 - Branche : !`git branch --show-current`
 - Tests : !`npm test 2>&1 | tail -5`
 
-## Etapes
-1. Verifier qu'on est sur main
+## Étapes
+1. Vérifier qu'on est sur main
 2. Builder : `npm run build`
 3. Deployer : `npm run deploy:$0`
-4. Verifier : `curl https://app.com/health`
+4. Vérifier : `curl https://app.com/health`
 
 $ARGUMENTS
 ```
@@ -346,7 +344,7 @@ Utilise le template dans [template.md](template.md).
 ## Validation
 !`${CLAUDE_SKILL_DIR}/scripts/validate-schema.sh $0`
 
-## Etapes
+## Étapes
 1. Parser le schema
 2. Generer les endpoints selon le template
 3. Valider avec le script
@@ -368,7 +366,7 @@ Migrer le composant `$0` de $1 vers $2.
 
 Preserver le comportement et les tests existants.
 
-Considerations specifiques :
+Considerations spécifiques :
 - Framework source : $1
 - Framework cible : $2
 ```
