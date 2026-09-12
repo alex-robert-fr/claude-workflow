@@ -11,13 +11,13 @@ C'est la distinction qui fait toute la valeur de la spec. Une spec qui derive en
 | **Duree de vie** | Durable, versionnee dans le repo | Ephemere, gitignore, supprimee a la PR |
 | **Portee** | Une feature, alimentee par N tickets | Un ticket |
 | **Lecteur** | La prochaine session (humaine ou IA) qui touche la feature | La session courante |
-| **Contient** | Intention, regles metier, hors-scope, decisions, points d'entree | Etapes, fichiers a creer/modifier, signatures |
+| **Contient** | Intention, règles métier, hors-scope, decisions, points d'entrée | Étapes, fichiers a créer/modifier, signatures |
 
 Test simple : **si une phrase devient fausse une fois le ticket merge, elle n'a rien a faire dans la spec.**
 
 Interdits dans une spec :
 
-- Etapes d'implementation, listes de fichiers a creer ou modifier
+- Étapes d'implementation, listes de fichiers a créer ou modifier
 - Blocs de code, signatures detaillees, extraits de diff
 - TODO, estimations, references au sprint ou au ticket en cours dans le corps
 - Toute formulation au futur (« on va ajouter », « il faudra »)
@@ -36,39 +36,39 @@ Ce que la feature fait, du point de vue de celui qui l'utilise. Une phrase — c
 
 ## Intention
 
-Le probleme resolu et a quoi on reconnait que c'est reussi. **3-5 lignes, en puces.**
-Pas d'histoire du projet, pas de justification du besoin : le probleme, point.
-- Le probleme que la feature resout
+Le problème resolu et a quoi on reconnait que c'est reussi. **3-5 lignes, en puces.**
+Pas d'histoire du projet, pas de justification du besoin : le problème, point.
+- Le problème que la feature resout
 - Ce qui prouve que c'est reussi
 
 ## Philosophie
 
 Le principe qui tranche les arbitrages futurs, en une puce : « ici on privilegie X sur Y ».
-Si rien ne s'impose, supprimer la section — c'est le cas le plus frequent.
+Si rien ne s'impose, supprimer la section — c'est le cas le plus fréquent.
 
 ## Comportement attendu
 
-Les garanties observables, **une ligne chacune, en langage simple**. Regles metier, cas limites, comportement en erreur.
-- Ce que la feature garantit, formule comme une regle
+Les garanties observables, **une ligne chacune, en langage simple**. Règles métier, cas limites, comportement en erreur.
+- Ce que la feature garantit, formule comme une règle
 
-Exception au format en puces : une feature qui expose plusieurs endpoints de forme parallele (meme triptyque route / reponse / cas d'echec) se documente mieux dans un tableau `Endpoint | Reponse | Cas d'echec` — plus scannable que N puces quasi identiques. Les regles transverses aux endpoints (auth, quota) restent en puces sous le tableau.
+Exception au format en puces : une feature qui expose plusieurs endpoints de forme parallele (meme triptyque route / reponse / cas d'echec) se documente mieux dans un tableau `Endpoint | Reponse | Cas d'echec` — plus scannable que N puces quasi identiques. Les règles transverses aux endpoints (auth, quota) restent en puces sous le tableau.
 
 ## Hors scope
 
 Ce que la feature ne fait **pas**, avec la raison. **Une ligne par exclusion.**
-Elle evite qu'une session future « complete » la feature dans une direction ecartee volontairement.
+Elle evite qu'une session future « complète » la feature dans une direction ecartee volontairement.
 - Ce qui est exclu — pourquoi
 
 ## Fonctionnement technique
 
-**Le mecanisme reel**, en prose dense — jargon du projet autorise, contrairement au reste de la spec : c'est la seule section ecrite pour quelqu'un qui va toucher le code, pas pour un lecteur hors dev. **5-15 lignes.**
+**Le mécanisme reel**, en prose dense — jargon du projet autorise, contrairement au reste de la spec : c'est la seule section ecrite pour quelqu'un qui va toucher le code, pas pour un lecteur hors dev. **5-15 lignes.**
 
-Alternative a la prose, quand le mecanisme est un enchainement de decisions binaires paralleles (plusieurs endpoints independants, chacun avec sa propre bifurcation) : un diagramme Mermaid (` ```mermaid flowchart TD ``` `) le montre souvent plus directement qu'un paragraphe. Si diagramme :
-- Un diagramme par mecanisme independant — jamais deux branches paralleles cote a cote dans le meme diagramme, ca force un rendu large qui scroll horizontalement dans la plupart des lecteurs markdown. Enchainer les noeuds verticalement a la place
+Alternative a la prose, quand le mécanisme est un enchainement de decisions binaires paralleles (plusieurs endpoints independants, chacun avec sa propre bifurcation) : un diagramme Mermaid (` ```mermaid flowchart TD ``` `) le montre souvent plus directement qu'un paragraphe. Si diagramme :
+- Un diagramme par mécanisme independant — jamais deux branches paralleles cote a cote dans le meme diagramme, ca force un rendu large qui scroll horizontalement dans la plupart des lecteurs markdown. Enchainer les noeuds verticalement a la place
 - Ne diagrammer que ce qui bifurque reellement (un code retour qui varie, par exemple) — un endpoint qui repond toujours la meme chose ne merite pas de diagramme, une phrase suffit
-- Ne jamais reproduire ce que le tableau Comportement attendu dit deja : le diagramme montre le *mecanisme* qui produit le resultat, pas le resultat lui-meme
+- Ne jamais reproduire ce que le tableau Comportement attendu dit déjà : le diagramme montre le *mécanisme* qui produit le resultat, pas le resultat lui-meme
 
-_Les fichiers ne figurent jamais dans cette section : mentionnes en italique ou en note, discretement — liste complete dans Points d'entree._
+_Les fichiers ne figurent jamais dans cette section : mentionnes en italique ou en note, discretement — liste complète dans Points d'entrée._
 
 ## Dependances
 
@@ -86,9 +86,9 @@ ceux dont on se redemandera « pourquoi comme ca ? ».
 | 1.4.0 | PROJ-42 | ... | ... | ... |
 | 1.6.0 (a venir) | PROJ-58 | ... | ... | ... |
 
-## Points d'entree
+## Points d'entrée
 
-| Fichier | Role |
+| Fichier | Rôle |
 |---------|------|
 | [reel.ts](chemin/reel.ts) | Ce qu'on y trouve, en quelques mots |
 
@@ -99,20 +99,25 @@ Un couplage invisible, un invariant a maintenir ailleurs. Pas de conseil general
 - **Idee cle en gras** — le reste de l'explication, pour se lire en balayant
 ```
 
-## Regles de redaction
+## Règles de rédaction
 
 - **Budget : 40-80 lignes.** Une spec qui gonfle contient du plan, du code ou du bavardage. Couper.
-- **Une info, un seul endroit.** Ne pas reformuler dans le hors-scope ce que le comportement dit deja, ni re-expliquer dans le fonctionnement ce qui est dans l'intention. La redondance entre sections est le premier facteur de verbosite.
+- **Une info, un seul endroit.** Ne pas reformuler dans le hors-scope ce que le comportement dit déjà, ni re-expliquer dans le fonctionnement ce qui est dans l'intention. La redondance entre sections est le premier facteur de verbosite.
 - **Chaque phrase gagne sa place** : elle apporte une information qu'on ne peut pas deduire du reste de la spec ni du nom de la feature. Une phrase qui « pose le contexte » sans rien apprendre se supprime.
 - **Pas de paragraphes d'introduction ni de transition.** On entre directement dans le contenu de chaque section.
-- **Supprimer les sections vides ou faibles** plutot que d'ecrire « N/A » ou de les meubler. Seules « En une phrase », « Comportement attendu » et « Points d'entree » sont obligatoires.
-- **Points d'entree** : uniquement des chemins reels, verifies pendant l'exploration. Un chemin faux coute plus cher que pas de chemin du tout. Marquer `(a creer)` si le fichier n'existe pas encore.
-- **Reference a un fichier reel** : afficher uniquement son nom, en lien markdown vers son chemin complet (`[nom.ts](../../chemin/vers/nom.ts)`) — jamais le chemin entier en texte visible, dans Points d'entree comme ailleurs dans le corps. Le lien est relatif au fichier de la spec (`docs/specs/`), donc prefixe typiquement `../../`. Le marqueur `(a creer)` se pose juste apres le lien, jamais noye dans la colonne Role.
+- **Supprimer les sections vides ou faibles** plutot que d'ecrire « N/A » ou de les meubler. Seules « En une phrase », « Comportement attendu » et « Points d'entrée » sont obligatoires.
+- **Points d'entrée** : uniquement des chemins reels, vérifiés pendant l'exploration. Un chemin faux coute plus cher que pas de chemin du tout. Marquer `(a créer)` si le fichier n'existe pas encore.
+- **Reference a un fichier reel** : afficher uniquement son nom, en lien markdown vers son chemin complet (`[nom.ts](../../chemin/vers/nom.ts)`) — jamais le chemin entier en texte visible, dans Points d'entrée comme ailleurs dans le corps. Le lien est relatif au fichier de la spec (`docs/specs/`), donc prefixe typiquement `../../`. Le marqueur `(a créer)` se pose juste apres le lien, jamais noye dans la colonne Rôle.
 - **Pas de dates** dans le corps : git porte l'historique. Les reperes temporels utiles sont la **version** et le **ticket**, dans le journal des decisions.
-- **Colonne Version du journal** : la version dans laquelle la decision est livree. Source, par ordre de priorite — la « Version cible » du pilotage, sinon la version en preparation (`Unreleased` du CHANGELOG, ou version courante du projet incrementee), notee `X.Y.Z (a venir)` tant qu'elle n'est pas publiee. Inconnue ou projet sans versioning → `—`. Ne jamais deviner une version passee : une decision heritee dont on ignore l'origine prend `—`. **Avant de reporter la version courante du projet telle quelle, verifier qu'elle n'est pas deja publiee** (une entree datee dans `CHANGELOG.md`, hors `[Unreleased]`) — sinon l'incrementer d'un cran.
-- Au moment d'une release, les entrees `(a venir)` de la version livree perdent leur mention — c'est le seul cas ou l'on modifie une ligne existante du journal.
-- **Cellule Decision du journal, affirmative et sans negation** : elle dit ce qui est fait, pas ce qui ne l'est pas — l'alternative rejetee est deja portee par la colonne Alternative ecartee. « Version lue depuis `package.json` a l'execution » suffit ; ne pas ajouter « , pas importee comme module ».
-- **Nommage du fichier** : `kebab-case` du nom de la feature, sans prefixe ni numero de ticket — `docs/specs/export-csv.md`, jamais `spec-42.md`.
+- **Colonne Version du journal** : la version dans laquelle la decision est livree. Source, par ordre de priorité :
+  - Le ticket parent de version lu sur le tracker, si le tracker en a
+  - Sinon la version en preparation (`Unreleased` du CHANGELOG, ou version courante du projet incrementee), notee `X.Y.Z (a venir)` tant qu'elle n'est pas publiee
+  - Sinon, inconnue ou projet sans versioning → `—`
+  - Ne jamais deviner une version passee : une decision heritee dont on ignore l'origine prend `—`
+  - Avant de reporter la version courante du projet telle quelle, vérifier qu'elle n'est pas déjà publiee (une entrée datee dans `CHANGELOG.md`, hors `[Unreleased]`) — sinon l'incrementer d'un cran
+- Au moment d'une release, les entrées `(a venir)` de la version livree perdent leur mention — c'est le seul cas ou l'on modifie une ligne existante du journal.
+- **Cellule Decision du journal, affirmative et sans negation** : elle dit ce qui est fait, pas ce qui ne l'est pas — l'alternative rejetee est déjà portee par la colonne Alternative ecartee. « Version lue depuis `package.json` a l'exécution » suffit ; ne pas ajouter « , pas importee comme module ».
+- **Nommage du fichier** : `kebab-case` du nom de la feature, sans prefixe ni numéro de ticket — `docs/specs/export-csv.md`, jamais `spec-42.md`.
 - **Une spec = une feature**, pas un module ni un ticket. Si deux specs se citent en permanence, elles n'en font probablement qu'une.
 - **Dependance ajoutee entre deux specs existantes** : reporter la reference dans les deux fichiers (`Dependants` d'un cote, `Internes` ou `Dependants` de l'autre) — un couplage documente dans un seul sens se redecouvre a la dure au prochain changement de l'autre spec.
 
@@ -130,21 +135,21 @@ Une spec qui survit a sa feature est le pire cas de figure : elle est lue comme 
 - Elle est **remplacee** par une autre feature — la spec qui prend le relais est mentionnee dans la raison
 - Elle est **fusionnee** dans une feature plus large : la spec absorbee est depreciee, celle qui absorbe est mise a jour
 
-Ne pas deprecier une feature simplement refactorisee : le comportement subsiste, la spec reste active et ses points d'entree sont mis a jour.
+Ne pas deprecier une feature simplement refactorisee : le comportement subsiste, la spec reste active et ses points d'entrée sont mis a jour.
 
 ### Comment
 
 1. Passer le statut a `depreciee` et ajouter la ligne `Retrait` : version de retrait et raison en une ligne
-2. **Ne rien supprimer du corps.** L'interet d'une spec depreciee est de repondre a « pourquoi cette feature a existe, et pourquoi elle a disparu » — c'est ce qui evite de la reintroduire par erreur des mois plus tard
+2. **Ne rien supprimer du corps.** L'intérêt d'une spec depreciee est de repondre a « pourquoi cette feature a existe, et pourquoi elle a disparu » — c'est ce qui evite de la reintroduire par erreur des mois plus tard
 3. Deplacer sa ligne de l'index vers la section « Specs depreciees »
 4. Ne jamais supprimer le fichier : git garderait la trace, mais plus personne ne la trouverait
 
 ### Effets automatiques
 
-Une fois le statut pose, deux mecanismes s'ajustent sans intervention :
+Une fois le statut pose, deux mécanismes s'ajustent sans intervention :
 
 - Le hook `SessionStart` cesse d'injecter la feature : il s'arrete a la section des depreciees
-- `check-specs.sh` cesse de controler ses points d'entree — ils ont disparu par construction, les signaler eternellement serait du bruit
+- `check-specs.sh` cesse de controler ses points d'entrée — ils ont disparu par construction, les signaler eternellement serait du bruit
 
 ### Signal de detection
 
@@ -152,8 +157,8 @@ Une fois le statut pose, deux mecanismes s'ajustent sans intervention :
 
 | Constat | Interpretation | Action |
 |---------|----------------|--------|
-| Quelques points d'entree morts | La spec a pris du retard | Mettre a jour les points d'entree |
-| **Tous** les points d'entree morts | La feature n'existe plus | Deprecier — ne pas rafistoler |
+| Quelques points d'entrée morts | La spec a pris du retard | Mettre a jour les points d'entrée |
+| **Tous** les points d'entrée morts | La feature n'existe plus | Deprecier — ne pas rafistoler |
 
 La depreciation n'est **jamais** automatique : le script signale, l'humain tranche. Une feature peut avoir simplement demenage.
 
@@ -164,17 +169,15 @@ inventaire, qui n'a pas besoin du reste de ce fichier.
 
 ## Verification de fraicheur (utilisee par `/pipe-review`)
 
-Une spec qui ment est pire que pas de spec : elle est lue comme une reference.
-
 Deux niveaux, a ne pas confondre.
 
-**Mecanique** — couvert par `.claude/scripts/check-specs.sh`, lance dans les checks outilles de `/pipe-review`. Un chemin mort ou une spec hors index se detectent sans jugement, donc ils ne doivent pas dependre d'un agent : points d'entree pointant vers des fichiers disparus, spec absente de l'index.
+**Mecanique** — couvert par `.claude/scripts/check-specs.sh`, lance dans les checks outilles de `/pipe-review`. Un chemin mort ou une spec hors index se detectent sans jugement, donc ils ne doivent pas dependre d'un agent : points d'entrée pointant vers des fichiers disparus, spec absente de l'index.
 
 **Au jugement** — pour chaque spec concernee par le diff :
 
 1. Le **comportement attendu** decrit-il ce que le code fait maintenant ?
 2. Le **hors scope** est-il toujours exact — n'a-t-on pas implemente ce qui en etait exclu ?
-3. Les **points d'entree** couvrent-ils les fichiers structurants **ajoutes** par le ticket ? C'est l'angle mort : un fichier neuf n'est dans aucune liste de points d'entree, donc aucun matching exact ne le rattrape. Matcher aussi par repertoire
-4. Une **decision** structurante a-t-elle ete prise pendant le dev sans etre consignee ?
+3. Les **points d'entrée** couvrent-ils les fichiers structurants **ajoutes** par le ticket ? C'est l'angle mort : un fichier neuf n'est dans aucune liste de points d'entrée, donc aucun matching exact ne le rattrape. Matcher aussi par repertoire
+4. Une **decision** structurante a-t-elle ete prise pendant le dev sans être consignee ?
 
 Tout ecart se corrige dans la spec avant de committer — la spec fait partie du changeset.
