@@ -122,7 +122,7 @@ Aucune spec concernee (`sans objet`, ou projet sans `docs/specs/`) → passe a l
 
 Si un fichier structurant du diff n'est couvert par aucune spec alors qu'il appartient a une feature specifiee, l'ajouter aux points d'entrée fait partie de la correction.
 
-Pour chaque spec concernee, applique la section « Verification de fraicheur » de `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` (charge-la avec Read) : comportement attendu, hors scope, points d'entrée, decisions prises pendant le dev.
+Pour chaque spec concernee, applique la section « Vérification de fraîcheur » de `${CLAUDE_SKILL_DIR}/../pipe-spec/fraicheur.md` (charge-le avec Read) : comportement attendu, hors scope, points d'entrée, decisions prises pendant le dev.
 
 ### Feature retiree
 
@@ -131,7 +131,7 @@ Un ticket peut **supprimer** une feature, pas seulement la modifier. Dans ce cas
 - Le check de l'étape 1 annonce `tous les points d'entrée ont disparu`
 - Le diff supprime les fichiers structurants d'une feature specifiee
 
-Applique alors la section « Fin de vie d'une spec » de `${CLAUDE_SKILL_DIR}/../pipe-spec/reference.md` : statut `depreciee`, ligne `Retrait` (version + raison), ligne deplacee vers la section « Specs depreciees » de l'index, corps **conserve** tel quel.
+Applique alors la section « Dépréciation » de `${CLAUDE_SKILL_DIR}/../pipe-spec/fraicheur.md` : statut `depreciee`, ligne `Retrait` (version + raison), ligne deplacee vers la section « Specs depreciees » de l'index, corps **conserve** tel quel.
 
 Ne deprecie jamais sans validation explicite de l'utilisateur : une feature dont les fichiers ont disparu a peut-être simplement demenage — et dans ce cas ce sont les points d'entrée qu'il faut corriger.
 

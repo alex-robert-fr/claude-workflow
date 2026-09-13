@@ -34,7 +34,7 @@ Ce qu'il faut faire, precisement. Pas de vague.
 Contraintes, pieges connus, suggestions d'approche.
 ```
 
-Mécanisme qui bifurque réellement (plusieurs cas d'erreur parallèles, par exemple) dans Description ou Notes techniques : un diagramme Mermaid vaut mieux qu'un paragraphe — critères dans skills/pipe-spec/reference.md (Template de spec, section Fonctionnement technique).
+Mécanisme qui bifurque réellement (plusieurs cas d'erreur parallèles, par exemple) dans Description ou Notes techniques : un diagramme Mermaid vaut mieux qu'un paragraphe — critères dans skills/pipe-spec/template.md (Template de spec, section Fonctionnement technique).
 
 ## Labels
 

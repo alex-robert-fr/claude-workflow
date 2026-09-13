@@ -9,9 +9,7 @@ Comment une spec nait, se met a jour, se verifie et se deprecie — et pourquoi 
 
 ## Intention
 
-Une session neuve qui doit modifier une feature n'a que deux options : reparcourir le code, ou lire ce que la feature est censee être. Le code dit le comportement, jamais le pourquoi, le hors-scope ni les alternatives ecartees — c'est ce manque que la spec comble.
-
-Reussi quand modifier une feature commence par lire une page au lieu d'explorer un repertoire, et qu'aucune session ne « complète » une feature dans une direction ecartee volontairement.
+Une session neuve qui doit modifier une feature n'a que deux options : reparcourir le code, ou lire ce que la feature est censee être. Le code dit le comportement, jamais le pourquoi, le hors-scope ni les alternatives ecartees — c'est ce manque que la spec comble. Reussi quand modifier une feature commence par lire une page au lieu d'explorer un repertoire, et qu'aucune session ne « complète » une feature dans une direction ecartee volontairement.
 
 ## Philosophie
 
@@ -37,7 +35,6 @@ Reussi quand modifier une feature commence par lire une page au lieu d'explorer 
 
 - Dire comment implementer — l'ordre, les fichiers et les signatures appartiennent au plan du ticket
 - Deprecier automatiquement — le controle outille signale, l'humain tranche : une feature peut avoir simplement demenage
-- Supprimer le fichier d'une feature retiree — git en garderait la trace, mais plus personne ne la retrouverait
 
 ## Fonctionnement technique
 
@@ -69,9 +66,12 @@ La verification de fraicheur se fait a deux niveaux, appeles depuis la review de
 | Fichier | Rôle |
 |---------|------|
 | `skills/pipe-spec/SKILL.md` | Tri, identification de la feature, Q/R, rédaction, elagage, validation |
-| `skills/pipe-spec/reference.md` | Frontiere spec/plan, template, règles de rédaction, fin de vie, fraicheur |
+| `skills/pipe-spec/template.md` | Template de spec et règles de rédaction — lu aussi par l'agent de relecture |
+| `skills/pipe-spec/fraicheur.md` | Vérification de fraîcheur et dépréciation — lu par la review de fin de cycle |
+| `skills/pipe-spec/spike.md` | Traitement d'un ticket d'investigation |
 | `skills/pipe-spec/index-format.md` | Format de l'index et budget de la phrase — lu aussi a l'installation |
 | `skills/pipe-spec/inventaire.md` | Reperage, priorisation par churn, presentation du classement |
+| `agents/spec-critic.md` | Relecture indépendante avant la validation humaine |
 
 ## Pieges et zones sensibles
 
