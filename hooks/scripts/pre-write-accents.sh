@@ -47,7 +47,12 @@ case "$TOOL" in
   Bash)
     CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
     printf '%s' "$CMD" | grep -qE 'git[[:space:]]+commit|gh[[:space:]]+pr[[:space:]]+(create|edit|comment)|gh[[:space:]]+issue[[:space:]]+create|gh[[:space:]]+api[^|]*comments' || exit 0
-    TEXT="$CMD"
+    # Seule la prose est jugée : un chemin, un nom de fichier, une URL ou une option ne
+    # sont pas du français (un nom de fichier en kebab-case dont un segment est un mot
+    # français sans accent bloquait tout `git add` qui le citait). Sont retirés les mots
+    # contenant `/`, `_`, un `.` suivi d'une lettre (extension, hôte), et ceux qui
+    # commencent par `-` — jamais la ponctuation de phrase.
+    TEXT=$(printf '%s' "$CMD" | tr -s '[:space:]' '\n' | grep -vE "/|_|\\.[A-Za-z]|^[\"']?-" | paste -sd' ' -)
     ;;
   *)
     exit 0

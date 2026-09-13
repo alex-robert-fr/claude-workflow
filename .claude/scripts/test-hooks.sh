@@ -1,5 +1,5 @@
 #!/bin/bash
-# Rejoue les hooks git/tests/commentaires/Stop du plugin (hooks/scripts/pre-git-guard.sh,
+# Rejoue les hooks du plugin (hooks/scripts/pre-git-guard.sh, pre-write-accents.sh,
 # protect-tests.sh, post-edit-comments.sh, stop-quality.sh) sur des entrées JSON simulées, sans Claude
 # Code. Le juge LLM (judge.sh) est remplacé par un faux binaire `claude`
 # dont le verdict est piloté par FAKE_VERDICT : on teste le filtre et le câblage, pas
@@ -89,6 +89,21 @@ sed -i 's/- \[x\] Code valide/- [ ] Code valide/; s/- \[x\] Tests valides/- [ ] 
 t "Tests valides décoché → libre" 0 "$P" "$(edit_json "$TMP/src/auth/login.spec.ts")"
 t "projet sans .claude/plans"     0 "$P" "$(jq -cn --arg cwd /nonexistent '{tool_name:"Edit",cwd:$cwd,tool_input:{file_path:"/nonexistent/a.spec.ts"}}')"
 rm -rf "$TMP"
+
+echo "== pre-write-accents =="
+A="$ROOT/hooks/scripts/pre-write-accents.sh"
+wjson() { jq -cn --arg f "$1" --arg c "$2" '{tool_name:"Write",tool_input:{file_path:$f,content:$c}}'; }
+t "md sans accent → bloqué"           2 "$A" "$(wjson docs/a.md 'Le fichier existe deja.')"
+t "md accentué → 0"                   0 "$A" "$(wjson docs/a.md 'Le fichier existe déjà.')"
+t "code applicatif jamais jugé"       0 "$A" "$(wjson src/a.ts 'const deja = 1')"
+t "commentaire .sh sans accent"       2 "$A" "$(wjson a.sh $'# deja fait\necho ok')"
+t "code .sh libre"                    0 "$A" "$(wjson a.sh $'deja=1\necho $deja')"
+t "commit sans accent → bloqué"       2 "$A" "$(bash_json 'git commit -m "fix: deja vu"')"
+t "commit accentué → 0"               0 "$A" "$(bash_json 'git commit -m "fix: déjà vu"')"
+t "chemin kebab dans git add → 0"     0 "$A" "$(bash_json 'git add docs/specs/developpement-guide-par-les-tests.md && git commit -m "docs: spec à jour"')"
+t "fichier et option dans gh pr → 0"  0 "$A" "$(bash_json 'gh pr edit 63 --body-file "$S/pr-body.md" --deja-option')"
+t "ponctuation de phrase conservée"   2 "$A" "$(bash_json 'git commit -m "fix: c'"'"'est deja."')"
+t "commande sans message → 0"         0 "$A" "$(bash_json 'grep -rn deja src/')"
 
 echo "== post-edit-comments =="
 FAKE=$(mktemp -d)
