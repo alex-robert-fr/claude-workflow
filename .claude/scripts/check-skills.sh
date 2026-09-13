@@ -124,5 +124,31 @@ else
   compare "skills/setup/SKILL.md" ancre_recap
 fi
 
+# 6. Agents du plugin : leur description est payée dans chaque session comme
+# celle des skills — même plafond.
+for agent in "$ROOT"/agents/*.md; do
+  [ -f "$agent" ] || continue
+  desc=$(awk 'NR > 1 && /^---$/ { exit } /^description:/ { sub(/^description:[ \t]*/, ""); print; exit }' "$agent")
+  if [ "${#desc}" -gt 130 ]; then
+    echo "AGENT $(basename "$agent" .md) — description trop longue (${#desc} car, max 130)"
+    status=1
+  fi
+done
+
+# 7. Référence ${CLAUDE_SKILL_DIR}/... vers un fichier qui n'existe pas : un
+# Read qui échoue en silence chez l'utilisateur du plugin.
+for f in "$ROOT"/skills/*/*.md "$ROOT"/shared/*.md "$ROOT"/agents/*.md; do
+  [ -f "$f" ] || continue
+  d=$(dirname "$f")
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue
+    target=$(realpath -m "${ref//\$\{CLAUDE_SKILL_DIR\}/$d}")
+    if [ ! -e "$target" ]; then
+      echo "REF ${f#"$ROOT"/} — cible introuvable : $ref"
+      status=1
+    fi
+  done < <(grep -oE '\$\{CLAUDE_SKILL_DIR\}/[^` )"]+\.(md|sh|json)' "$f" | sort -u)
+done
+
 [ $status -eq 0 ] && echo "Skills : coherents"
 exit $status
