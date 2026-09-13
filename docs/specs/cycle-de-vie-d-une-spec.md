@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -23,10 +24,9 @@ Une session neuve qui doit modifier une feature n'a que deux options : reparcour
 - Un ticket technique met a jour une spec existante plutot que d'en créer une
 - Intention, hors-scope et alternatives ecartees viennent de l'utilisateur ; si elles restent vides, l'exercice est annonce comme sans valeur au lieu d'être meuble
 - Le journal des decisions s'ajoute, ne se reecrit pas — une decision remplacee est conservee avec sa raison
-- Budget de 40 a 80 lignes, sections faibles supprimees plutot que remplies
+- Budget de 40 a 80 lignes, sommaire en tête synchronisé avec les sections (outillé), sections faibles supprimees plutot que remplies
 - Seul l'index est charge pour savoir quelles features existent, et sa phrase de resume est bornee
-- Une spec dont tous les points d'entrée ont disparu est proposee a la depreciation ; quelques points morts signalent seulement du retard
-- Une spec depreciee conserve son corps entier, quitte l'index actif et cesse d'être injectee dans les sessions
+- Une spec dont tous les points d'entrée ont disparu est proposee a la depreciation (quelques points morts signalent seulement du retard) ; depreciee, elle conserve son corps entier, quitte l'index actif et cesse d'être injectee dans les sessions
 - Un projet dont les features preexistent dispose d'un mode inventaire priorise, une feature par passe
 - Aucune spec n'est ecrite sans accord explicite de l'utilisateur
 - Un ticket d'investigation (spike) a pour seul livrable une spec : son code d'exploration vit sur une branche jetable, jamais mergee, et le dev qui en decoule repart de nouveaux tickets

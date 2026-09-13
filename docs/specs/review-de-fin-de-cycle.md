@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -75,6 +76,5 @@ Les specs concernees sont identifiees en croisant quatre sources : points d'entr
 ## Pieges et zones sensibles
 
 - **Le protocole du reviewer ne doit jamais être charge dans le contexte principal** : c'est sa taille qui justifie le sous-agent, l'y ramener annule le gain
-- **Un statut sans constat n'a pas besoin des maquettes** : les charger quand meme paie un cout pour rien
 - **Le croisement par repertoire est le seul filet des fichiers ajoutes** : le retirer rend la verification de fraicheur aveugle aux creations
 - Au-dela de trois tentatives sur un echec de test, la faute est plus souvent dans le test que dans le code — insister revient a modifier le contrat

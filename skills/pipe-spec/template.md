@@ -11,6 +11,7 @@ Interdit dans une spec (c'est du plan) : étapes d'implémentation, listes de fi
 
 > **Statut** : active | expérimentale | dépréciée
 > **Retrait** : 2.1.0 — raison en une ligne _(uniquement si dépréciée)_
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dépendances](#dépendances) · [Décisions](#décisions) · [Points d'entrée](#points-dentrée) · [Pièges et zones sensibles](#pièges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -71,6 +72,8 @@ Uniquement le non-devinable : couplage invisible, invariant à maintenir ailleur
 - Budget 40-80 lignes ; une spec qui gonfle contient du plan, du code ou du bavardage. Vérifié par `check-specs.sh`
 - Une info, un seul endroit : pas de reformulation entre sections. Chaque phrase apporte ce qu'on ne peut pas déduire du reste ; pas d'introduction ni de transition
 - Sections vides ou faibles supprimées, jamais « N/A ». Obligatoires : En une phrase, Comportement attendu, Points d'entrée
+- Sommaire : une ligne dans l'en-tête, un lien par section `##` dans l'ordre du fichier (texte du lien = titre exact, ancre = titre en minuscules, espaces en tirets, apostrophes retirées), « En une phrase » exclue. Vérifié par `check-specs.sh`
+- Schéma plutôt que prose partout où un enchaînement ou une dépendance se lit mieux en diagramme qu'en paragraphe (Mermaid, ou ASCII pour une arborescence) ; le texte garde ce qui ne se dessine pas
 - Points d'entrée : chemins réels vérifiés pendant l'exploration, ou `(à créer)` juste après le lien. Un fichier se cite par son nom seul, en lien markdown relatif à `docs/specs/` (`[nom.ts](../../chemin/nom.ts)`), jamais le chemin en texte visible — dans Points d'entrée comme ailleurs
 - Pas de dates : les repères sont la version et le ticket, dans le journal
 - Colonne Version : ticket parent de version sur le tracker > version en préparation (`Unreleased` du CHANGELOG, ou version courante incrémentée si elle est déjà publiée) notée `X.Y.Z (à venir)` > `—`. Une version passée ne se devine pas. À la release, `(à venir)` disparaît — seule modification autorisée d'une ligne du journal

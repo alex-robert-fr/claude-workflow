@@ -11,6 +11,7 @@
 #     injecte de la FAUSSE information dans chaque session, pas de l'absence
 #   - une phrase d'index trop longue : l'index est injecte a chaque session,
 #     c'est le seul poste de contexte qui grossit tout seul
+#   - un sommaire absent ou qui ne liste plus les sections du fichier
 #
 # Une spec au statut dépréciée est exclue du controle des chemins : ses fichiers
 # ont disparu par construction, la signaler eternellement serait du bruit.
@@ -47,6 +48,23 @@ for spec in "$SPECS"/*.md; do
   if [ "$nlines" -gt 80 ]; then
     echo "SPEC $base — $nlines lignes (budget 80) : plan, code ou redite a couper"
     status=1
+  fi
+
+  # Sommaire : une ligne `> **Sommaire** :` dans l'en-tête, dont les textes de lien
+  # doivent être exactement les titres `## ` du fichier, dans l'ordre, « En une phrase »
+  # exclue. On compare les textes, jamais les ancres : calculer un slug avec accents est
+  # dépendant de la locale, comparer deux chaînes ne l'est pas.
+  attendu=$(grep -E '^## ' "$spec" | sed 's/^## //' | grep -vE '^En une phrase$')
+  ligne=$(grep -m1 -E '^> \*\*Sommaire\*\*' "$spec")
+  if [ -z "$ligne" ]; then
+    echo "SPEC $base — sommaire absent (ligne \`> **Sommaire** :\` dans l'en-tête)"
+    status=1
+  else
+    trouve=$(printf '%s' "$ligne" | grep -oE '\[[^]]+\]\(#' | sed 's/^\[//; s/\](#$//')
+    if [ "$trouve" != "$attendu" ]; then
+      echo "SPEC $base — sommaire désynchronisé des sections : attendu $(printf '%s' "$attendu" | paste -sd '·' | sed 's/·/ · /g')"
+      status=1
+    fi
   fi
 
   # Points d'entrée : première colonne du tableau de la section uniquement.

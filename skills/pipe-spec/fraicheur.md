@@ -6,7 +6,7 @@ Chargé par `/pipe-review` (fraîcheur des specs après validation du code). Une
 
 Deux niveaux :
 
-- **Mécanique** — `check-specs.sh`, lancé dans les checks outillés : points d'entrée vers des fichiers disparus, spec hors index, ligne d'index sans fichier, phrase d'index > 80 caractères, spec > 80 lignes
+- **Mécanique** — `check-specs.sh`, lancé dans les checks outillés : points d'entrée vers des fichiers disparus, spec hors index, ligne d'index sans fichier, phrase d'index > 80 caractères, spec > 80 lignes, sommaire absent ou désynchronisé des sections
 - **Au jugement**, pour chaque spec concernée par le diff :
   1. Le comportement attendu décrit-il ce que le code fait maintenant ?
   2. Le hors scope est-il toujours exact — n'a-t-on pas implémenté ce qui en était exclu ?

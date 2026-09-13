@@ -35,6 +35,7 @@ argument-hint: [cle JIRA, numéro issue, URL, nom de feature, ou rien pour inven
 
 Registres, par importance : intention (problème, pour qui, à quoi on reconnaît que c'est réussi) ; philosophie (le principe qui tranchera les arbitrages) ; périmètre et hors-scope ; règles métier et cas limites.
 
+- Chaque salve s'ouvre par une vue haut niveau de 2–3 lignes, en langage non technique : ce qui est acquis, ce qui reste à trancher et pourquoi ça compte. Le détail technique vient seulement si l'utilisateur le demande
 - Chaque question s'appuie sur l'exploration et propose des options concrètes
 - Aucune question d'implémentation (nommage, découpage, où vit la logique) : c'est `/pipe-plan`
 - Mise à jour : ne questionne que le delta du ticket
@@ -50,7 +51,7 @@ Read `${CLAUDE_SKILL_DIR}/template.md` (template et règles de rédaction). Écr
 
 ## Étape 6 — Relecture indépendante
 
-Lance l'agent `claude-workflow:spec-critic` (Agent tool) avec le chemin de la spec et celui de `${CLAUDE_SKILL_DIR}/template.md`. Applique les corrections retenues, puis vérifie : 40–80 lignes, sections obligatoires présentes (En une phrase, Comportement attendu, Points d'entrée), sections faibles supprimées, chemins des points d'entrée réels ou `(à créer)`.
+Lance l'agent `claude-workflow:spec-critic` (Agent tool) avec le chemin de la spec et celui de `${CLAUDE_SKILL_DIR}/template.md`. Applique les corrections retenues, puis `bash .claude/scripts/check-specs.sh` s'il existe (budget, sommaire, index, chemins) et corrige ses écarts ; à défaut vérifie à la main : 40–80 lignes, sommaire synchronisé, sections obligatoires présentes (En une phrase, Comportement attendu, Points d'entrée), sections faibles supprimées, chemins des points d'entrée réels ou `(à créer)`.
 
 ## Étape 7 — Validation humaine (pause)
 
