@@ -4,64 +4,46 @@ description: Implementer la feature en session dediee, guidee par les tests vali
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
-## Étape 0 — Verifications
+**Les tests validés sont le contrat : l'implémentation les satisfait, elle ne les modifie pas.** Un test qui semble faux, contradictoire ou impossible à satisfaire arrête le travail et remonte à l'humain.
 
-Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md`, puis localise le fichier de pilotage :
+## Étape 0 — Vérifications
 
-- Argument fourni → `.claude/plans/plan-<identifiant>.md`
-- Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
+- Read `.claude/skills/workflow-config/SKILL.md`
+- Pilotage : `bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" [identifiant]` — exit 3 : demander lequel
+- Prérequis : `Tests valides` coché (sinon `/pipe-test` d'abord), `git switch` sur la branche du pilotage, fichiers de tests listés présents
+- Lis le pilotage en entier (plan, notes de reprise) et la spec qu'il référence (intention, philosophie, hors-scope, dépendances, pièges) : c'est tout le contexte de la session
 
-Verifie :
+## Étape 1 — Implémenter
 
-- [ ] Le pilotage existe et `Tests valides` est coche (sinon → `/pipe-test` d'abord)
-- [ ] La branche courante est celle du pilotage (sinon `git checkout` dessus)
-- [ ] Les fichiers de tests listes dans le pilotage existent
+- Suis le plan ; boucle coder → tests (commande de workflow-config) → corriger, jusqu'à ce que tous passent, nouveaux et existants
+- Conventions de workflow-config (stack, architecture, nommage) ; le style est l'affaire des hooks, pas d'une vérification manuelle
+- Commits au fil de l'eau, uniquement par changeset propre : une unité logique terminée dont les tests passent, message selon `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (Read), affiché et confirmé avant chaque `git commit`. Ce qui ne forme pas encore une unité cohérente reste dans le working tree pour `/pipe-commit`
+- Problème non anticipé par le plan (fichier manquant, dépendance absente, incohérence) → stop :
 
-Lis le pilotage en entier : plan, notes de reprise — c'est tout le contexte de la session.
+  ```
+  Problème détecté — [description précise]
+  Option A : [approche]
+  Option B : [approche]
+  Comment tu veux procéder ?
+  ```
 
-Si le pilotage reference une spec (`docs/specs/<feature>.md`), lis-la aussi : intention, philosophie, hors-scope, dependances et pieges.
+  La décision corrige le plan en place ; si elle survit au merge, elle rejoint aussi le journal de la spec
 
-## Étape 1 — Implementer
+## Étape 2 — Clôture
 
-Suis le plan, guide par les tests :
-
-- **Les tests valides sont le contrat.** Interdiction de les modifier pour les faire passer. Si un test semble faux, contradictoire ou impossible a satisfaire, stoppe et signale-le — c'est une decision humaine.
-- Boucle : coder → lancer les tests (commande de `workflow-config`) → corriger. L'implementation est terminee quand **tous** les tests passent — les nouveaux et les existants.
-- **Commits au fil de l'eau, uniquement par changesets propres.** Tu peux committer quand une unite logique est terminee et que les tests qui la couvrent passent — chaque commit suit les conventions de `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (utilise Read pour le charger). Ce qui ne forme pas encore une unite cohérente reste dans le working tree — `/pipe-commit` decoupera le reste en fin de cycle. Jamais de commit fourre-tout ou "wip". **Avant chaque `git commit`, affiche le message complet (titre + body) et attends la validation explicite de l'utilisateur** — meme en enchainement, ne committe jamais sans confirmation préalable.
-- Respecte les conventions de `workflow-config` (stack, architecture, nommage). Pas de verification de style manuelle — c'est le rôle des hooks PostToolUse.
-
-Si une étape revele un problème non anticipe dans le plan (fichier manquant, dependance absente, incohérence), **stoppe et signale-le** avant de continuer :
-
-```
-Problème detecte — [description précise]
-Option A : [approche]
-Option B : [approche]
-Comment tu veux proceder ?
-```
-
-Corrige le plan en place pour refleter la decision prise (étape ou point d'attention concerne) ; si elle survit au merge, elle rejoint aussi le journal de la spec.
-
-## Étape 2 — Cloture
-
-Une fois tous les tests verts :
-
-- Coche `Dev termine` dans le pilotage
-- Note dans Notes de reprise les ecarts au plan et tout contexte utile a la review
-- Affiche le recap :
+Tous les tests verts → coche `Dev termine`, note dans Notes de reprise les écarts au plan et le contexte utile à la review, affiche :
 
 ```
-**Dev termine — [ticket]** · tests ✅ N passent (dont M nouveaux)
+**Dev terminé — [ticket]** · tests ✅ N passent (dont M nouveaux)
 
 Commits créés (le reste attend `/pipe-commit`) :
 - emoji type(scope): description
 
-Fichiers — `+ chemin/nouveau.ts` · `~ chemin/modifie.ts`
+Fichiers — `+ chemin/nouveau.ts` · `~ chemin/modifié.ts`
 
 ---
 Suite : la review, dans une **nouvelle session** — `/pipe-ship [ticket]`.
 ```
-
-`+` pour un fichier crée, `~` pour un fichier modifie : deux sections séparées pour la meme information, c'est une section de trop.
 
 ---
 
