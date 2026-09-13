@@ -1,8 +1,6 @@
 # Pipe Review — Maquettes de rendu
 
-Ce fichier est charge par le **contexte principal** du skill (jamais par le sub-agent), et seulement quand la review a produit au moins un constat : un statut OK n'a besoin de rien d'ici.
-
-Règle commune aux deux maquettes : **une ligne par idee, aucune phrase de transition**. Ce qui tient sur une ligne ne prend pas un paragraphe ; le detail supplementaire, l'utilisateur le demande s'il le veut.
+Chargé par `/pipe-review` seulement s'il y a au moins un constat. Une ligne par idée, aucune phrase de transition ; le détail supplémentaire, l'utilisateur le demande.
 
 ## Motif d'un constat
 

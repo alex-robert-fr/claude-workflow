@@ -66,7 +66,9 @@ Les specs concernees sont identifiees en croisant quatre sources : points d'entr
 | Fichier | Rôle |
 |---------|------|
 | `skills/pipe-review/SKILL.md` | Enchainement des quatre filtres, collecte du contexte, fraicheur |
-| `skills/pipe-review/reference.md` | Protocole du reviewer — charge par le sous-agent seul |
+| `agents/reviewer.md` | Protocole du reviewer — prompt système de l'agent, jamais dans le contexte principal |
+| `skills/pipe-spec/fraicheur.md` | Vérification de fraîcheur et dépréciation, appliquées à l'étape 6 |
+| `shared/scripts/find-plan.sh` | Localise le pilotage |
 | `skills/pipe-review/rendu.md` | Maquettes du rapport et du Question/Reponse — charge s'il y a un constat |
 | `skills/setup/scripts/check-specs.sh` | Controle mecanique de cohérence des specs |
 

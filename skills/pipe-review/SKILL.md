@@ -4,161 +4,66 @@ description: Reviewer le code en session dediee : checks outilles, agent, review
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 
-## Étape 0 — Verifications
+**La qualité mécanique vient des outils, le jugement d'un agent isolé puis de l'humain** : ce skill ne corrige rien sans validation explicite.
 
-Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md`, puis localise le fichier de pilotage :
+## Étape 0 — Vérifications
 
-- Argument fourni → `.claude/plans/plan-<identifiant>.md`
-- Sans argument → cherche `.claude/plans/plan-*.md` : un seul fichier → le prendre ; plusieurs → demander lequel
+- Read `.claude/skills/workflow-config/SKILL.md`
+- Pilotage : `bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" [identifiant]` — exit 3 : demander lequel. Avec pilotage : `Dev termine` coché, `git switch` sur sa branche, lis plan et notes de reprise. Sans pilotage (usage autonome) : la branche courante n'est pas la branche par défaut
+- Aucun changement (ni commits d'avance, ni working tree modifié) → une ligne, stop
 
-**Avec pilotage** : verifie que `Dev termine` est coche, place-toi sur la branche du pilotage, lis plan + notes de reprise.
+## Étape 1 — Checks outillés
 
-**Sans pilotage** (usage autonome) : verifie que la branche courante n'est pas la branche par defaut.
+Dans l'ordre, avec les commandes de workflow-config : format (appliqué), lint, tests, puis `bash .claude/scripts/check-specs.sh` s'il existe. Commande non configurée → une ligne, on continue.
 
-S'il n'y a aucun changement a reviewer (ni commits d'avance, ni working tree modifie), signale-le et arrete-toi.
+- Lint ou tests rouges → corrige, 3 tentatives au plus ; le problème semble venir d'un test → stop et signale, c'est une décision humaine. Après 3 échecs → stop avec le détail
+- Un écart de `check-specs.sh` n'est pas bloquant : il se traite à l'étape 6
+- Récap une ligne : `Format : ✅ | Lint : ✅ | Tests : ✅ N passent | Specs : ✅`
 
-## Étape 1 — Checks outilles
+## Étape 2 — Contexte
 
-La qualité mecanique passe par les vrais outils, pas par un agent. Lance dans l'ordre, avec les commandes de `workflow-config` :
+Le strict nécessaire — il porte encore les étapes 5 et 6, puis `/pipe-commit` et `/pipe-pr` dans la même session : `git diff <branche par défaut>` + fichiers non trackés (`git status`), liste des fichiers modifiés et créés, ticket (pilotage ou nom de branche). Aucune lecture de fichier ici : l'agent les lit lui-même, une étape qui en a besoin lit ponctuellement.
 
-1. **Format** — applique le formatage
-2. **Lint**
-3. **Tests**
-4. **Specs** — `bash .claude/scripts/check-specs.sh` si le script existe : points d'entrée pointant vers des fichiers disparus, specs absentes de l'index. Un ecart n'est pas bloquant ici — il se corrige a l'étape 6, avec le reste de la fraicheur
+## Étape 3 — Agent `reviewer`
 
-Si le lint ou les tests echouent : corrige (max 3 tentatives), en respectant la règle du contrat — **ne jamais modifier un test valide** pour le faire passer ; si le problème semble venir d'un test, stoppe et signale-le. Apres 3 tentatives sans succes, stoppe avec le detail de ce qui a ete tente.
+Lance l'agent (Agent tool, `subagent_type: "claude-workflow:reviewer"`) avec : branche et branche par défaut, liste des fichiers modifiés, chemin du `CLAUDE.md` du projet et de `.claude/_review-persona.md` (ou « absent »), et le diff complet.
 
-Affiche un recap une ligne :
+## Étape 4 — Rapport
 
-```
-Format : ✅ | Lint : ✅ | Tests : ✅ N passent | Specs : ✅
-```
-
-Si une commande n'est pas configuree dans `workflow-config`, signale-le en une ligne et continue.
-
-## Étape 2 — Collecter le contexte
-
-Rassemble le strict nécessaire. Ce contexte doit rester leger : il porte encore la review humaine (étape 5), la fraicheur des specs (étape 6), puis `/pipe-commit` et `/pipe-pr` dans la meme session.
-
-- **Diff complet** vs branche par defaut, **y compris le travail non commite** : `git diff <branche-defaut>` + fichiers non trackes (`git status`)
-- **Liste des fichiers** modifies et créés
-- **Ticket lie** (depuis le pilotage, ou le nom de branche)
-
-Ne charge pas ici le contenu des fichiers : c'est le sub-agent de l'étape 3 qui les lit en entier, dans son propre contexte. Si une étape suivante a besoin d'un fichier précis, elle le lit ponctuellement a ce moment-la.
-
-## Étape 3 — Lancer la review en sub-agent
-
-Lance un **sub-agent** (Agent tool, type `general-purpose`, model `sonnet`) pour isoler la review du contexte principal. Le protocole complet du reviewer est dans `${CLAUDE_SKILL_DIR}/reference.md` : il s'adresse au **sub-agent seul**, ne le charge jamais dans le contexte principal. Les maquettes destinees au contexte principal sont dans `${CLAUDE_SKILL_DIR}/rendu.md`.
-
-Prompt du sub-agent :
-
-```
-Utilise Read pour charger `[chemin absolu de ${CLAUDE_SKILL_DIR}/reference.md]` et applique la section "Protocole du reviewer".
-
-Contexte de la review :
-- Branche : [branche courante] (diff vs [branche par defaut], travail non commite inclus)
-- Fichiers modifies : [liste des fichiers]
-- CLAUDE.md du projet : [chemin, ou "absent"]
-- Persona de review projet : [chemin de .claude/_review-persona.md, ou "absent"]
-
-Lis chaque fichier modifie dans son intégralité via Read, ainsi que CLAUDE.md et le persona s'ils existent.
-
-[diff complet]
-```
-
-Remplace les crochets par les valeurs reelles avant de lancer le sub-agent.
-
-## Étape 4 — Afficher le rapport
-
-**Si le statut est OK** (rien a signaler), affiche une seule ligne — c'est un resultat valide, pas un echec de la review — et ne charge rien de plus :
-
-```
-**Review [branche]** — rien a signaler : pas de bug detecte, organisation du projet respectee.
-```
-
-**S'il y a des constats** — et seulement dans ce cas — utilise Read pour charger `${CLAUDE_SKILL_DIR}/rendu.md` : format du rapport, motif d'un constat, squelette Question/Reponse de l'étape 5 et exemple complet. Affiche le rapport du sub-agent a ce format.
+- Statut OK → une ligne, rien de plus : `**Review [branche]** — rien à signaler : pas de bug détecté, organisation du projet respectée.`
+- Des constats → Read `${CLAUDE_SKILL_DIR}/rendu.md` et affiche le rapport à son format
 
 ## Étape 5 — Review humaine du code (pause)
 
-C'est la pause du cycle : l'utilisateur relit le code lui-meme, avec le rapport comme guide. Presente-lui de quoi demarrer :
+Affiche de quoi démarrer, rien d'autre — résumé depuis le diff, lecture ponctuelle du seul fichier qui ne s'y résume pas :
 
 ```
-### A relire
+### À relire
 
 - `chemin/fichier.ts` — [ce que le fichier apporte, une ligne]
 ```
 
-Rien d'autre : les checks et le decompte des constats ont déjà ete affiches.
+Puis, par sévérité décroissante, un problème à la fois au format Q/R de `rendu.md` : corriger (relis le fichier avant d'appliquer), adapter (demande la modification puis applique), ignorer. Les retours de l'utilisateur sur sa propre relecture se traitent de même. Après toute correction : tests et lint. Des bloquants ignorés → `⚠️ X bloquant(s) ignoré(s) — risque de bug ou de régression.`
 
-Resume chaque fichier depuis le diff. Si l'un ne s'y resume pas, lis-le ponctuellement via Read — celui-la seul, jamais la liste entiere.
+Code validé par l'utilisateur → étape 6.
 
-Puis traite les retours, dans l'ordre :
+## Étape 6 — Fraîcheur des specs
 
-- **Problèmes du rapport** : parcours-les par sévérité (bloquants d'abord) au format Question/Reponse pedagogique de `${CLAUDE_SKILL_DIR}/rendu.md` (déjà charge a l'étape 4), en te basant sur les 7 champs produits par le sub-agent. Attends la decision pour chaque problème : **corriger** (relis le fichier via Read avant d'appliquer), **adapter** (demande la modification souhaitee puis applique), **ignorer** (passe au suivant).
-- **Retours de l'utilisateur** sur le code qu'il relit : applique-les de la meme facon.
-- Apres toute correction : relance les tests (et le lint) pour vérifier que rien ne casse.
-- Ne jamais corriger sans validation explicite de l'utilisateur.
+Specs concernées, quatre sources croisées : un point d'entrée dans le diff ; un point d'entrée qui partage un répertoire avec un fichier du diff (rattrape les fichiers neufs) ; la spec du pilotage ; les écarts de `check-specs.sh`. Aucune (`sans objet`, ou pas de `docs/specs/`) → étape 7 sans rien signaler.
 
-Si des bloquants ont ete ignores, signale-le explicitement :
+Read `${CLAUDE_SKILL_DIR}/../pipe-spec/fraicheur.md` et applique-le à chaque spec concernée :
 
-```
-⚠️ Attention : X bloquant(s) ont ete ignores. Ces problèmes peuvent causer des bugs ou regressions.
-```
+- Fichier structurant du diff hors de toute spec alors qu'il appartient à une feature spécifiée → l'ajouter aux points d'entrée
+- Feature retirée (tous les points d'entrée disparus, fichiers structurants supprimés) → dépréciation, après validation explicite : les fichiers ont peut-être seulement déménagé
+- Écarts présentés puis corrigés après validation, au format `### Spec — docs/specs/<feature>.md` / `- [section] <écart> → <correction>` ; une décision structurante prise pendant le dev rejoint le journal avec le ticket ; aucun écart → une ligne
+- La spec modifiée fait partie du changeset : `/pipe-commit` la rattache à la feature
 
-Quand l'utilisateur valide le code : passe a l'étape 6 — les decisions durables rejoignent le journal de la spec a l'étape 7, le pilotage n'en garde aucune.
+Coche `Code valide` dans le pilotage.
 
-## Étape 6 — Fraicheur de la spec
-
-Le code est fige : c'est le moment de vérifier que la doc de la feature ne ment pas.
-
-Identifie les specs concernees. Le piege est de ne matcher que les points d'entrée : un fichier structurant **ajoute** par le ticket n'y figure pas encore, et c'est precisement le cas ou la spec devient fausse. Croise donc quatre sources :
-
-- Les specs dont un **point d'entrée** apparait dans le diff
-- Les specs dont un point d'entrée partage un **repertoire** avec un fichier du diff — ce qui rattrape les fichiers nouveaux
-- La spec **liee au pilotage**
-- Les ecarts remontes par le **check outille** de l'étape 1
-
-Aucune spec concernee (`sans objet`, ou projet sans `docs/specs/`) → passe a l'étape 7 sans rien signaler.
-
-Si un fichier structurant du diff n'est couvert par aucune spec alors qu'il appartient a une feature specifiee, l'ajouter aux points d'entrée fait partie de la correction.
-
-Pour chaque spec concernee, applique la section « Vérification de fraîcheur » de `${CLAUDE_SKILL_DIR}/../pipe-spec/fraicheur.md` (charge-le avec Read) : comportement attendu, hors scope, points d'entrée, decisions prises pendant le dev.
-
-### Feature retiree
-
-Un ticket peut **supprimer** une feature, pas seulement la modifier. Dans ce cas la spec ne se corrige pas : elle se deprecie. Deux signaux :
-
-- Le check de l'étape 1 annonce `tous les points d'entrée ont disparu`
-- Le diff supprime les fichiers structurants d'une feature specifiee
-
-Applique alors la section « Dépréciation » de `${CLAUDE_SKILL_DIR}/../pipe-spec/fraicheur.md` : statut `depreciee`, ligne `Retrait` (version + raison), ligne deplacee vers la section « Specs depreciees » de l'index, corps **conserve** tel quel.
-
-Ne deprecie jamais sans validation explicite de l'utilisateur : une feature dont les fichiers ont disparu a peut-être simplement demenage — et dans ce cas ce sont les points d'entrée qu'il faut corriger.
-
-### Ecarts ordinaires
-
-Si des ecarts existent, presente-les et applique les corrections apres validation :
+## Étape 7 — Suite
 
 ```
-### Spec — `docs/specs/<feature>.md`
-
-- [section] <ecart constate> → <correction proposee>
-```
-
-Règles :
-
-- La spec reste une spec : corriger, ce n'est pas y verser le detail de l'implementation ni les étapes du plan
-- Une decision structurante prise pendant le dev (ecart au plan, arbitrage métier) rejoint le journal Decisions de la spec, avec le ticket
-- Aucun ecart est un resultat valide — le dire en une ligne et passer a la suite
-- La spec modifiee fait partie du travail a committer : elle sera rattachee au changeset de la feature par `/pipe-commit`
-
-Puis coche `Code valide` dans le pilotage.
-
-## Étape 7 — Proposer la suite
-
-```
----
-Code valide. Suite : `/pipe-commit [ticket]` (meme session).
+Code validé. Suite : `/pipe-commit [ticket]` (même session).
 ```
 
 ---
