@@ -4,79 +4,39 @@ description: Decouper le travail en commits-changesets qui servent de doc techni
 argument-hint: [description optionnelle du changement]
 ---
 
-## Étape 0 — Analyser l'etat
+**Un commit est un changeset qui se lit seul**, et son corps est la doc technique du projet. Conventions : `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (Read) — le hook `pre-git-guard.sh` refuse `git add .` et les signatures.
 
-Verifie l'etat du repo :
+## Étape 0 — État
 
-- `git status` — fichiers modifies, stages, non-trackes
-- `git diff --stat` — resume des changements
+- `git status` et `git diff --stat` ; rien à committer → une ligne, stop
+- Pilotage : `bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh"` — trouvé avec `Code valide` coché → mode découpage ; sinon → mode simple
 
-Si rien a committer → signale-le et arrete-toi.
+## Mode découpage (fin de cycle)
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (section Commits).
+Périmètre : le travail non commité (`/pipe-code` a déjà commité les unités terminées) — affiche d'abord les commits existants pour situer.
 
-Cherche un fichier de pilotage `.claude/plans/plan-*.md` correspondant a la branche courante :
-
-- Present avec `Code valide` coche → **mode decoupage** (fin de cycle)
-- Absent → **mode simple** (commit ponctuel)
-
-## Mode decoupage (fin de cycle)
-
-- **Changeset** — un commit = une unite logique qui se lit seule
-- **Perimetre** — travail restant non commite (`/pipe-code` a déjà commit les unites terminees au fil du dev) ; affiche d'abord les commits existants pour situer le decoupage
-
-### Étape 1 — Construire le plan de decoupage
-
-- Lis l'ensemble des changements restants (diff du working tree + fichiers non trackes)
-- Regroupe par unite logique : modele + migration, service métier, composant UI, config... Les tests accompagnent le changeset du comportement qu'ils verifient — pas de commit fourre-tout `tests`
-- Une spec modifiee (`docs/specs/`) accompagne le changeset de la feature qu'elle decrit, pas un commit `docs` isole. Seule exception : une spec ecrite hors cycle, qui devient alors son propre commit `docs`
-- Ordre logique : dependances d'abord ; chaque commit laisse idealement le projet cohérent
-- Granularite = le fichier (staging par chemin). Si un meme fichier melange deux changesets, rattache-le au changeset principal et documente-le dans le body
-- Pour chaque changeset, rédige le message complet selon `git-conventions` : titre `emoji type(scope): description`, body en puces (le pourquoi, l'approche choisie, les impacts non evidents depuis le diff)
-
-### Étape 2 — Presenter puis committer
-
-Affiche le plan de decoupage complet (un bloc par commit : message, body, fichiers) et attends la validation explicite de l'utilisateur avant de committer. Une fois valide, committe changeset par changeset sans redemander a chaque commit individuel.
-
-- Stage par chemins explicites, jamais `git add .`
-- Exclus les fichiers sensibles (.env, credentials) et signale tout fichier sans rapport avec le cycle
-- A la fin, verifie que `git status` est propre (le pilotage, gitignore, n'y apparait pas)
-
-Coche `Commits créés` dans le pilotage.
-
-### Étape 3 — Proposer la suite
+1. Lis l'ensemble des changements restants (diff + fichiers non trackés) et regroupe par unité logique : modèle + migration, service métier, composant UI, config… Les tests accompagnent le changeset du comportement qu'ils vérifient ; une spec modifiée accompagne le changeset de sa feature (une spec écrite hors cycle est le seul commit `docs` isolé). Ordre : dépendances d'abord, chaque commit laisse le projet cohérent. Granularité = le fichier ; un fichier qui mélange deux changesets va au principal, et son corps le dit
+2. Rédige chaque message complet selon git-conventions (titre, corps en puces : le pourquoi, l'approche, les impacts non évidents)
+3. Affiche le plan de découpage entier (un bloc par commit : message, corps, fichiers) et attends la validation explicite ; puis committe changeset par changeset sans redemander, en stageant par chemins explicites. Fichiers sensibles exclus, fichier sans rapport avec le cycle signalé
+4. `git status` propre à la fin (le pilotage, gitignoré, n'y apparaît pas) ; coche `Commits créés`
 
 ```
----
 N commits créés. Suite : `/pipe-pr [ticket]`.
 ```
 
 ## Mode simple (commit ponctuel)
 
-### Étape 1 — Stager les changements
-
-- Stage les fichiers pertinents par chemin explicite (pas de `git add .` aveugle)
-- Exclure les fichiers sensibles (.env, credentials, etc.)
-- Ne demande confirmation que si un fichier sensible ou sans rapport évident avec le changement est present
-
-### Étape 2 — Committer
-
-A partir des changements stages et de l'argument utilisateur (si fourni), determine type, scope, description et body selon `git-conventions`.
-
-Affiche le message complet (titre + body) et attends la validation explicite de l'utilisateur avant de committer.
-
-Affiche le recap apres coup :
+1. Stage les fichiers pertinents par chemin explicite ; confirmation seulement si un fichier sensible ou sans rapport évident est présent
+2. Type, scope, description et corps depuis les changements stagés et l'argument ; affiche le message complet, attends la validation, committe
 
 ```
 **Commit créé** — emoji type(scope): description
-- [puce du body si present]
+- [puce du corps si présent]
 
 Fichiers — `chemin/fichier.ts`
 ```
 
-### Étape 3 — Push (optionnel)
-
-Si la branche a un upstream, propose de push. Ne push que sur confirmation explicite.
+3. Branche avec upstream → propose le push, sur confirmation explicite seulement
 
 ---
 
