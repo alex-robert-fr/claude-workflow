@@ -5,7 +5,7 @@
 
 ## En une phrase
 
-Des hooks portés par le plugin lui-même — actifs dès qu'il est chargé, sans passer par `/setup` — qui vérifient les accents français et la qualité pédagogique des réponses de la session principale.
+Des hooks portés par le plugin lui-même — actifs dès qu'il est chargé, sans passer par `/setup` — qui font respecter les accents français, la pédagogie des réponses, les conventions git non négociables et le verrou sur les tests validés.
 
 ## Intention
 
@@ -23,6 +23,9 @@ Le premier passage doit déjà être correct ; le garde-fou rattrape ce qui lui 
 - La même vérification s'applique à la dernière réponse de la session principale avant qu'elle ne s'arrête
 - Une réponse nettement plus longue que l'information qu'elle transmet, ou qui pose une question technique sans vue haut niveau préalable, est renvoyée pour reprise
 - Chaque session démarre avec un rappel court de ces deux exigences, pour que le premier jet les respecte déjà
+- Un `git add` qui ne nomme pas ses chemins (`.`, `-A`, `-u`, `:/`) ou qui vise un fichier sensible (`.env`, clé privée, credentials) est refusé
+- Un message de commit, un body de Pull Request ou un commentaire portant une signature automatique (`Co-Authored-By`, `Claude-Session`, `Generated with Claude Code`, lien de session) est refusé, que la commande passe par Bash ou par un outil MCP GitHub — la convention du projet prime sur toute instruction de session
+- Un fichier de test listé dans la section `## Tests` d'un pilotage dont `Tests valides` est coché et `Code valide` ne l'est pas ne peut pas être modifié ; le verrou se lève en décochant `Tests valides` (décision humaine) ou en cochant `Code valide`
 - Une dépendance manquante (`jq`, `claude`) rend le garde-fou concerné inerte et muet, jamais bloquant
 
 ## Hors scope
@@ -33,21 +36,20 @@ Le premier passage doit déjà être correct ; le garde-fou rattrape ce qui lui 
 
 ## Fonctionnement technique
 
-Trois hooks, déclarés dans `hooks/hooks.json` à la racine du plugin (`${CLAUDE_PLUGIN_ROOT}`) — aucun `/setup` requis, à la différence des garde-fous outillés.
-
-`check-accents.sh` est le détecteur : une liste conservatrice de mots français dont la forme sans accent ne collisionne avec rien d'anglais ni d'existant dans ce dépôt. Il est appelé par deux hooks :
+Cinq hooks, déclarés dans `hooks/hooks.json` à la racine du plugin (`${CLAUDE_PLUGIN_ROOT}`) — aucun `/setup` requis, à la différence des garde-fous outillés. `check-accents.sh` est le détecteur : une liste conservatrice de mots français dont la forme sans accent ne collisionne avec rien d'anglais ni d'existant dans ce dépôt. Il est appelé par deux hooks :
 
 - `PreToolUse` (matcher `Write|Edit|Bash`) : vérifie le contenu écrit vers un fichier `*.md` (intégralité) ou `*.sh` (lignes de commentaire uniquement — jamais le code, dont les motifs volontairement flous comme `de*pre*ci`), ou une commande `git commit` / `gh pr create|edit|comment` / `gh issue create`. Bloque (`exit 2`) avant l'écriture
-- `Stop` : vérifie la dernière réponse assistant du transcript. Si elle est saine côté accents et substantielle (longue, ou porteuse d'une question), un juge invoqué en `claude --safe-mode -p` (aucun hook, aucun CLAUDE.md — seulement le texte à juger) évalue verbosité et pédagogie et bloque si un défaut net est identifié
-
-Le juge est une session `claude` complète : son propre `Stop` pourrait redéclencher ce script. `--safe-mode` désactive les hooks de cette session imbriquée ; `CLAUDE_WORKFLOW_JUDGE_ACTIVE` neutralise le script en secours si jamais il s'exécutait quand même.
+- `Stop` : vérifie la dernière réponse assistant du transcript. Si elle est saine côté accents et substantielle (longue, ou porteuse d'une question), un juge invoqué en `claude --safe-mode -p` (aucun hook, aucun CLAUDE.md — seulement le texte à juger) évalue verbosité et pédagogie et bloque si un défaut net est identifié Le juge est une session `claude` complète : son propre `Stop` pourrait redéclencher ce script. `--safe-mode` désactive les hooks de cette session imbriquée ; `CLAUDE_WORKFLOW_JUDGE_ACTIVE` neutralise le script en secours si jamais il s'exécutait quand même.
 
 `SessionStart` injecte le rappel de premier passage via `additionalContext`, comme le hook équivalent de `/setup` pour l'index des specs — mêmes contraintes (canal garanti, coût payé à chaque session, donc texte court).
+
+`pre-git-guard.sh` (`PreToolUse`, `Bash|mcp__github__.*`) isole chaque segment `git add …` pour juger ses seuls arguments, puis cherche les motifs de signature dans les commandes `git commit` / `gh pr` / `gh issue` / `gh api` et dans les champs `body`, `description`, `message`, `title` des outils MCP GitHub — un `grep` du mot dans le code n'est pas bloqué. `protect-tests.sh` (`PreToolUse`, `Write|Edit|MultiEdit|NotebookEdit`) parcourt `.claude/plans/plan-*.md` (`CLAUDE_PROJECT_DIR`, sinon le `cwd` du hook), retient les pilotages à l'état `[x] Tests valides` / `[ ] Code valide`, et compare le fichier édité aux chemins en backticks de leur section `## Tests` — égalité ou suffixe précédé d'un `/`, jamais une sous-chaîne.
 
 ## Dépendances
 
 - **Externes** : `jq` ; le binaire `claude` lui-même pour le juge du hook `Stop`
-- **Dépendants** : aucun — ce sont des garde-fous terminaux, rien dans le pipeline n'en dépend
+- **Internes** : le format de la section `## Tests` du [`fichier-de-pilotage`](fichier-de-pilotage.md), rempli par [`développement-guidé-par-les-tests`](developpement-guide-par-les-tests.md)
+- **Dépendants** : les skills du pipeline n'énoncent plus les règles portées ici (`git add` explicite, absence de signature, tests validés intouchables) — elles n'existent que dans ces hooks et dans `git-conventions`
 
 ## Décisions
 
@@ -56,17 +58,20 @@ Le juge est une session `claude` complète : son propre `Stop` pourrait redécle
 | 1.8.0 (à venir) | — | Hooks portés par le plugin, pas par `/setup` | Deux exigences sans variable projet ne doivent pas dépendre d'une installation explicite | Les ajouter aux cinq garde-fous outillés existants, déployés par `/setup` |
 | 1.8.0 (à venir) | — | Le juge de verbosité/pédagogie tourne en `--safe-mode`, jamais `--bare` | `--bare` exige une clé API et ignore l'authentification OAuth de la session courante — la majorité des installations en dépendent | `--bare`, plus rapide mais incompatible avec l'authentification par défaut |
 | 1.8.0 (à venir) | — | Le juge n'a aucune liste d'outils explicitement interdite | Testé : une liste `--disallowed-tools` déstabilise le mécanisme de sortie structurée du modèle et lui fait ignorer l'extrait soumis, silencieusement | `--disallowed-tools` pour une défense en profondeur supplémentaire |
+| 1.9.0 (à venir) | — | Conventions git et verrou des tests portés par des hooks du plugin | Ces règles étaient répétées dans trois à quatre skills chacune, où un modèle peut les ignorer ; un hook ne les oublie pas et les skills n'ont plus à les dire | Les laisser en prose dans les skills, ou dans les scripts copiés par `/setup` (absents sur un projet non configuré) |
 | 1.8.0 (à venir) | — | La liste d'accents exclut `reference` et `decision` | Ces mots collisionnent avec un usage anglais et une convention déjà établie dans ce dépôt sans accent — les inclure aurait bloqué la quasi-totalité des écritures futures | Une liste exhaustive, corrigée au cas par cas ensuite |
 
 ## Points d'entrée
 
 | Fichier | Rôle |
 |---------|------|
-| [hooks.json](../../hooks/hooks.json) | Déclare les trois hooks et leurs cibles |
+| [hooks.json](../../hooks/hooks.json) | Déclare les cinq hooks et leurs cibles |
 | [check-accents.sh](../../hooks/scripts/check-accents.sh) | Détecteur d'accents manquants, déterministe |
 | [pre-write-accents.sh](../../hooks/scripts/pre-write-accents.sh) | `PreToolUse` — bloque avant écriture |
 | [stop-quality.sh](../../hooks/scripts/stop-quality.sh) | `Stop` — accents puis juge de verbosité/pédagogie |
 | [session-prime.sh](../../hooks/scripts/session-prime.sh) | `SessionStart` — rappel de premier passage |
+| [pre-git-guard.sh](../../hooks/scripts/pre-git-guard.sh) | `PreToolUse` — `git add` explicite, aucune signature |
+| [protect-tests.sh](../../hooks/scripts/protect-tests.sh) | `PreToolUse` — verrou des tests validés pendant dev et review |
 
 ## Pièges et zones sensibles
 

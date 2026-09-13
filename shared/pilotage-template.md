@@ -32,7 +32,10 @@ PROJ-42 | #42
 [le plan technique — template « Template de plan technique » de /pipe-plan]
 
 ## Tests
-[a completer par /pipe-test — comportements couverts par fichier, un par ligne]
+[a completer par /pipe-test — un fichier par ligne en backticks, ses comportements en puces dessous]
+
+`src/module/fichier.spec.ts`
+- quand [situation], alors [comportement]
 
 ## Notes de reprise
 - **3 lignes max.** Uniquement ce qui ne figure nulle part ailleurs (pas de redite du plan ni de ses Points d'attention) et qui sert a la session suivante
@@ -47,7 +50,7 @@ Règles :
 - Les cases de review humaine (`Tests valides`, `Code valide`) ne se cochent qu'apres validation explicite de l'utilisateur
 - Pas de journal de decisions dans le pilotage. Une decision qui survit au merge va dans le journal de la spec ; une decision qui ne concerne que ce cycle **corrige le plan en place** (approche, étape ou point d'attention). Un journal a cote du plan ne fait que le dupliquer, puis le contredire
 - Notes de reprise : 3 lignes max, jamais une redite du plan ou de ses Points d'attention
-- La section `## Tests` n'est remplie que par `/pipe-test`, jamais par `/pipe-plan` (qui rédige déjà sa propre section Tests **a l'interieur** du plan) — doublon sinon
+- La section `## Tests` n'est remplie que par `/pipe-test`, jamais par `/pipe-plan` (qui rédige déjà sa propre section Tests **a l'interieur** du plan) — doublon sinon. Son format est un contrat : chaque fichier de test sur sa propre ligne, en backticks, chemin relatif à la racine du projet — c'est ce que lit le hook `protect-tests.sh` du plugin pour verrouiller les tests validés tant que `Code valide` n'est pas coché
 - `Spec a jour` est cochee par `/pipe-spec` apres validation humaine de la spec, ou par `/pipe-plan` quand le ticket ne concerne aucune feature (`sans objet`). Le contenu de la spec vit dans `docs/specs/`, jamais recopie ici — le pilotage n'en porte que le chemin
 - Un pilotage ouvert par `/pipe-spec` est **supprime** si `/pipe-plan` bascule ensuite le ticket en voie rapide : pas de cycle, pas de pilotage
 - Ticket d'investigation (spike) : `/pipe-spec` coche d'office `Plan valide`, `Tests ecrits`, `Tests valides`, `Dev termine` et `Code valide` avec la mention `(sans objet — spike)`, et la section Branche porte les deux branches — `spike/` pour l'exploration jetable, `docs/` pour la livraison de la spec. `/pipe-ship` enchaine alors du cadrage aux commits
