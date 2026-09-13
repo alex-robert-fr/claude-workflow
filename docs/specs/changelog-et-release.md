@@ -64,7 +64,10 @@ La version du plugin se resout par ordre de priorité : le champ de `plugin.json
 | Fichier | Rôle |
 |---------|------|
 | `skills/pipe-changelog/SKILL.md` | Collecte, filtrage, classement et rédaction des entrées |
-| `skills/pipe-changelog/reference.md` | Conventions, mapping des types, exclusions |
+| `skills/pipe-changelog/entree.md` | Types, mapping, rédaction, exclusions — lu aussi par la Pull Request |
+| `skills/pipe-changelog/fichier.md` | Structure du fichier, en-têtes, liens, notes de déploiement, sources |
+| `shared/scripts/detect-version.sh` | Dernière version publiée, dernier tag, version suivante |
+| `shared/scripts/changelog-section.sh` | Extrait une section sans charger le fichier |
 | `skills/pipe-release/SKILL.md` | Version, contenu de la release, PR vers la production |
 | `skills/pipe-tag/SKILL.md` | Tag annote, notes extraites du CHANGELOG |
 | `.claude/scripts/bump-version.sh` | Version du plugin de ce repo — local, non distribue |

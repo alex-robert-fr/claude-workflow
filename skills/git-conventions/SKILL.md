@@ -59,7 +59,7 @@ Exemple :
 - Titre : `[Type] Titre de l'issue (#numéro)`
 - Le corps référence son ticket : `Closes #XX` par issue native (`Closes #12, Closes #15` si plusieurs) ; ticket externe → `Ticket : [PROJ-42](url)`, sans auto-close
 - Le corps est un sommaire, pas la doc technique : Contexte, Ce qui a été fait, un bloc `## Changelog`, À vérifier à la main. Sans liste de fichiers ni de commits, sans section tests ni points de review — le détail est dans les corps de commits
-- Le bloc Changelog est au format du CHANGELOG du projet (types Keep a Changelog, une phrase par effet observable, références vers les commits en fin de ligne, rédigé pour le consommateur — `pipe-changelog/reference.md`) et décrit l'état final de la branche, jamais un delta
+- Le bloc Changelog est au format du CHANGELOG du projet (types Keep a Changelog, une phrase par effet observable, références vers les commits en fin de ligne, rédigé pour le consommateur — `pipe-changelog/entree.md`) et décrit l'état final de la branche, jamais un delta
 - Une PR déjà ouverte évolue par un commentaire d'itération ; sa description est réécrite en état complet, sans « ajouté » ni « mis à jour »
 - Même règle de signature que les commits : aucun pied de page `Generated with Claude Code` ni lien de session
 - Dans le paramètre `body` des appels MCP GitHub : de vrais sauts de ligne, jamais `\n` littéraux

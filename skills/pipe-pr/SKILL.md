@@ -47,7 +47,7 @@ Ajouts propres a ce skill : ticket JIRA rattache a une version cible (ticket par
 
 ### Changelog
 
-Le body porte un bloc `## Changelog` au format du CHANGELOG du projet : c'est lui qui sera agrege a la release, ecrit maintenant, tant que le contexte est frais. Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-changelog/reference.md` et applique ses sections « Types d'entrées », « Mapping prefixe de commit → type », « Règles de contenu », « Rediger pour le consommateur » et « Exclusions ».
+Le body porte un bloc `## Changelog` au format du CHANGELOG du projet : c'est lui qui sera agrege a la release, ecrit maintenant, tant que le contexte est frais. Utilise Read pour charger `${CLAUDE_SKILL_DIR}/../pipe-changelog/entree.md` et applique-le.
 
 ## Étape 4 — Rediger le commentaire d'iteration (mise a jour uniquement)
 
