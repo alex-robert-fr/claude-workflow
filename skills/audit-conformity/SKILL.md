@@ -1,6 +1,7 @@
 ---
 name: audit-conformity
 description: Auditer la conformite du code a un document de reference (spec, règle, skill, CLAUDE.md) et planifier la remediation.
+disable-model-invocation: true
 argument-hint: [document de reference] [perimetre optionnel]
 ---
 

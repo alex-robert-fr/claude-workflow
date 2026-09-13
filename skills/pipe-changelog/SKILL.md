@@ -1,6 +1,7 @@
 ---
 name: pipe-changelog
 description: Generer ou maintenir CHANGELOG.md depuis les commits : entrées courtes orientees métier, Keep a Changelog, SemVer.
+disable-model-invocation: true
 argument-hint: [version a tagger ou rien pour Unreleased]
 ---
 

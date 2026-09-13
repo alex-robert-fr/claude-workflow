@@ -155,9 +155,9 @@ Le cycle complet se justifie quand il y a un **comportement a valider**. Règle 
 | [`pipe-review`](skills/pipe-review/SKILL.md) | Checks outilles + review agent haute valeur + review humaine du code |
 | [`pipe-commit`](skills/pipe-commit/SKILL.md) | Decouper le travail en commits-changesets qui servent de doc technique |
 | [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour la PR (ticket, version cible, changesets) |
-| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG métier + PR develop → main (slash-only) |
+| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG métier + PR develop → main |
 | [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente métier) |
-| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer apres merge + deploiement (slash-only) |
+| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer apres merge + deploiement |
 
 ### Utilitaires
 
@@ -165,7 +165,7 @@ Commandes invocables a tout moment, hors du flow principal du pipeline.
 
 | Skill | Description |
 |-------|-------------|
-| [`setup`](skills/setup/SKILL.md) | Configuration complète du projet, one-shot (slash-only) |
+| [`setup`](skills/setup/SKILL.md) | Configuration complète du projet, one-shot |
 | [`create-issue`](skills/create-issue/SKILL.md) | Issues GitHub structurees avec decoupage |
 | [`worktree`](skills/worktree/SKILL.md) | Creer, lister, supprimer et basculer entre worktrees git |
 | [`audit-conformity`](skills/audit-conformity/SKILL.md) | Auditer le code contre un document de reference (spec, règle, skill) et planifier la remediation |
@@ -178,7 +178,7 @@ Charges automatiquement par les skills du pipeline qui en dependent.
 |-------|-------------|
 | [`git-conventions`](skills/git-conventions/SKILL.md) | Branches, commits, Pull Requests |
 
-Les skills marques **slash-only** (`disable-model-invocation: true`) ne coutent aucun contexte en session : ils ne sont charges que quand tu les invoques.
+Tous les skills sont **slash-only** (`disable-model-invocation: true`) : chacun écrit, pousse ou lance des agents, aucun ne doit partir sur une initiative du modèle, et leur description ne coûte ainsi aucun contexte en session — ils ne sont chargés que quand tu les invoques. `check-skills.sh` refuse un skill qui ne le déclare pas.
 
 ### Agents
 

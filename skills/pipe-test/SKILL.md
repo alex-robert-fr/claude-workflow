@@ -1,6 +1,7 @@
 ---
 name: pipe-test
 description: Ecrire les tests d'une feature avant son implementation, depuis le plan du pilotage. Ils deviennent le contrat du dev.
+disable-model-invocation: true
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 

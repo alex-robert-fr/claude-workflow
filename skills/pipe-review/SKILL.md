@@ -1,6 +1,7 @@
 ---
 name: pipe-review
 description: Reviewer le code en session dediee : checks outilles, agent, review humaine, fraicheur de la spec. Apres /pipe-code.
+disable-model-invocation: true
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 

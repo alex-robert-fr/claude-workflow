@@ -1,6 +1,7 @@
 ---
 name: pipe-code
 description: Implementer la feature en session dediee, guidee par les tests valides et le plan du pilotage. Apres /pipe-test.
+disable-model-invocation: true
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 ---
 

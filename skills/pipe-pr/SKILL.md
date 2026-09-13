@@ -1,6 +1,7 @@
 ---
 name: pipe-pr
 description: Creer ou mettre a jour une Pull Request : titre, description, commentaire d'iteration. Apres /pipe-commit.
+disable-model-invocation: true
 argument-hint: [rien — detecte automatiquement la branche courante]
 ---
 

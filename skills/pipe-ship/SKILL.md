@@ -1,6 +1,7 @@
 ---
 name: pipe-ship
 description: Reprendre le cycle d'un ticket : lit le pilotage, detecte la phase, deroule jusqu'a la prochaine pause humaine.
+disable-model-invocation: true
 argument-hint: [cle du ticket ou rien pour détecter le cycle en cours]
 ---
 

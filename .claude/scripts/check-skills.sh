@@ -11,6 +11,7 @@
 #     chemin qualifie : Read exige un chemin absolu, un nom nu n'est resolvable que
 #     depuis le cwd de ce repo, pas depuis un plugin installe
 #   - un skill invocable sans $ARGUMENTS : l'argument utilisateur est perdu
+#   - un skill que le modèle peut invoquer seul : tous ont des effets de bord
 #   - un corps trop long sans fichier support : le seuil de delegation n'est pas tenu
 #   - le diagramme du pipeline divergent entre ses trois copies
 
@@ -67,6 +68,16 @@ for skill in "$ROOT"/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md; do
   # 3. Skill invocable qui n'exploite pas l'argument utilisateur
   if ! grep -qE '^user-invocable:[ \t]*false' "$skill" && ! grep -qF '$ARGUMENTS' "$skill"; then
     echo "SKILL $name — invocable mais aucun \$ARGUMENTS"
+    status=1
+  fi
+
+  # 3b. Skill invocable que le modèle pourrait déclencher seul. Tous les skills du plugin
+  # écrivent, poussent ou lancent des agents : ils restent slash-only, ce qui retire aussi
+  # leur description du contexte de chaque session. Un futur skill en lecture seule
+  # s'ajoute à AUTO_OK plutôt que de retirer le contrôle.
+  AUTO_OK="create-skill"
+  if ! grep -qE '^disable-model-invocation:[ \t]*true' "$skill" && ! printf ' %s ' "$AUTO_OK" | grep -qF " $name "; then
+    echo "SKILL $name — invocable par le modèle : disable-model-invocation: true attendu (ou nom dans AUTO_OK)"
     status=1
   fi
 
