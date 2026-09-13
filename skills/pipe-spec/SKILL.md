@@ -35,6 +35,7 @@ allowed-tools:
 - Mise à jour : lis la spec en entier, elle cible l'exploration
 - Création : Read, Glob, Grep autour de la feature — existant, patterns, modules touchés
 - But : de vraies questions pour l'étape 4, et de quoi remplir Fonctionnement technique, Dépendances, Points d'entrée
+- Rien n'est affiché à cette étape : ce que l'exploration apprend nourrit la vue haut niveau et les questions, jamais un compte rendu technique (fichiers, classes, bibliothèques absentes)
 
 ## Étape 4 — Cadrer avec l'utilisateur (Q/R, plusieurs salves)
 

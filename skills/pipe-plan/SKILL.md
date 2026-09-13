@@ -37,7 +37,7 @@ Technique (refactor, migration, perf, CI, lint, deps, infra, dette, tooling) · 
 
 ## Étape 4 — Explorer
 
-Spec d'abord (`docs/specs/<feature>.md` : points d'entrée, dépendances, pièges), puis Read, Glob, Grep de façon ciblée : fichiers et modules concernés, patterns en place, zones impactées. Spec fausse ou incomplète → à signaler pour correction dans la spec, pas à contourner dans le plan.
+Spec d'abord (`docs/specs/<feature>.md` : points d'entrée, dépendances, pièges), puis Read, Glob, Grep de façon ciblée : fichiers et modules concernés, patterns en place, zones impactées. Spec fausse ou incomplète → à signaler pour correction dans la spec, pas à contourner dans le plan. Rien n'est affiché à cette étape : l'exploration nourrit la vue haut niveau et les questions, pas un compte rendu technique.
 
 ## Étape 5 — Q/R (plusieurs salves)
 

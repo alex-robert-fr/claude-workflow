@@ -212,6 +212,7 @@ claude-workflow/
 ├── CLAUDE.md                # conventions du plugin
 ├── CHANGELOG.md             # historique des versions
 ├── agents/                  # 6 agents : prompts système des sub-agents du pipeline
+├── evals/                   # suite `claude plugin eval` : un cas par comportement, gradé sans relecture humaine
 ├── hooks/                   # hooks.json + scripts : garde-fous actifs sans /setup
 ├── shared/
 │   ├── pilotage-template.md # template du fichier de pilotage
@@ -222,6 +223,8 @@ claude-workflow/
     │   └── *.md             # annexes chargées par chemin, selon le besoin (template, spike, fraîcheur…)
     └── setup/scripts/       # scripts universels, copies tels quels par /setup
 ```
+
+**Évaluer les skills.** `test-hooks.sh` et `test-scripts.sh` prouvent la mécanique, pas le comportement : rien n'y dit si `/pipe-spec` ouvre bien par une vue haut niveau ou si `/pipe-commit` attend la validation. C'est le rôle de `evals/` : chaque cas est un dépôt jetable (`fixture.sh`), un prompt tel qu'un utilisateur le taperait, et des graders surtout déterministes (regex sur la réponse, outil appelé ou non, fichier écrit ou non) — un juge LLM seulement là où une règle ne suffit pas. Lancer `claude plugin eval . --scaffold --allow-tools Bash --no-publish` depuis la racine (Bash exige un sandbox : `bubblewrap` et `socat`) ; `--case <nom> --runs 1 --ablation none` pour itérer à moindre coût, la baseline sans plugin dit ensuite ce que le plugin apporte réellement. Un cas s'arrête à la première pause humaine du skill : c'est elle qu'on grade, pas ce qu'un modèle ferait sans personne.
 
 Les scripts (hooks, checks) sont de **vrais fichiers** versionnes, pas des blocs de code dans un markdown : `/setup` les copie (`cp` + `chmod +x`) au lieu de les faire recopier par le modele. Seuls les templates reellement variables — commandes de lint, format et test — restent dans les markdown, avec les valeurs du projet.
 
