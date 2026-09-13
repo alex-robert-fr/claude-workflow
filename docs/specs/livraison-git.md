@@ -9,9 +9,7 @@ Des commits qui se lisent comme la documentation technique du projet, et une Pul
 
 ## Intention
 
-Un CHANGELOG oriente consommateur ne peut pas porter le detail technique, et une description de Pull Request est reecrite a chaque iteration. Il reste un seul emplacement stable pour repondre a « pourquoi ce code est comme ca » : le corps du commit.
-
-Reussi quand relire l'historique d'une branche suffit a comprendre la feature et les arbitrages qu'elle a demandes.
+Un CHANGELOG oriente consommateur ne peut pas porter le detail technique, et une description de Pull Request est reecrite a chaque iteration. Il reste un seul emplacement stable pour repondre a « pourquoi ce code est comme ca » : le corps du commit. Reussi quand relire l'historique d'une branche suffit a comprendre la feature et les arbitrages qu'elle a demandes.
 
 ## Philosophie
 
@@ -23,24 +21,19 @@ Reussi quand relire l'historique d'une branche suffit a comprendre la feature et
 - Une branche d'exploration (`spike/`) n'est jamais mergee ni proposee en Pull Request : poussee pour sauvegarde, supprimee une fois la spec du ticket livree par une branche de documentation
 - Un commit porte un emoji, un type, un scope métier obligatoire pour les changements de code, et une description en français
 - Le corps est obligatoire des que le changement n'est pas trivial, et documente ce que le diff ne montre pas
-- Aucune signature automatique n'est ajoutee a un message de commit, a une description de Pull Request ni a un commentaire d'iteration
-- Les tests accompagnent le changeset du comportement qu'ils verifient ; une spec modifiee accompagne le changeset de sa feature
-- Une spec ecrite hors cycle est la seule a former son propre commit de documentation
-- Les fichiers sont stages par chemin explicite ; les fichiers sensibles sont exclus et signales
-- Un commit n'est jamais créé sans validation humaine : le message complet (titre + corps) est affiche et confirme avant chaque `git commit`, y compris en enchainement automatique
-- Un push n'a jamais lieu sans confirmation explicite
-- La description d'une Pull Request decrit toujours son etat complet actuel, jamais son delta
+- Les tests accompagnent le changeset du comportement qu'ils verifient ; une spec modifiee accompagne le changeset de sa feature — une spec écrite hors cycle est la seule à former son propre commit de documentation
+- Les fichiers sont stages par chemin explicite ; les fichiers sensibles sont exclus et signales ; aucune signature automatique n'est ajoutée à un commit, une Pull Request ou un commentaire — ces deux garanties sont portées par les hooks du plugin ([`garde-fous-automatiques.md`](garde-fous-automatiques.md))
+- Un commit n'est jamais créé sans validation humaine : le message complet (titre + corps) est affiche et confirme avant chaque `git commit`, y compris en enchainement automatique ; un push n'a jamais lieu sans confirmation explicite
+- La description d'une Pull Request decrit toujours son etat complet actuel, jamais son delta ; son évolution passe par un commentaire d'itération, jamais par sa description
 - La description d'une Pull Request est un sommaire : contexte, ce qui a ete fait, un bloc Changelog, et ce qui reste a vérifier a la main — jamais de liste de fichiers ni de commits, de section tests ni de points de review
 - Le bloc Changelog d'une Pull Request est ecrit au format du CHANGELOG du projet, pour le consommateur, avec ses references vers les commits : il decrit l'etat final de la branche et sera repris tel quel a la release
 - Chaque Pull Request reference son ticket, avec fermeture automatique si la plateforme le permet
-- L'evolution d'une Pull Request déjà ouverte passe par un commentaire d'iteration, pas par sa description
 - Le document de pilotage est supprime a la creation de la Pull Request
 
 ## Hors scope
 
 - Merger, ou decider quand merger — la protection de branche et l'humain tranchent
 - Deduire une version depuis les prefixes de commit — voir [`changelog-et-release.md`](changelog-et-release.md)
-- Reecrire l'historique : un commit pousse est immuable, une erreur dans un corps ne se corrige pas apres coup
 - Committer un travail non valide : le decoupage de fin de cycle suppose le code déjà review
 
 ## Fonctionnement technique

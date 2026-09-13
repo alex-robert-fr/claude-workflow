@@ -40,6 +40,15 @@ for spec in "$SPECS"/*.md; do
               if (t ~ /statut.*:.*de*pre*ci/) { found = 1; exit } }
        END { exit !found }' "$spec" && continue
 
+  # Budget d'une spec active : 80 lignes. Au-delà, elle contient du plan, du code
+  # ou du bavardage — le seuil est celui de pipe-spec, verifie ici plutot que
+  # laisse a la vigilance du modele qui vient d'ecrire le fichier.
+  nlines=$(wc -l < "$spec")
+  if [ "$nlines" -gt 80 ]; then
+    echo "SPEC $base — $nlines lignes (budget 80) : plan, code ou redite a couper"
+    status=1
+  fi
+
   # Points d'entrée : première colonne du tableau de la section uniquement.
   # La colonne Role cite souvent d'autres chemins — les lire produirait des faux positifs.
   # Les lignes marquees (a creer) sont ignorees : une spec precede le dev.

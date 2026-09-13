@@ -37,7 +37,6 @@ Reussi quand modifier une feature commence par lire une page au lieu d'explorer 
 
 - Dire comment implementer — l'ordre, les fichiers et les signatures appartiennent au plan du ticket
 - Deprecier automatiquement — le controle outille signale, l'humain tranche : une feature peut avoir simplement demenage
-- Generer plusieurs specs d'affilee — chacune exige son propre cadrage
 - Supprimer le fichier d'une feature retiree — git en garderait la trace, mais plus personne ne la retrouverait
 
 ## Fonctionnement technique
@@ -79,4 +78,3 @@ La verification de fraicheur se fait a deux niveaux, appeles depuis la review de
 - **Le titre de la section des features retirees est un contrat** : le garde-fou de session s'y arrete pour n'injecter que l'actif. Le renommer ou le deplacer reintroduit les features mortes dans chaque session
 - **Rien ne rappelle le rattrapage apres l'installation** : le controle outille ne valide que les specs existantes et ne signale jamais une feature sans spec
 - **Une entrée de journal `(a venir)` est modifiee au moment de la release** : c'est le seul cas ou une ligne existante du journal change
-- Une version passee ne se devine pas : une decision heritee dont on ignore l'origine reste sans version, sinon le journal devient faux la ou il pretend être précis

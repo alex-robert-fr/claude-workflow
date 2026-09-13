@@ -34,6 +34,7 @@ Il couvre quatre ecarts qu'un agent detecte mal :
 - une spec absente de l'index, donc jamais injectee par le hook SessionStart, donc morte
 - une ligne d'index pointant vers une spec disparue, seul mode de panne qui produise de la **fausse** information plutot que de l'absence
 - une phrase d'index depassant 80 caracteres
+- une spec active de plus de 80 lignes : le budget de `/pipe-spec`, vérifié ici plutôt que confié au modèle qui vient d'écrire le fichier
 
 Points de mecanique, tous vérifiés par test — a connaitre avant de modifier le script :
 
