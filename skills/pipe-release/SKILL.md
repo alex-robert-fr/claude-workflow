@@ -27,7 +27,13 @@ Depuis `git log origin/<production>..<intégration>` (merges de PR) :
 - #15 [Fix] Titre (PROJ-45)
 ```
 
-Tracker Jira ou Linear configuré → `git log origin/<production>..<intégration> --format=%B | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | sort -u`, affiché en `**Tickets référencés** : …` — informatif, le statut est mis à jour par `/pipe-tag` une fois livré. Issues GitHub : rien, `Closes #N` les ferme au merge.
+Tracker Jira ou Linear configuré :
+
+- `bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/list-tickets.sh" origin/<production>..<intégration>` (clés citées dans les commits), complété par les clés citées dans les corps des PR mergées de la plage (MCP de la plateforme)
+- Chaque clé vérifiée sur le tracker (MCP `mcp__linear__` ou `mcp__atlassian__`) : titre et statut actuel récupérés ; introuvable → marquée `(introuvable)`, exclue de toute mise à jour
+- Affiché en `**Tickets référencés** : PROJ-42 (titre · statut), … · introuvables : …` — informatif, le statut est posé par `/pipe-tag` une fois livré
+
+Issues GitHub : rien, `Closes #N` les ferme au merge.
 
 ## Étape 3 — CHANGELOG et specs
 

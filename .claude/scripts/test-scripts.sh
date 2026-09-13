@@ -89,6 +89,30 @@ t "changelog absent"          1 ""                                          env 
 git -C "$W" tag -a v0.1.0 -m x && git -C "$W" tag -a v0.2.0 -m x
 t "--tag (tri sémantique)"    0 "v0.2.0"                                    env CLAUDE_PROJECT_DIR="$W" bash "$S/detect-version.sh" --tag
 
+echo "== list-tickets =="
+L="$TMP/l"; git -C "$L" init -q -b main 2>/dev/null || { mkdir -p "$L"; git -C "$L" init -q -b main; }
+git -C "$L" commit -q --allow-empty -m "init" && git -C "$L" tag v0.1.0
+git -C "$L" commit -q --allow-empty -m "✨ feat(auth): login (PROJ-42)" -m "- encode en UTF-8, hash SHA-256, voir RFC-7231"
+git -C "$L" commit -q --allow-empty -m "🐛 fix(auth): PROJ-42 et LIN-7" -m "Ticket : [ABC-1](https://linear.app/x/issue/ABC-1)"
+git -C "$L" commit -q --allow-empty -m "🔧 chore: feat/PROJ-99-branch mentionné en chemin"
+t "clés dédoublonnées, sigles exclus" 0 $'ABC-1\nLIN-7\nPROJ-42'  env CLAUDE_PROJECT_DIR="$L" bash "$S/list-tickets.sh" v0.1.0..HEAD
+t "plage vide → rien"                 0 ""                          env CLAUDE_PROJECT_DIR="$L" bash "$S/list-tickets.sh" HEAD..HEAD
+t "sans argument"                     2 ""                          env CLAUDE_PROJECT_DIR="$L" bash "$S/list-tickets.sh"
+t "plage invalide"                    1 ""                          env CLAUDE_PROJECT_DIR="$L" bash "$S/list-tickets.sh" nope..HEAD
+
+echo "== check-specs : sommaire =="
+Y="$TMP/y"; mkdir -p "$Y/docs/specs"
+printf '# Specs\n\n| Feature | Spec | En une phrase |\n|---|---|---|\n| A | [`a.md`](a.md) | x |\n| B | [`b.md`](b.md) | x |\n| C | [`c.md`](c.md) | x |\n' > "$Y/docs/specs/README.md"
+printf '# A\n\n> **Statut** : active\n> **Sommaire** : [Intention](#intention) · [Points d%sentrée](#points-dentrée)\n\n## En une phrase\n\nx\n\n## Intention\n\ny\n\n## Points d%sentrée\n\n| Fichier | Rôle |\n|---|---|\n' "'" "'" > "$Y/docs/specs/a.md"
+printf '# B\n\n> **Statut** : active\n> **Sommaire** : [Intention](#intention)\n\n## Intention\n\ny\n\n## Points d%sentrée\n\n' "'" > "$Y/docs/specs/b.md"
+printf '# C\n\n> **Statut** : active\n\n## Intention\n' > "$Y/docs/specs/c.md"
+out=$(CLAUDE_PROJECT_DIR="$Y" bash "$REPO/skills/setup/scripts/check-specs.sh" 2>&1)
+if ! printf '%s' "$out" | grep -q "a.md — sommaire" && printf '%s' "$out" | grep -q "b.md — sommaire désynchronisé" && printf '%s' "$out" | grep -q "c.md — sommaire absent"; then
+  echo "ok   sommaire : synchronisé accepté, désynchronisé et absent signalés"
+else
+  echo "FAIL sommaire — sortie : $out"; status=1
+fi
+
 echo "== check-specs : budget de lignes =="
 X="$TMP/x"; mkdir -p "$X/docs/specs"
 printf '# Specs\n\n| Feature | Spec | En une phrase |\n|---|---|---|\n| Longue | [`longue.md`](longue.md) | x |\n| Courte | [`courte.md`](courte.md) | x |\n' > "$X/docs/specs/README.md"

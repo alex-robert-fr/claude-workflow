@@ -35,7 +35,10 @@ Affiche : `Version cible **vX.Y.Z** · dernier tag [tag ou "aucun"]`
 
 ## Étape 3 — Confirmer
 
-Tracker Jira ou Linear avec « Statut ticket à la release » renseigné → tickets de la plage `<dernier-tag>..HEAD` (tout l'historique sans tag) : `git log <dernier-tag>..HEAD --format=%B | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | sort -u`.
+Tracker Jira ou Linear avec « Statut ticket à la release » renseigné :
+
+- `bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/list-tickets.sh" <dernier-tag>..HEAD` (tout l'historique sans tag), complété par les clés citées dans les corps des PR mergées de la plage (MCP de la plateforme)
+- Chaque clé vérifiée sur le tracker (MCP `mcp__linear__` ou `mcp__atlassian__`) : introuvable → exclue et listée à part ; déjà au statut cible → listée comme telle, non modifiée
 
 ```
 **Tag vX.Y.Z** — annoté, message `Release vX.Y.Z`
@@ -43,6 +46,7 @@ Tracker Jira ou Linear avec « Statut ticket à la release » renseigné → tic
 [notes, ou "(aucune note)"]
 
 [si tracker] Tickets qui passeront à l'état [statut] : PROJ-42, PROJ-45 (ou "(aucun ticket détecté)")
+[si tracker] Ignorés — introuvables : PROJ-99 · déjà [statut] : PROJ-40
 
 Je crée et pousse ce tag ?
 ```
@@ -51,7 +55,7 @@ Je crée et pousse ce tag ?
 
 1. `git tag -a vX.Y.Z -m "Release vX.Y.Z` + ligne vide + notes + `"` (sans notes : `-m "Release vX.Y.Z"` seul)
 2. `git push origin vX.Y.Z`
-3. Tracker configuré avec statut → pour chaque ticket de l'étape 3, pose le statut via le MCP (`mcp__atlassian__` ou `mcp__linear__`) ; un échec est signalé et n'arrête ni les autres ni le skill
+3. Tracker configuré avec statut → pour chaque ticket retenu à l'étape 3, pose le statut via le MCP (`mcp__atlassian__` ou `mcp__linear__`) ; un échec est signalé et n'arrête ni les autres ni le skill
 
 ```
 Tag vX.Y.Z créé et poussé sur origin. Pipeline terminé.
