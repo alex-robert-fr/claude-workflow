@@ -3,6 +3,11 @@ name: pipe-commit
 description: Decouper le travail en commits-changesets qui servent de doc technique, selon les conventions git.
 disable-model-invocation: true
 argument-hint: [description optionnelle du changement]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
+  - Bash(git status *)
+  - Bash(git diff *)
+  - Bash(git log *)
 ---
 
 **Un commit est un changeset qui se lit seul**, et son corps est la doc technique du projet. Conventions : `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` (Read) — le hook `pre-git-guard.sh` refuse `git add .` et les signatures.

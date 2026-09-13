@@ -3,6 +3,8 @@ name: create-issue
 description: Creer des issues GitHub structurees depuis une demande : decoupage, critères d'acceptance, labels.
 disable-model-invocation: true
 argument-hint: [description de ce qu'il faut faire]
+allowed-tools:
+  - Bash(git remote get-url origin)
 ---
 
 **En cas de doute, découper : une issue trop petite coûte moins qu'une issue fourre-tout.** Rien n'est créé sans confirmation.

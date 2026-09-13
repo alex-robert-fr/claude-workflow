@@ -3,6 +3,10 @@ name: pipe-spec
 description: Cadrer une feature dans une spec durable et versionnee (docs/specs/) avant le dev. Sans argument, inventorier l'existant.
 disable-model-invocation: true
 argument-hint: [cle JIRA, numéro issue, URL, nom de feature, ou rien pour inventorier l'existant]
+allowed-tools:
+  - Bash(bash .claude/scripts/check-specs.sh)
+  - Bash(git remote get-url origin)
+  - Bash(git log *)
 ---
 
 **Une spec dit ce que la feature est et pourquoi, jamais comment on va la coder** : si une phrase devient fausse une fois le ticket mergé, elle n'y a pas sa place. Elle vit dans `docs/specs/<feature>.md`, versionnée, alimentée par plusieurs tickets, et n'est jamais écrite sans validation humaine.

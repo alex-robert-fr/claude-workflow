@@ -3,7 +3,10 @@ name: worktree
 description: Creer, lister, supprimer et basculer entre worktrees git pour travailler en parallele sur plusieurs branches.
 disable-model-invocation: true
 argument-hint: [create|list|remove|switch] [branche]
-allowed-tools: Read, Bash(git *)
+allowed-tools:
+  - Bash(git worktree *)
+  - Bash(git branch --show-current)
+  - Bash(git rev-parse *)
 ---
 
 **Un worktree par branche, dans `<parent>/<repo>-worktrees/<slug>`** — slug = nom de branche avec `/` remplacé par `-` (`feat/123-login` → `feat-123-login`).

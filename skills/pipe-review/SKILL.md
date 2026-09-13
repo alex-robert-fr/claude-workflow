@@ -3,6 +3,12 @@ name: pipe-review
 description: Reviewer le code en session dediee : checks outilles, agent, review humaine, fraicheur de la spec. Apres /pipe-code.
 disable-model-invocation: true
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
+  - Bash(bash .claude/scripts/check-specs.sh)
+  - Bash(git status *)
+  - Bash(git diff *)
+  - Bash(git log *)
 ---
 
 **La qualité mécanique vient des outils, le jugement d'un agent isolé puis de l'humain** : ce skill ne corrige rien sans validation explicite.

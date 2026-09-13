@@ -3,6 +3,16 @@ name: pipe-tag
 description: Creer et pousser le tag git annote d'une release, apres merge de la PR et deploiement.
 disable-model-invocation: true
 argument-hint: "[v1.2.3]"
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/detect-version.sh" *)
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/changelog-section.sh" *)
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/list-tickets.sh" *)
+  - Bash(git branch --show-current)
+  - Bash(git describe *)
+  - Bash(git status *)
+  - Bash(git log *)
+  - Bash(git tag -l *)
+  - Bash(git tag --list *)
 ---
 
 **Un tag de release est annoté, posé sur la branche de production à jour, et porte les notes du CHANGELOG.** Hors cadre (pre-release à arbitrer, tag à supprimer, doute SemVer) : Read `${CLAUDE_SKILL_DIR}/reference.md`.

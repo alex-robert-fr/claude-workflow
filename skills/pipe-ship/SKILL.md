@@ -3,6 +3,16 @@ name: pipe-ship
 description: Reprendre le cycle d'un ticket : lit le pilotage, detecte la phase, deroule jusqu'a la prochaine pause humaine.
 disable-model-invocation: true
 argument-hint: [cle du ticket ou rien pour détecter le cycle en cours]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
+  - Bash(bash .claude/scripts/check-specs.sh)
+  - Bash(git status *)
+  - Bash(git log *)
+  - Bash(git diff *)
+  - Bash(git remote get-url origin)
+  - Bash(git branch --show-current)
+  - Bash(gh pr list *)
+  - Bash(gh pr view *)
 ---
 
 **Le pilotage dit où en est le cycle ; ce skill charge le skill de la phase courante et enchaîne jusqu'à la prochaine pause humaine ou frontière de session.** Les skills unitaires restent invocables directement.

@@ -3,6 +3,10 @@ name: pipe-test
 description: Ecrire les tests d'une feature avant son implementation, depuis le plan du pilotage. Ils deviennent le contrat du dev.
 disable-model-invocation: true
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
+  - Bash(git status *)
+  - Bash(git branch --show-current)
 ---
 
 **Les tests validés ici sont le contrat du dev** : ils décrivent le comportement attendu avant qu'il n'existe, et ne changent plus ensuite sans décision humaine.

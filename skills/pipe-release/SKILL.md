@@ -3,6 +3,12 @@ name: pipe-release
 description: Preparer une release : CHANGELOG métier, puis PR de la branche d'integration vers la production.
 disable-model-invocation: true
 argument-hint: "[version cible ex: 0.5.2, ou rien pour détecter]"
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/list-tickets.sh" *)
+  - Bash(git log *)
+  - Bash(git status *)
+  - Bash(git tag -l *)
+  - Bash(git tag --list *)
 ---
 
 **Une release, c'est un CHANGELOG committé puis une PR de l'intégration vers la production, sous une seule confirmation.** Le tag vient après le merge et le déploiement (`/pipe-tag`).

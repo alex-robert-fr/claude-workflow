@@ -3,6 +3,14 @@ name: pipe-changelog
 description: Generer ou maintenir CHANGELOG.md depuis les commits : entrées courtes orientees métier, Keep a Changelog, SemVer.
 disable-model-invocation: true
 argument-hint: [version a tagger ou rien pour Unreleased]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/changelog-section.sh" *)
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/detect-version.sh" *)
+  - Bash(git log *)
+  - Bash(git tag -l *)
+  - Bash(git tag --list *)
+  - Bash(gh pr list *)
+  - Bash(gh pr view *)
 ---
 
 **Le CHANGELOG dit ce qui change pour celui qui consomme le projet, une phrase par effet observable** ; le détail technique vit dans les commits et les PR qu'il référence, jamais dans un fichier technique séparé.

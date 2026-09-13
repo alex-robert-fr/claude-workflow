@@ -180,6 +180,8 @@ Charges automatiquement par les skills du pipeline qui en dependent.
 
 Tous les skills sont **slash-only** (`disable-model-invocation: true`) : chacun écrit, pousse ou lance des agents, aucun ne doit partir sur une initiative du modèle, et leur description ne coûte ainsi aucun contexte en session — ils ne sont chargés que quand tu les invoques. `check-skills.sh` refuse un skill qui ne le déclare pas.
 
+Chaque skill pré-approuve (`allowed-tools`) les commandes qu'il lance en lecture — scripts du plugin, `git status|log|diff`, `gh pr list|view` — pour le tour qui l'invoque ; `commit`, `push` et `tag` restent soumis à confirmation.
+
 ### Agents
 
 Les jugements qui exigent un regard neuf sont confiés à des agents du plugin, lancés par les skills avec le seul contexte utile — une relecture par le modèle qui vient d'écrire est complaisante par construction, l'isolation de contexte est ce qui rend la critique indépendante.

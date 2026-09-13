@@ -2,6 +2,10 @@
 name: setup
 description: Configurer un projet pour le workflow AI-Driven Development : CLAUDE.md, workflow-config, hooks, scripts, plans, specs.
 disable-model-invocation: true
+allowed-tools:
+  - Bash(git remote -v)
+  - Bash(git symbolic-ref *)
+  - Bash(git branch --show-current)
 ---
 
 **Ne traite que ce qui manque, après confirmation de la liste.** Les scripts se copient (`cp`), ils ne se réécrivent jamais ; ce qui varie par projet passe en argument dans `settings.json`.

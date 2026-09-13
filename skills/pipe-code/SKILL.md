@@ -3,6 +3,11 @@ name: pipe-code
 description: Implementer la feature en session dediee, guidee par les tests valides et le plan du pilotage. Apres /pipe-test.
 disable-model-invocation: true
 argument-hint: [cle du ticket ou rien si un seul cycle en cours]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
+  - Bash(git status *)
+  - Bash(git diff *)
+  - Bash(git log *)
 ---
 
 **Les tests validés sont le contrat : l'implémentation les satisfait, elle ne les modifie pas.** Un test qui semble faux, contradictoire ou impossible à satisfaire arrête le travail et remonte à l'humain.

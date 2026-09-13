@@ -3,6 +3,13 @@ name: pipe-pr
 description: Creer ou mettre a jour une Pull Request : titre, description, commentaire d'iteration. Apres /pipe-commit.
 disable-model-invocation: true
 argument-hint: [rien — detecte automatiquement la branche courante]
+allowed-tools:
+  - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
+  - Bash(git status *)
+  - Bash(git log *)
+  - Bash(git remote get-url origin)
+  - Bash(gh pr list *)
+  - Bash(gh pr view *)
 ---
 
 **La description d'une PR est un sommaire de son état complet** — contexte, ce qui a été fait, bloc Changelog, à vérifier à la main — jamais un delta ni la doc technique, qui vit dans les commits. Règles : `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md`, section Pull Requests (Read).
