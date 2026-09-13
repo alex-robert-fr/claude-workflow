@@ -21,9 +21,10 @@ argument-hint: [cle du ticket ou rien si un seul cycle en cours]
 - Problème non anticipé par le plan (fichier manquant, dépendance absente, incohérence) → stop :
 
   ```
-  Problème détecté — [description précise]
-  Option A : [approche]
-  Option B : [approche]
+  Problème détecté — [en une phrase non technique : ce que ça change pour la feature]
+  Détail : [description précise, une ligne]
+  Option A : [approche, et ce qu'elle produit]
+  Option B : [approche, et ce qu'elle produit]
   Comment tu veux procéder ?
   ```
 

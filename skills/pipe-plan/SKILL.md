@@ -38,6 +38,7 @@ Spec d'abord (`docs/specs/<feature>.md` : points d'entrée, dépendances, piège
 
 Deux registres : métier — seulement les cas limites que la spec ne couvre pas ; architecture — découpage en composants, où vit la logique, réutiliser ou créer.
 
+- Chaque salve s'ouvre par une vue haut niveau de 2–3 lignes, en langage non technique : ce qui est acquis, ce qui reste à trancher et pourquoi ça compte. Le détail technique vient seulement si l'utilisateur le demande
 - Chaque question s'appuie sur l'exploration et propose des options concrètes
 - Pas de nommage ni de détail que les conventions du projet tranchent déjà
 - Aucune vraie question → le dire et rédiger
