@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -66,7 +67,9 @@ Le plan est ecrit dans le pilotage, jamais dans un document a part. S'il a ete o
 | Fichier | Rôle |
 |---------|------|
 | `skills/pipe-plan/SKILL.md` | Recuperation du ticket, classification, taille, exploration, Q/R, rédaction |
-| `skills/pipe-plan/reference.md` | Detection d'environnement, template de plan, critères de classification et de decoupage |
+| `skills/pipe-plan/ticket.md` | Détection d'environnement et récupération du ticket — lu aussi par le cadrage |
+| `skills/pipe-plan/template.md` | Template de plan et règles de rédaction |
+| `skills/pipe-plan/decomposition.md` | Découpage d'un ticket trop large — chargé dans ce cas seulement |
 | `shared/pilotage-template.md` | Structure du document ou le plan est ecrit |
 
 ## Pieges et zones sensibles

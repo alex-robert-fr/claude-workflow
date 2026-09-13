@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -9,9 +10,7 @@ Comment une spec nait, se met a jour, se verifie et se deprecie — et pourquoi 
 
 ## Intention
 
-Une session neuve qui doit modifier une feature n'a que deux options : reparcourir le code, ou lire ce que la feature est censee être. Le code dit le comportement, jamais le pourquoi, le hors-scope ni les alternatives ecartees — c'est ce manque que la spec comble.
-
-Reussi quand modifier une feature commence par lire une page au lieu d'explorer un repertoire, et qu'aucune session ne « complète » une feature dans une direction ecartee volontairement.
+Une session neuve qui doit modifier une feature n'a que deux options : reparcourir le code, ou lire ce que la feature est censee être. Le code dit le comportement, jamais le pourquoi, le hors-scope ni les alternatives ecartees — c'est ce manque que la spec comble. Reussi quand modifier une feature commence par lire une page au lieu d'explorer un repertoire, et qu'aucune session ne « complète » une feature dans une direction ecartee volontairement.
 
 ## Philosophie
 
@@ -25,10 +24,9 @@ Reussi quand modifier une feature commence par lire une page au lieu d'explorer 
 - Un ticket technique met a jour une spec existante plutot que d'en créer une
 - Intention, hors-scope et alternatives ecartees viennent de l'utilisateur ; si elles restent vides, l'exercice est annonce comme sans valeur au lieu d'être meuble
 - Le journal des decisions s'ajoute, ne se reecrit pas — une decision remplacee est conservee avec sa raison
-- Budget de 40 a 80 lignes, sections faibles supprimees plutot que remplies
+- Budget de 40 a 80 lignes, sommaire en tête synchronisé avec les sections (outillé), sections faibles supprimees plutot que remplies
 - Seul l'index est charge pour savoir quelles features existent, et sa phrase de resume est bornee
-- Une spec dont tous les points d'entrée ont disparu est proposee a la depreciation ; quelques points morts signalent seulement du retard
-- Une spec depreciee conserve son corps entier, quitte l'index actif et cesse d'être injectee dans les sessions
+- Une spec dont tous les points d'entrée ont disparu est proposee a la depreciation (quelques points morts signalent seulement du retard) ; depreciee, elle conserve son corps entier, quitte l'index actif et cesse d'être injectee dans les sessions
 - Un projet dont les features preexistent dispose d'un mode inventaire priorise, une feature par passe
 - Aucune spec n'est ecrite sans accord explicite de l'utilisateur
 - Un ticket d'investigation (spike) a pour seul livrable une spec : son code d'exploration vit sur une branche jetable, jamais mergee, et le dev qui en decoule repart de nouveaux tickets
@@ -37,8 +35,6 @@ Reussi quand modifier une feature commence par lire une page au lieu d'explorer 
 
 - Dire comment implementer — l'ordre, les fichiers et les signatures appartiennent au plan du ticket
 - Deprecier automatiquement — le controle outille signale, l'humain tranche : une feature peut avoir simplement demenage
-- Generer plusieurs specs d'affilee — chacune exige son propre cadrage
-- Supprimer le fichier d'une feature retiree — git en garderait la trace, mais plus personne ne la retrouverait
 
 ## Fonctionnement technique
 
@@ -70,13 +66,15 @@ La verification de fraicheur se fait a deux niveaux, appeles depuis la review de
 | Fichier | Rôle |
 |---------|------|
 | `skills/pipe-spec/SKILL.md` | Tri, identification de la feature, Q/R, rédaction, elagage, validation |
-| `skills/pipe-spec/reference.md` | Frontiere spec/plan, template, règles de rédaction, fin de vie, fraicheur |
+| `skills/pipe-spec/template.md` | Template de spec et règles de rédaction — lu aussi par l'agent de relecture |
+| `skills/pipe-spec/fraicheur.md` | Vérification de fraîcheur et dépréciation — lu par la review de fin de cycle |
+| `skills/pipe-spec/spike.md` | Traitement d'un ticket d'investigation |
 | `skills/pipe-spec/index-format.md` | Format de l'index et budget de la phrase — lu aussi a l'installation |
 | `skills/pipe-spec/inventaire.md` | Reperage, priorisation par churn, presentation du classement |
+| `agents/spec-critic.md` | Relecture indépendante avant la validation humaine |
 
 ## Pieges et zones sensibles
 
 - **Le titre de la section des features retirees est un contrat** : le garde-fou de session s'y arrete pour n'injecter que l'actif. Le renommer ou le deplacer reintroduit les features mortes dans chaque session
 - **Rien ne rappelle le rattrapage apres l'installation** : le controle outille ne valide que les specs existantes et ne signale jamais une feature sans spec
 - **Une entrée de journal `(a venir)` est modifiee au moment de la release** : c'est le seul cas ou une ligne existante du journal change
-- Une version passee ne se devine pas : une decision heritee dont on ignore l'origine reste sans version, sinon le journal devient faux la ou il pretend être précis

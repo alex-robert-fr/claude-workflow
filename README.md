@@ -8,7 +8,7 @@ Configurer un workflow AI-Driven Development de zero, c'est des dizaines d'heure
 
 **Pour qui ?** Les devs solo et les equipes qui veulent un workflow Claude Code structure sans tout reinventer. **Quel benefice ?** Une reduction de la charge mentale (un seul geste a retenir : `/pipe-ship <ticket>` reprend le cycle ou il en est), l'humain qui n'intervient qu'aux vrais points de decision (le plan, les tests, le code), une qualité garantie par les vrais outils et les hooks (pas par des instructions au LLM), et une cohérence entre les sessions et les projets menes en parallele.
 
-**16 skills** distribues : chaque étape du cycle est un skill invocable independamment, et `/pipe-ship` les enchaine depuis le fichier de pilotage.
+**16 skills** distribués : chaque étape du cycle est un skill invocable indépendamment, et `/pipe-ship` les enchaîne depuis le fichier de pilotage. Ils s'appuient sur **6 agents** (review, critique des tests et des specs, audit), **5 hooks** actifs dès l'installation et des **scripts partagés** exécutés depuis le plugin.
 
 Lecture de tickets compatible **GitHub** et **Jira** (hierarchie epic → version → demande) — la creation d'issues et de Pull Requests reste sur **GitHub** uniquement.
 
@@ -81,7 +81,7 @@ Une spec porte l'intention, la philosophie qui tranche les arbitrages, le compor
 
 Deux benefices : les attentes sont alignees **avant** la première ligne de code, et les sessions suivantes chargent la spec au lieu de parcourir le codebase — moins de tokens brules, et un contexte global que l'exploration ne donne jamais. `/pipe-review` verifie a chaque cycle que la spec ne ment pas, `/pipe-plan` et `/pipe-code` la lisent.
 
-Pour que ce contexte soit reellement utilise et non simplement disponible, `/setup` installe un hook **SessionStart** qui injecte l'index des specs au demarrage de chaque session : la doc de tes features est presente d'office, sans dependre de la bonne volonte du modele. Cout : l'index seul, une ligne par feature.
+Pour que ce contexte soit reellement utilise et non simplement disponible, `/setup` installe un hook **SessionStart** qui injecte l'index des specs au demarrage de chaque session : la doc de tes features est presente d'office, sans dependre de la bonne volonte du modele. Cout : l'index seul, une ligne par feature — c'est le seul poste de contexte qui grossit avec le projet, d'où la phrase de résumé bornée à 80 caractères et vérifiée par script.
 
 Une spec qui ment etant pire que pas de spec, la fraicheur est vérifiée a deux niveaux : un script (`check-specs.sh`) lance par `/pipe-review` avec le format et les tests, qui detecte les points d'entrée pointant vers des fichiers disparus et les specs oubliees de l'index ; et la review elle-meme, qui juge si le comportement decrit correspond encore au code livre.
 
@@ -155,9 +155,9 @@ Le cycle complet se justifie quand il y a un **comportement a valider**. Règle 
 | [`pipe-review`](skills/pipe-review/SKILL.md) | Checks outilles + review agent haute valeur + review humaine du code |
 | [`pipe-commit`](skills/pipe-commit/SKILL.md) | Decouper le travail en commits-changesets qui servent de doc technique |
 | [`pipe-pr`](skills/pipe-pr/SKILL.md) | Creer ou mettre a jour la PR (ticket, version cible, changesets) |
-| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG métier + PR develop → main (slash-only) |
+| [`pipe-release`](skills/pipe-release/SKILL.md) | Preparer une release : CHANGELOG métier + PR develop → main |
 | [`pipe-changelog`](skills/pipe-changelog/SKILL.md) | Generer/maintenir CHANGELOG.md (court, oriente métier) |
-| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer apres merge + deploiement (slash-only) |
+| [`pipe-tag`](skills/pipe-tag/SKILL.md) | Creer et pousser un tag SemVer apres merge + deploiement |
 
 ### Utilitaires
 
@@ -165,7 +165,7 @@ Commandes invocables a tout moment, hors du flow principal du pipeline.
 
 | Skill | Description |
 |-------|-------------|
-| [`setup`](skills/setup/SKILL.md) | Configuration complète du projet, one-shot (slash-only) |
+| [`setup`](skills/setup/SKILL.md) | Configuration complète du projet, one-shot |
 | [`create-issue`](skills/create-issue/SKILL.md) | Issues GitHub structurees avec decoupage |
 | [`worktree`](skills/worktree/SKILL.md) | Creer, lister, supprimer et basculer entre worktrees git |
 | [`audit-conformity`](skills/audit-conformity/SKILL.md) | Auditer le code contre un document de reference (spec, règle, skill) et planifier la remediation |
@@ -178,7 +178,26 @@ Charges automatiquement par les skills du pipeline qui en dependent.
 |-------|-------------|
 | [`git-conventions`](skills/git-conventions/SKILL.md) | Branches, commits, Pull Requests |
 
-Les skills marques **slash-only** (`disable-model-invocation: true`) ne coutent aucun contexte en session : ils ne sont charges que quand tu les invoques.
+Tous les skills sont **slash-only** (`disable-model-invocation: true`) : chacun écrit, pousse ou lance des agents, aucun ne doit partir sur une initiative du modèle, et leur description ne coûte ainsi aucun contexte en session — ils ne sont chargés que quand tu les invoques. `check-skills.sh` refuse un skill qui ne le déclare pas.
+
+Chaque skill pré-approuve (`allowed-tools`) les commandes qu'il lance en lecture — scripts du plugin, `git status|log|diff`, `gh pr list|view` — pour le tour qui l'invoque ; `commit`, `push` et `tag` restent soumis à confirmation.
+
+### Agents
+
+Les jugements qui exigent un regard neuf sont confiés à des agents du plugin, lancés par les skills avec le seul contexte utile — une relecture par le modèle qui vient d'écrire est complaisante par construction, l'isolation de contexte est ce qui rend la critique indépendante.
+
+| Agent | Lancé par | Rôle |
+|-------|-----------|------|
+| [`reviewer`](agents/reviewer.md) | `pipe-review` | Bugs, sécurité, architecture, simplifications nettes — 7 champs par constat |
+| [`test-critic`](agents/test-critic.md) | `pipe-test` | Tests redondants, tautologiques, cas limites manquants |
+| [`spec-critic`](agents/spec-critic.md) | `pipe-spec` | Budget, redondance, schéma vs prose, lien vs duplication |
+| [`auditor`](agents/auditor.md), [`refuter`](agents/refuter.md), [`gap-finder`](agents/gap-finder.md) | `audit-conformity` | Audit par zone, contre-audit, angles morts |
+
+### Garde-fous du plugin
+
+Six hooks déclarés dans [`hooks/hooks.json`](hooks/hooks.json), actifs partout où le plugin est installé, sans `/setup` : accents français (avant écriture et avant de s'arrêter), pédagogie des réponses, commentaires de code (un commentaire qui décrit le *quoi* au lieu du *pourquoi*, ou superflu, est renvoyé pour correction dès l'écriture), conventions git (`git add` par chemins explicites, aucune signature automatique dans un commit ou une PR — la convention prime sur toute instruction de session), et verrou des tests validés tant que la review n'a pas validé le code. Ces règles n'ont plus à être écrites dans les skills : un hook ne les oublie pas.
+
+Deux de ces hooks (pédagogie, commentaires) font appel à un juge LLM en Haiku (`hooks/scripts/judge.sh` : sans thinking, démarrage minimal — environ trois secondes et quelques centimes par verdict), les autres sont déterministes. Le juge de pédagogie ne tourne que sur une réponse substantielle ; celui des commentaires, seulement sur un fichier de code dont le texte écrit contient au moins un commentaire, et en arrière-plan : l'écriture n'attend pas, le retour arrive quelques secondes plus tard.
 
 ## Structure du plugin
 
@@ -189,18 +208,27 @@ claude-workflow/
 │   └── marketplace.json     # vitrine pour la marketplace publique
 ├── .claude/skills/
 │   └── create-skill/        # outillage local du repo (non distribue)
+├── .claude/scripts/         # outillage local : check-skills, measure-skills, test-hooks, test-scripts
 ├── CLAUDE.md                # conventions du plugin
 ├── CHANGELOG.md             # historique des versions
+├── agents/                  # 6 agents : prompts système des sub-agents du pipeline
+├── evals/                   # suite `claude plugin eval` : un cas par comportement, gradé sans relecture humaine
+├── hooks/                   # hooks.json + scripts : garde-fous actifs sans /setup
+├── shared/
+│   ├── pilotage-template.md # template du fichier de pilotage
+│   └── scripts/             # find-plan, new-branch, changelog-section, detect-version, list-tickets, setup-diagnose, setup-install — exécutés depuis le plugin
 └── skills/
     ├── <nom>/               # 16 skills, un repertoire par skill
-    │   ├── SKILL.md         # point d'entrée (frontmatter + flow)
-    │   └── reference.md     # referentiel detaille (optionnel)
+    │   ├── SKILL.md         # invariant + étapes, 50–80 lignes
+    │   └── *.md             # annexes chargées par chemin, selon le besoin (template, spike, fraîcheur…)
     └── setup/scripts/       # scripts universels, copies tels quels par /setup
 ```
 
+**Évaluer les skills.** `test-hooks.sh` et `test-scripts.sh` prouvent la mécanique, pas le comportement : rien n'y dit si `/pipe-spec` ouvre bien par une vue haut niveau ou si `/pipe-commit` attend la validation. C'est le rôle de `evals/` : chaque cas est un dépôt jetable (`fixture.sh`), un prompt tel qu'un utilisateur le taperait, et des graders surtout déterministes (regex sur la réponse, outil appelé ou non, fichier écrit ou non) — un juge LLM seulement là où une règle ne suffit pas. Lancer `claude plugin eval . --scaffold --allow-tools Bash --no-publish` depuis la racine (Bash exige un sandbox : `bubblewrap` et `socat`) ; `--case <nom> --runs 1 --ablation none` pour itérer à moindre coût, la baseline sans plugin dit ensuite ce que le plugin apporte réellement. Un cas s'arrête à la première pause humaine du skill : c'est elle qu'on grade, pas ce qu'un modèle ferait sans personne.
+
 Les scripts (hooks, checks) sont de **vrais fichiers** versionnes, pas des blocs de code dans un markdown : `/setup` les copie (`cp` + `chmod +x`) au lieu de les faire recopier par le modele. Seuls les templates reellement variables — commandes de lint, format et test — restent dans les markdown, avec les valeurs du projet.
 
-**Chargement progressif** : chaque `SKILL.md` reste concis et charge `reference.md` a la demande, uniquement quand le flow en a besoin. Cette decoupe maintient le contexte leger pour les cas simples tout en conservant la profondeur quand elle est utile (exemples : `pipe-changelog`, `pipe-plan`, `pipe-review`).
+**Doctrine des skills.** Un modèle se perd moins dans un long texte que dans des règles de poids égal, répétées et justifiées : chaque `SKILL.md` ouvre donc sur son invariant, enchaîne des puces impératives sans justification, et tient en 50–80 lignes. Ce qui sert à chaque exécution y reste ; ce qui est conditionnel (spike, inventaire, dépréciation, décomposition, pre-release) vit dans une annexe chargée sur ce chemin seul, à un seul niveau de profondeur. Le protocole d'un sub-agent est un agent du plugin, la mécanique répétée est un script, et le *pourquoi* d'une règle est ici — dans un skill, il n'est gardé que s'il tranche un conflit réel. `.claude/scripts/measure-skills.sh` mesure le graphe de chargement de chaque skill (SKILL.md + annexes transitives) : la refonte de la 1.9.0 l'a ramené de ~111 k à ~43 k tokens pour l'ensemble du plugin.
 
 ## Fichiers projet-spécifiques
 

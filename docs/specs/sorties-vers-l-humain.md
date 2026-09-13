@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée)
 
 ## En une phrase
 
@@ -60,5 +61,6 @@ Les maquettes de rendu reellement variables — celles qu'un skill n'affiche que
 | Fichier | Rôle |
 |---------|------|
 | `.claude/skills/create-skill/guide.md` | Section « Grammaire de sortie » : la règle, appliquee a l'ecriture de chaque skill |
+| `skills/pipe-spec/SKILL.md`, `skills/pipe-plan/SKILL.md` | Salves de Q/R ouvertes par une vue haut niveau non technique |
 | `skills/pipe-review/rendu.md` | Maquettes de constat et de sollicitation de la review |
 | [`garde-fous-automatiques.md`](garde-fous-automatiques.md) | Verification a posteriori de la règle, sur les reponses de la session principale |

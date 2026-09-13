@@ -1,19 +1,19 @@
 #!/bin/bash
 # Hook PreToolUse (plugin) — bloque un Write/Edit/commande git-gh qui introduit un mot
-# francais sans son accent, avant que le contenu n'existe. Deterministe, aucun LLM :
-# check-accents.sh fait toute la detection, ce script ne fait qu'extraire le bon texte
-# selon l'outil et decider du blocage.
+# français sans son accent, avant que le contenu n'existe. Déterministe, aucun LLM :
+# check-accents.sh fait toute la détection, ce script ne fait qu'extraire le bon texte
+# selon l'outil et décider du blocage.
 #
-# Perimetre volontairement restreint pour eviter les faux positifs :
-#   - Write/Edit sur *.md : la prose de ce depot verifiee dans son integralite
-#   - Write/Edit sur *.sh : seules les lignes de COMMENTAIRE sont verifiees — jamais le
-#     code (regex, motifs volontairement flous comme `de*pre*ci`) ni les commentaires de
-#     code applicatif hors scripts de ce plugin, dont la qualite est du ressort du
-#     sub-agent de /pipe-review, pas d'un hook
-#   - Bash : uniquement les commandes qui portent un message en francais par convention
+# Périmètre volontairement restreint pour éviter les faux positifs :
+#   - Write/Edit sur *.md : la prose de ce dépôt vérifiée dans son intégralité
+#   - Write/Edit sur *.sh : seules les lignes de COMMENTAIRE sont vérifiées — jamais le
+#     code (regex, motifs volontairement flous comme `de*pre*ci`). Les commentaires de
+#     code applicatif ne sont pas vérifiés ici pour leurs accents ; leur fond (quoi vs
+#     pourquoi) est jugé par post-edit-comments.sh après écriture
+#   - Bash : uniquement les commandes qui portent un message en français par convention
 #     (git commit, gh pr create/edit, gh pr comment, gh issue create, gh api ...comments)
 #
-# Exit 2 bloque, et c'est STDERR qui est alors transmis a Claude — jamais stdout.
+# Exit 2 bloque, et c'est STDERR qui est alors transmis à Claude — jamais stdout.
 
 command -v jq >/dev/null 2>&1 || exit 0
 
@@ -47,7 +47,12 @@ case "$TOOL" in
   Bash)
     CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
     printf '%s' "$CMD" | grep -qE 'git[[:space:]]+commit|gh[[:space:]]+pr[[:space:]]+(create|edit|comment)|gh[[:space:]]+issue[[:space:]]+create|gh[[:space:]]+api[^|]*comments' || exit 0
-    TEXT="$CMD"
+    # Seule la prose est jugée : un chemin, un nom de fichier, une URL ou une option ne
+    # sont pas du français (un nom de fichier en kebab-case dont un segment est un mot
+    # français sans accent bloquait tout `git add` qui le citait). Sont retirés les mots
+    # contenant `/`, `_`, un `.` suivi d'une lettre (extension, hôte), et ceux qui
+    # commencent par `-` — jamais la ponctuation de phrase.
+    TEXT=$(printf '%s' "$CMD" | tr -s '[:space:]' '\n' | grep -vE "/|_|\\.[A-Za-z]|^[\"']?-" | paste -sd' ' -)
     ;;
   *)
     exit 0
@@ -61,8 +66,8 @@ HITS=$(printf '%s' "$TEXT" | "$SCRIPT_DIR/check-accents.sh")
 [ -n "$HITS" ] || exit 0
 
 {
-  echo "BLOQUE — accent(s) francais manquant(s) dans le texte a ecrire :"
+  echo "BLOQUÉ — accent(s) français manquant(s) dans le texte à écrire :"
   printf '%s\n' "$HITS"
-  echo "Corrige ces mots puis reessaie."
+  echo "Corrige ces mots puis réessaie."
 } >&2
 exit 2
