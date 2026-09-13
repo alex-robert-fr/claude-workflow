@@ -11,7 +11,7 @@ allowed-tools:
 
 ## Étape 0 — Vérifications
 
-Remote `origin` configuré et description fournie ; sinon une ligne, stop. Le repo actif est celui du remote (MCP GitHub) : toutes les issues y vont.
+Remote `origin` configuré et description fournie ; sinon une ligne, stop. Le repo actif est celui du remote : toutes les issues y vont. Canal : MCP GitHub, sinon `gh issue create` ; ni l'un ni l'autre → une ligne, stop.
 
 ## Étape 1 — Une ou plusieurs issues
 
@@ -39,7 +39,7 @@ Un mécanisme qui bifurque réellement (plusieurs cas d'erreur parallèles) se d
 
 ## Étape 3 — Confirmer puis créer
 
-Récap de toutes les issues, puis « Je crée ces N issues sur GitHub ? ». Confirmé → création via MCP GitHub dans l'ordre des dépendances, label = type en minuscules (`bug`, `feature`, `refactor`, `chore`, `docs`, `perf`), créé s'il manque sur le repo ; affiche chaque URL.
+Récap de toutes les issues, puis « Je crée ces N issues sur GitHub ? ». Confirmé → création par le canal disponible dans l'ordre des dépendances, label = type en minuscules (`bug`, `feature`, `refactor`, `chore`, `docs`, `perf`), créé s'il manque sur le repo ; affiche chaque URL.
 
 ---
 

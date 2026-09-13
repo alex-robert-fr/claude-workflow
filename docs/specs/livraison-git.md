@@ -48,7 +48,7 @@ La Pull Request tire son contexte du pilotage, sinon de l'identifiant present da
 ## Dependances
 
 - **Internes** : [`fichier-de-pilotage.md`](fichier-de-pilotage.md) pour l'identifiant du ticket et le plan ; [`review-de-fin-de-cycle.md`](review-de-fin-de-cycle.md), dont la validation precede le decoupage ; la configuration du projet pour la plateforme et la branche par defaut
-- **Externes** : `git` ; le MCP de la plateforme pour créer et mettre a jour une Pull Request
+- **Externes** : `git` ; le MCP de la plateforme pour créer et mettre à jour une Pull Request, à défaut sa CLI (`gh`, `glab`), à défaut le body est affiché et le skill s'arrête
 - **Dependants** : [`changelog-et-release.md`](changelog-et-release.md), qui reprend les blocs Changelog des Pull Requests mergees et associe les commits restants a leurs Pull Requests
 
 ## Decisions
@@ -71,7 +71,7 @@ La Pull Request tire son contexte du pilotage, sinon de l'identifiant present da
 |---------|------|
 | `skills/git-conventions/SKILL.md` | Formats de branche, de commit et de Pull Request — referentiel unique |
 | `skills/pipe-commit/SKILL.md` | Decoupage de fin de cycle et commit ponctuel |
-| `skills/pipe-pr/SKILL.md` | Push, contexte, description, iteration, fin de cycle |
+| `skills/pipe-pr/SKILL.md` | Push, contexte, description, fin de cycle ; format du commentaire d'itération dans `iteration.md` |
 
 ## Pieges et zones sensibles
 

@@ -26,7 +26,7 @@ allowed-tools:
 - Ticket : depuis le pilotage, sinon l'identifiant du nom de branche (`feat/42-…` → issue #42 via MCP GitHub ; `feat/PROJ-42-…` → Jira via MCP Atlassian) ; aucun ticket identifiable → demande-le avant de continuer
 - Commits : `git log <défaut>..HEAD --format="%h %s"` ; URL HTTPS du remote pour les liens `<base>/commit/<sha>`
 - Diff : vérifie que la description reflète ce qui a réellement été implémenté
-- PR ouverte sur la branche (MCP GitHub) ? → mise à jour, sinon création
+- PR ouverte sur la branche (MCP GitHub, sinon `gh pr list --head <branche> --state open`) ? → mise à jour, sinon création
 
 ## Étape 2 — Description
 
@@ -60,22 +60,11 @@ Bloc Changelog : Read `${CLAUDE_SKILL_DIR}/../pipe-changelog/entree.md` et appli
 
 ## Étape 3 — Commentaire d'itération (mise à jour seulement)
 
-Tous les commits poussés depuis la dernière mise à jour de la PR :
+Read `${CLAUDE_SKILL_DIR}/iteration.md` et applique son format aux commits poussés depuis la dernière mise à jour.
 
-```markdown
-## Mise à jour — [date]
+## Étape 4 — Confirmer puis soumettre
 
-### Nouveaux commits
-- `emoji type(scope): description`
-
-### Changements ajoutés
-- `chemin/fichier` — ce qui a changé
-
-### Impact
-Une phrase pour l'ensemble de l'itération.
-```
-
-## Étape 4 — Confirmer puis soumettre (MCP GitHub)
+Canal : MCP GitHub ; absent → `gh pr create` / `gh pr edit` + `gh pr comment` (body par `--body-file`) ; ni l'un ni l'autre → affiche le body final et stop.
 
 Affiche le contenu complet — création : `**PR à créer** — [Type] Titre (#XX)` / `type/XX-description → [branche par défaut]` / body / `Je crée cette PR ?` ; mise à jour : description réécrite + commentaire. Confirmé → crée (base : branche par défaut de workflow-config) ou met à jour et poste le commentaire ; affiche `PR créée : [URL]` ou `PR mise à jour : [URL]`. Body avec de vrais sauts de ligne.
 

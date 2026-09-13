@@ -22,7 +22,7 @@ La forme `ABC-123` est ambiguë (Jira et Linear partagent le format). Ordre de r
 | 2 | URL `*.atlassian.net/*` / `linear.app/*` | Jira / Linear | idem |
 | 3 (repli) | Forme `ABC-123` seule | Jira | `mcp__atlassian__` |
 
-Aucun tracker externe → le ticket vient de la plateforme git. MCP nécessaire absent → le signaler, proposer des alternatives.
+Aucun tracker externe → le ticket vient de la plateforme git. MCP nécessaire absent → CLI de la plateforme si installée (`gh issue view <n>`, `glab issue view <n>`, `tea issues <n>`) ; sinon le signaler et demander le contenu du ticket.
 
 ## Formes de l'argument
 
@@ -35,7 +35,7 @@ Récupère le ticket complet : titre, body, labels, commentaires pertinents.
 
 ## Vérifications
 
-Remote `origin` configuré ; argument qui identifie un ticket ; MCP disponible. Une vérification échoue → une ligne, stop.
+Remote `origin` configuré ; argument qui identifie un ticket ; MCP ou CLI disponible. Une vérification échoue → une ligne, stop.
 
 ## Hiérarchie Jira
 

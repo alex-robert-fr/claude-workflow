@@ -48,7 +48,7 @@ Issues GitHub : rien, `Closes #N` les ferme au merge.
 
 ## Étape 4 — PR de release
 
-Affiche version, PR incluses, extrait du CHANGELOG ; demande une confirmation unique ; puis `git push origin <intégration>` et crée la PR `<intégration>` → `<production>` via le MCP de la plateforme : titre `[Release] vX.Y.Z`, body = section CHANGELOG de la version, PR incluses, version cible.
+Affiche version, PR incluses, extrait du CHANGELOG ; demande une confirmation unique ; puis `git push origin <intégration>` et crée la PR `<intégration>` → `<production>` via le MCP de la plateforme (absent → `gh pr create` ou `glab mr create`, sinon affiche le body et stop) : titre `[Release] vX.Y.Z`, body = section CHANGELOG de la version, PR incluses, version cible.
 
 ```
 PR de release créée : [URL]
