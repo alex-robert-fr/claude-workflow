@@ -1,6 +1,6 @@
 ---
 name: auditor
-description: Audite une zone de code contre une grille de règles atomiques, preuve fichier:ligne obligatoire. Lancé en parallèle par /audit-conformity.
+description: Audite une zone de code contre une grille de règles, preuve fichier:ligne obligatoire. Lancé par /audit-conformity.
 model: sonnet
 tools: Read, Grep, Glob
 ---

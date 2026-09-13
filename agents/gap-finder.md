@@ -1,6 +1,6 @@
 ---
 name: gap-finder
-description: Cherche ce qu'un audit n'a pas vu — règles jamais évaluées, zones survolées, faux négatifs, périmètre manquant. Lancé une fois par /audit-conformity.
+description: Cherche les angles morts d'un audit — règles jamais évaluées, zones survolées, périmètre manquant. Lancé par /audit-conformity.
 model: sonnet
 tools: Read, Grep, Glob
 ---
