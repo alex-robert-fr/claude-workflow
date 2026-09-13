@@ -13,7 +13,7 @@
 #   - un skill invocable sans $ARGUMENTS : l'argument utilisateur est perdu
 #   - un skill que le modèle peut invoquer seul : tous ont des effets de bord
 #   - un mot sans accent dans ce que le modèle lit à chaque session
-#   - un corps trop long sans fichier support : le seuil de delegation n'est pas tenu
+#   - un corps au-delà du budget de 80 lignes : le seuil de délégation n'est pas tenu
 #   - le diagramme du pipeline divergent entre ses trois copies
 
 ROOT="${CLAUDE_PROJECT_DIR:-.}"
@@ -82,13 +82,22 @@ for skill in "$ROOT"/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md; do
     status=1
   fi
 
-  # 4. Corps > 150 lignes sans aucun fichier support a cote
+  # 4. Budget de la doctrine : 80 lignes de corps pour un skill du plugin (le contenu
+  # conditionnel va en annexe). Les skills locaux de .claude/ tolèrent 150 sans annexe.
   fm_end=$(awk 'NR > 1 && /^---$/ { print NR; exit }' "$skill")
   body=$(( $(wc -l < "$skill") - ${fm_end:-0} ))
-  if [ "$body" -gt 150 ] && [ -z "$(find "$dir" -maxdepth 1 -type f ! -name 'SKILL.md' -print -quit)" ]; then
-    echo "SKILL $name — corps de $body lignes sans fichier support (max 150)"
-    status=1
-  fi
+  case "$skill" in
+    "$ROOT"/skills/*)
+      if [ "$body" -gt 80 ]; then
+        echo "SKILL $name — corps de $body lignes (max 80 : déplacer le conditionnel en annexe)"
+        status=1
+      fi ;;
+    *)
+      if [ "$body" -gt 150 ] && [ -z "$(find "$dir" -maxdepth 1 -type f ! -name 'SKILL.md' -print -quit)" ]; then
+        echo "SKILL $name — corps de $body lignes sans fichier support (max 150)"
+        status=1
+      fi ;;
+  esac
 done
 
 # 5. Le diagramme du pipeline est reproduit a trois endroits : README.md (source),
@@ -100,7 +109,7 @@ done
 # `sed '/pipe-spec/,/pipe-pr/p'` attraperait la première mention en prose du
 # fichier et produirait une fausse divergence.
 #   - README.md et CLAUDE.md : bloc entre <!-- pipeline:debut --> et <!-- pipeline:fin -->
-#   - skills/setup/SKILL.md  : la ligne du recap, prefixee `Cycle : `
+#   - skills/setup/recap.md  : la ligne du recap, prefixee `Cycle : `
 sequence() {
   # Noms de skills pipe-* dans l'ordre, dedoublonnes a la suite. pipe-ship est
   # ecarte : il reprend le cycle, il n'en est pas une phase.
@@ -133,7 +142,7 @@ else
     fi
   }
   compare "CLAUDE.md" ancre_bloc
-  compare "skills/setup/SKILL.md" ancre_recap
+  compare "skills/setup/recap.md" ancre_recap
 fi
 
 # 6. Agents du plugin : leur description est payée dans chaque session comme

@@ -12,18 +12,9 @@ allowed-tools:
 
 ## Étape 0 — Diagnostic
 
-- `CLAUDE.md` à la racine
-- `.claude/skills/workflow-config/SKILL.md` rempli (aucun placeholder `<!-- -->`) ; idem pour tout autre fichier de `.claude/skills/`
-- `.claude/settings.json` avec les quatre hooks (SessionStart, PreToolUse, PostToolUse, Stop — vérifiés séparément), chacun câblé vers un script existant et exécutable :
+`bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/setup-diagnose.sh"` — une ligne `ok` / `KO (motif)` par élément : CLAUDE.md, workflow-config sans placeholder, les quatre hooks de `.claude/settings.json` chacun câblé vers un script exécutable, check-specs.sh, `.claude/plans/`, `docs/specs/` et son index. Vérifie aussi l'absence de placeholder dans tout autre fichier de `.claude/skills/`.
 
-  ```bash
-  jq -r '.hooks | to_entries[] | .value[].hooks[].command' .claude/settings.json 2>/dev/null \
-    | awk '{print $2}' | sort -u | while read -r f; do [ -x "$f" ] && echo "ok $f" || echo "KO $f"; done
-  ```
-
-- `.claude/scripts/check-specs.sh` ; `.claude/plans/` ; `docs/specs/` avec son `README.md`
-
-Récap `✅ / ❌ (motif)` par ligne — un hook dont le script est absent ou non exécutable compte ❌. Confirme la liste des actions avant de commencer.
+Affiche le diagnostic tel quel, puis la liste des actions ; confirme-la avant de commencer.
 
 ## Étape 1 — CLAUDE.md
 
@@ -57,16 +48,8 @@ Stack, architecture et nommage se remplissent depuis ce qui est détecté. Confi
 
 Read `${CLAUDE_SKILL_DIR}/hooks-reference.md`.
 
-```bash
-mkdir -p .claude/hooks .claude/scripts
-cp "${CLAUDE_SKILL_DIR}/scripts/session-start.sh" "${CLAUDE_SKILL_DIR}/scripts/pre-tool-use.sh" \
-   "${CLAUDE_SKILL_DIR}/scripts/post-tool-use.sh" "${CLAUDE_SKILL_DIR}/scripts/stop.sh" .claude/hooks/
-cp "${CLAUDE_SKILL_DIR}/scripts/check-specs.sh" .claude/scripts/
-chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
-cp "${CLAUDE_SKILL_DIR}/settings-template.json" .claude/settings.json
-```
+`bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/setup-install.sh"` — copie les quatre hooks, check-specs.sh et le template de settings, sans écraser : `différent` → demande, puis relance avec `--force` si confirmé.
 
-- Fichier déjà présent : identique → rien ; différent → demande avant d'écraser
 - `settings.json` existant → merge les hooks du template sans toucher permissions ni MCP
 - Placeholders, depuis workflow-config : `<EXTENSIONS>` (liste `ts|tsx|js`, sans point ni antislash — tableau « Valeurs par stack » de hooks-reference), `<COMMANDE_FORMAT>` (sans chemin de fichier), `<COMMANDE_TEST>`
 - Après écriture : aucun `<...>` ne subsiste, rejoue le contrôle d'existence de l'étape 0. `jq` absent → le signaler, installer quand même
@@ -78,27 +61,7 @@ cp "${CLAUDE_SKILL_DIR}/settings-template.json" .claude/settings.json
 
 ## Étape 5 — Récap
 
-```
-## Setup termine — [nom du projet]
-
-### Configure
-- ✅ CLAUDE.md
-- ✅ workflow-config (lint: [cmd], test: [cmd], ...)
-- ✅ hooks (SessionStart, PreToolUse, PostToolUse, Stop) — scripts copies dans .claude/hooks/
-- ✅ post-tool-use.sh (format: [cmd], extensions: [regex]) + stop.sh (test: [cmd])
-- ✅ check-specs.sh (cohérence des specs, lance par /pipe-review)
-- ✅ .claude/plans/
-- ✅ .claude/rules/
-- ✅ docs/specs/ (+ index)
-
-### Pipeline disponible
-Cycle : /pipe-spec → [validation humaine de la spec] → /pipe-plan → /pipe-test → [review humaine des tests] → /pipe-code (session neuve) → /pipe-review (session neuve) → [review humaine du code] → /pipe-commit → /pipe-pr
-Reprise a tout moment : /pipe-ship [ticket]
-Release : /pipe-release → [merge + deploiement] → /pipe-tag
-
-### Prochaine étape
-Lance `/pipe-spec [ticket]` pour demarrer un cycle par le cadrage de la feature.
-```
+Read `${CLAUDE_SKILL_DIR}/recap.md` et affiche-le avec les valeurs du projet.
 
 ---
 

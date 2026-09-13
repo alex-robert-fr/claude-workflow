@@ -125,5 +125,28 @@ else
   echo "FAIL budget de lignes — sortie : $out"; status=1
 fi
 
+echo "== setup-install / setup-diagnose =="
+I="$TMP/i"; mkdir -p "$I"; git -C "$I" init -q -b develop
+out=$(CLAUDE_PROJECT_DIR="$I" bash "$S/setup-install.sh"); code=$?
+if [ "$code" = 0 ] && [ "$(printf '%s\n' "$out" | grep -c '^copié')" = 6 ] && [ -x "$I/.claude/hooks/stop.sh" ] && [ -x "$I/.claude/scripts/check-specs.sh" ]; then
+  echo "ok   projet vide → six fichiers copiés, exécutables"
+else echo "FAIL setup-install sur projet vide (exit $code) — $out"; status=1; fi
+echo "modifié" >> "$I/.claude/hooks/stop.sh"
+out=$(CLAUDE_PROJECT_DIR="$I" bash "$S/setup-install.sh")
+if printf '%s\n' "$out" | grep -q '^différent .claude/hooks/stop.sh' && printf '%s\n' "$out" | grep -q '^identique .claude/hooks/session-start.sh' && grep -q 'modifié' "$I/.claude/hooks/stop.sh"; then
+  echo "ok   fichier modifié signalé, jamais écrasé sans --force"
+else echo "FAIL setup-install différent — $out"; status=1; fi
+CLAUDE_PROJECT_DIR="$I" bash "$S/setup-install.sh" --force >/dev/null
+grep -q 'modifié' "$I/.claude/hooks/stop.sh" && { echo "FAIL --force n'a pas écrasé"; status=1; } || echo "ok   --force écrase"
+t "diagnostic : projet incomplet → 1" 1 "" bash "$S/setup-diagnose.sh" "$I"
+out=$(bash "$S/setup-diagnose.sh" "$I")
+printf '%s\n' "$out" | grep -q '^KO CLAUDE.md' && printf '%s\n' "$out" | grep -q '^ok hook Stop' && echo "ok   diagnostic : KO et ok par élément" || { echo "FAIL diagnostic — $out"; status=1; }
+chmod -x "$I/.claude/hooks/stop.sh"
+bash "$S/setup-diagnose.sh" "$I" | grep -q '^KO hook Stop' && echo "ok   hook non exécutable → KO" || { echo "FAIL hook non exécutable non détecté"; status=1; }
+sed -i "s|'<EXTENSIONS>' '<COMMANDE_FORMAT>'|'ts' 'x'|; s|'<COMMANDE_TEST>'|'x'|" "$I/.claude/settings.json" 2>/dev/null
+chmod +x "$I/.claude/hooks/stop.sh"; echo "# p" > "$I/CLAUDE.md"; mkdir -p "$I/.claude/skills/workflow-config" "$I/.claude/plans" "$I/docs/specs"
+printf -- '---\nname: workflow-config\n---\n- Git hosting : GitHub\n' > "$I/.claude/skills/workflow-config/SKILL.md"; echo "# Specs" > "$I/docs/specs/README.md"
+t "diagnostic : projet complet → 0" 0 "" bash "$S/setup-diagnose.sh" "$I"
+
 [ $status -eq 0 ] && echo "Scripts : OK" || echo "Scripts : ÉCHEC"
 exit $status

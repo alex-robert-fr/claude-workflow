@@ -22,8 +22,7 @@ Reussi quand un projet neuf et un projet configure par une version anterieure ab
 
 - Le diagnostic precede toute ecriture et son resultat est presente avant confirmation
 - Chaque type de garde-fou est diagnostique séparément : un projet configure par une version anterieure en a certains et pas d'autres
-- Un garde-fou declare mais cable vers un fichier absent ou non executable compte comme manquant
-- Un fichier existant identique a la source est laisse tel quel ; different, il est signale et son ecrasement demande
+- Un garde-fou déclaré mais câblé vers un fichier absent ou non exécutable compte comme manquant ; un fichier existant identique à la source est laissé tel quel, différent il est signalé et son écrasement demandé
 - Les scripts sans variable projet sont copies, jamais reecrits — ce qui varie passe en argument
 - Les valeurs de configuration sont d'abord detectees depuis le projet, proposees, puis confirmees, jamais devinees en silence
 - Un champ déjà rempli n'est jamais retouche ; seuls les emplacements a completer sont questionnes
@@ -41,9 +40,7 @@ Reussi quand un projet neuf et un projet configure par une version anterieure ab
 
 ## Fonctionnement technique
 
-Cinq temps : diagnostic, instructions permanentes du projet, configuration du workflow, garde-fous, repertoires. Chaque temps ne traite que ses manques.
-
-La configuration du workflow est la source unique : plateforme, tracker, branche par defaut, branche de production, commandes de qualité, stack. Tout le reste la lit — les garde-fous recoivent ses valeurs en arguments, les skills du pipeline la chargent au demarrage.
+Cinq temps : diagnostic, instructions permanentes du projet, configuration du workflow, garde-fous, répertoires. Chaque temps ne traite que ses manques ; le diagnostic et la copie sont deux scripts du plugin, le skill n'exécute aucun bloc shell. La configuration du workflow est la source unique : plateforme, tracker, branche par defaut, branche de production, commandes de qualité, stack. Tout le reste la lit — les garde-fous recoivent ses valeurs en arguments, les skills du pipeline la chargent au demarrage.
 
 Le declenchement des garde-fous par événement, leur cablage et leurs arguments sont decrits dans [`garde-fous-outilles.md`](garde-fous-outilles.md) ; ici n'est traite que leur installation.
 
@@ -67,7 +64,9 @@ Le declenchement des garde-fous par événement, leur cablage et leurs arguments
 
 | Fichier | Rôle |
 |---------|------|
-| `skills/setup/SKILL.md` | Diagnostic, questions, installation, recapitulatif |
+| `skills/setup/SKILL.md` | Questions et enchaînement ; récapitulatif dans `recap.md` |
+| `shared/scripts/setup-diagnose.sh` | Diagnostic : une ligne ok / KO par élément, hooks vérifiés un à un depuis settings.json |
+| `shared/scripts/setup-install.sh` | Copie des hooks, de check-specs.sh et du template de settings, sans écraser (`--force` après confirmation) |
 | `skills/setup/workflow-config-template.md` | Squelette de la configuration projet |
 | `skills/setup/settings-template.json` | Cablage des garde-fous et emplacements des arguments |
 | `skills/setup/hooks-reference.md` | Semantique des événements et valeurs par stack |

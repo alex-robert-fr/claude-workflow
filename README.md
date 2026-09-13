@@ -216,7 +216,7 @@ claude-workflow/
 ├── hooks/                   # hooks.json + scripts : garde-fous actifs sans /setup
 ├── shared/
 │   ├── pilotage-template.md # template du fichier de pilotage
-│   └── scripts/             # find-plan, new-branch, changelog-section, detect-version, list-tickets — exécutés depuis le plugin
+│   └── scripts/             # find-plan, new-branch, changelog-section, detect-version, list-tickets, setup-diagnose, setup-install — exécutés depuis le plugin
 └── skills/
     ├── <nom>/               # 16 skills, un repertoire par skill
     │   ├── SKILL.md         # invariant + étapes, 50–80 lignes
