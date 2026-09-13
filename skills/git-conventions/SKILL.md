@@ -63,5 +63,3 @@ Exemple :
 - Une PR déjà ouverte évolue par un commentaire d'itération ; sa description est réécrite en état complet, sans « ajouté » ni « mis à jour »
 - Même règle de signature que les commits : aucun pied de page `Generated with Claude Code` ni lien de session
 - Dans le paramètre `body` des appels MCP GitHub : de vrais sauts de ligne, jamais `\n` littéraux
-
-Templates du corps de PR et du commentaire d'itération : `${CLAUDE_SKILL_DIR}/reference.md` (chargé par pipe-pr seul).

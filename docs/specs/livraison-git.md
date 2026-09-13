@@ -69,7 +69,6 @@ La Pull Request tire son contexte du pilotage, sinon de l'identifiant present da
 | Fichier | Rôle |
 |---------|------|
 | `skills/git-conventions/SKILL.md` | Formats de branche, de commit et de Pull Request — referentiel unique |
-| `skills/git-conventions/reference.md` | Templates de corps de PR et de commentaire d'iteration |
 | `skills/pipe-commit/SKILL.md` | Decoupage de fin de cycle et commit ponctuel |
 | `skills/pipe-pr/SKILL.md` | Push, contexte, description, iteration, fin de cycle |
 
