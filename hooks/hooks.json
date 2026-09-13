@@ -39,6 +39,17 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/post-edit-comments.sh\""
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

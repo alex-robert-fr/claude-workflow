@@ -7,9 +7,9 @@
 # Perimetre volontairement restreint pour eviter les faux positifs :
 #   - Write/Edit sur *.md : la prose de ce depot verifiee dans son integralite
 #   - Write/Edit sur *.sh : seules les lignes de COMMENTAIRE sont verifiees — jamais le
-#     code (regex, motifs volontairement flous comme `de*pre*ci`) ni les commentaires de
-#     code applicatif hors scripts de ce plugin, dont la qualite est du ressort du
-#     sub-agent de /pipe-review, pas d'un hook
+#     code (regex, motifs volontairement flous comme `de*pre*ci`). Les commentaires de
+#     code applicatif ne sont pas verifies ici pour leurs accents ; leur fond (quoi vs
+#     pourquoi) est juge par post-edit-comments.sh apres ecriture
 #   - Bash : uniquement les commandes qui portent un message en francais par convention
 #     (git commit, gh pr create/edit, gh pr comment, gh issue create, gh api ...comments)
 #

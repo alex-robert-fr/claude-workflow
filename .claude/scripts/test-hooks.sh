@@ -1,13 +1,17 @@
 #!/bin/bash
-# Rejoue les hooks git/tests du plugin (hooks/scripts/pre-git-guard.sh et
-# protect-tests.sh) sur des entrées JSON simulées, sans Claude Code.
+# Rejoue les hooks git/tests/commentaires du plugin (hooks/scripts/pre-git-guard.sh,
+# protect-tests.sh et post-edit-comments.sh) sur des entrées JSON simulées, sans Claude
+# Code. Le juge LLM de post-edit-comments.sh est remplacé par un faux binaire `claude`
+# dont le verdict est piloté par FAKE_VERDICT : on teste le filtre et le câblage, pas
+# le jugement lui-même.
 # Outillage LOCAL, jamais distribué — à lancer après toute modification de ces
 # scripts. Exit 1 dès qu'un cas échoue.
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 G="$ROOT/hooks/scripts/pre-git-guard.sh"
 P="$ROOT/hooks/scripts/protect-tests.sh"
-unset CLAUDE_PROJECT_DIR
+C="$ROOT/hooks/scripts/post-edit-comments.sh"
+unset CLAUDE_PROJECT_DIR CLAUDE_WORKFLOW_JUDGE_ACTIVE
 status=0
 
 t() {
@@ -85,6 +89,42 @@ sed -i 's/- \[x\] Code valide/- [ ] Code valide/; s/- \[x\] Tests valides/- [ ] 
 t "Tests valides décoché → libre" 0 "$P" "$(edit_json "$TMP/src/auth/login.spec.ts")"
 t "projet sans .claude/plans"     0 "$P" "$(jq -cn --arg cwd /nonexistent '{tool_name:"Edit",cwd:$cwd,tool_input:{file_path:"/nonexistent/a.spec.ts"}}')"
 rm -rf "$TMP"
+
+echo "== post-edit-comments =="
+FAKE=$(mktemp -d)
+cat > "$FAKE/claude" <<'FAKECLI'
+#!/bin/bash
+# Faux juge : le verdict vient de FAKE_VERDICT (ok | ko | muet), et il note qu'il a été appelé.
+echo called >> "$FAKE_LOG"
+case "$FAKE_VERDICT" in
+  ok)   echo '{"structured_output":{"ok":true,"commentaires":[]}}' ;;
+  ko)   echo '{"structured_output":{"ok":false,"commentaires":[{"commentaire":"// incrémente i","raison":"paraphrase du code"}]}}' ;;
+  *)    exit 1 ;;
+esac
+FAKECLI
+chmod +x "$FAKE/claude"
+export FAKE_LOG="$FAKE/log" PATH="$FAKE:$PATH"
+write_json() { jq -cn --arg f "$1" --arg c "$2" '{tool_name:"Write",tool_input:{file_path:$f,content:$c}}'; }
+edit_new()   { jq -cn --arg f "$1" --arg c "$2" '{tool_name:"Edit",tool_input:{file_path:$f,old_string:"a",new_string:$c}}'; }
+AVEC=$'let i = 0\n// incrémente i\ni++\n'
+SANS=$'let i = 0\ni++\n'
+export FAKE_VERDICT=ko
+t "verdict ko → renvoyé"           2 "$C" "$(write_json src/a.ts "$AVEC")"
+t "Edit avec commentaire → jugé"   2 "$C" "$(edit_new src/a.py $'x = 1  # met x à 1')"
+t "markdown jamais jugé"           0 "$C" "$(write_json docs/a.md "$AVEC")"
+t "json jamais jugé"               0 "$C" "$(write_json a.json '{"a":1}')"
+: > "$FAKE_LOG"
+t "code sans commentaire → 0"      0 "$C" "$(write_json src/a.ts "$SANS")"
+t "shebang + shellcheck ignorés"   0 "$C" "$(write_json a.sh $'#!/bin/bash\n# shellcheck disable=SC2086\necho $x')"
+[ -s "$FAKE_LOG" ] && { echo "FAIL juge appelé sans commentaire à juger"; status=1; } || echo "ok   juge non appelé sans commentaire"
+export FAKE_VERDICT=ok
+t "verdict ok → 0"                 0 "$C" "$(write_json src/a.ts "$AVEC")"
+export FAKE_VERDICT=muet
+t "juge muet → 0"                  0 "$C" "$(write_json src/a.ts "$AVEC")"
+export FAKE_VERDICT=ko
+out=$(printf '%s' "$(write_json src/a.ts "$AVEC")" | CLAUDE_WORKFLOW_JUDGE_ACTIVE=1 bash "$C" 2>&1 >/dev/null); code=$?
+[ "$code" = 0 ] && echo "ok   CLAUDE_WORKFLOW_JUDGE_ACTIVE neutralise" || { echo "FAIL CLAUDE_WORKFLOW_JUDGE_ACTIVE (exit $code)"; status=1; }
+rm -rf "$FAKE"
 
 [ $status -eq 0 ] && echo "Hooks : OK" || echo "Hooks : ÉCHEC"
 exit $status
