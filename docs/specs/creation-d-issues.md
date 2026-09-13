@@ -58,7 +58,6 @@ Le depot cible est deduit du remote, jamais demande. Les règles de decoupage, l
 | Fichier | Rôle |
 |---------|------|
 | `skills/create-issue/SKILL.md` | Detection du depot, analyse de la demande, rédaction, creation |
-| `skills/create-issue/reference.md` | Règles de decoupage, template de corps, table des labels |
 
 ## Pieges et zones sensibles
 
