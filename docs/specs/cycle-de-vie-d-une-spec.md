@@ -59,7 +59,7 @@ La verification de fraicheur se fait a deux niveaux, appeles depuis la review de
 | — | — | La priorisation de l'inventaire suit le churn | Une spec rapporte proportionnellement au nombre de fois ou la feature sera rouverte, et le passe le predit mieux que l'intuition | Suivre l'ordre alphabetique ou la taille |
 | — | — | La phrase de l'index est bornee a 80 caracteres et le plafond est outille | L'index est le seul poste de contexte qui grossit avec le projet : une colonne libre le fait grossir deux fois | Compter sur la concision du modele |
 | — | — | Le mode inventaire vit dans un fichier separe des references | Il enchaine sur le flow normal, qui charge déjà les references : un fichier unique se faisait lire deux fois par invocation | Tout garder dans un fichier |
-| 1.8.0 (a venir) | — | Le livrable d'un ticket d'investigation est la spec, son code est jete | Un prototype explore plusieurs pistes et n'en garde qu'une : le nettoyer pour le livrer coute plus qu'une reecriture depuis la spec, et traine des choix anterieurs a la decision | Merger la branche d'exploration apres nettoyage |
+| 1.7.1 | — | Le livrable d'un ticket d'investigation est la spec, son code est jete | Un prototype explore plusieurs pistes et n'en garde qu'une : le nettoyer pour le livrer coute plus qu'une reecriture depuis la spec, et traine des choix anterieurs a la decision | Merger la branche d'exploration apres nettoyage |
 
 ## Points d'entrée
 

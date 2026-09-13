@@ -56,7 +56,7 @@ La version du plugin se resout par ordre de priorité : le champ de `plugin.json
 | 1.6.0 | — | L'audit de cohérence ne tourne qu'a la publication | En mode brouillon il coutait plusieurs appels reseau par exécution, pour un historique qui n'avait pas bouge | Auditer a chaque passage |
 | 1.6.0 | — | Le CHANGELOG est lu par bornes | Un fichier qui grossit a chaque release finit par couter plus cher que la seule section utile | Le charger puis en extraire la section |
 | — | — | Les blocs Changelog des PRs sont la source primaire | L'entrée est ecrite par celui qui a fait le changement, quand le contexte est frais ; la release agrege au lieu de re-deriver. Les commits restent le repli pour tout ce qui n'a pas de bloc, dont l'historique anterieur | Tout re-deriver des commits a chaque release |
-| 1.8.0 (a venir) | — | La synchronisation du statut des tickets a lieu au tag, pas à la PR de release | Le tag marque le déploiement réellement confirmé ; la PR de release ne fait encore que proposer un contenu, pas livré | Synchroniser dès la création de la PR de release |
+| 1.7.1 | — | La synchronisation du statut des tickets a lieu au tag, pas à la PR de release | Le tag marque le déploiement réellement confirmé ; la PR de release ne fait encore que proposer un contenu, pas livré | Synchroniser dès la création de la PR de release |
 
 ## Points d'entrée
 

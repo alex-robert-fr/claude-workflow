@@ -9,6 +9,41 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-09-13
+
+### Added
+
+- Six hooks du plugin actifs dès l'installation, sans `/setup` : `git add` par chemins explicites, aucune signature automatique dans un commit, une PR ou un body MCP GitHub, verrou des tests validés jusqu'à `Code valide`, et relecture des commentaires de code dès l'écriture, en arrière-plan — ceux qui paraphrasent le code ou sont superflus sont renvoyés pour correction ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Six agents du plugin — `reviewer`, `test-critic`, `spec-critic`, `auditor`, `refuter`, `gap-finder` — appelables par `claude-workflow:<nom>` ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Scripts partagés `find-plan.sh`, `new-branch.sh`, `changelog-section.sh`, `detect-version.sh`, `list-tickets.sh`, `setup-diagnose.sh`, `setup-install.sh`, exécutés depuis le plugin sans copie dans le projet ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Chaque spec porte une ligne `> **Sommaire**` dans son en-tête ; `check-specs.sh` la vérifie contre les sections réelles, et signale toute spec active de plus de 80 lignes ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Chaque skill pré-approuve ses commandes en lecture (scripts du plugin, `git status|log|diff|describe|tag -l`, `gh pr list|view`) pour le tour qui l'invoque ; `commit`, `push` et `tag` restent soumis à confirmation ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Suite d'évaluation `evals/` pour `claude plugin eval` : message de commit conforme, CHANGELOG `[Unreleased]` rédigé pour le consommateur, première salve de `/pipe-spec` ouverte par une vue haut niveau ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Sans MCP plateforme, `/pipe-pr`, `/create-issue`, `/pipe-release` et la lecture de ticket passent par `gh`, `glab` ou `tea` ; sans CLI non plus, le contenu est affiché et le skill s'arrête ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+
+### Changed
+
+- Chaque skill réécrit : invariant en tête, puces sans justification, annexes chargées par chemin selon le besoin — graphe de chargement du plugin réduit de 59 % ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Tous les skills sont slash-only : aucun ne part sur une initiative du modèle, et leur description ne coûte plus de contexte en session ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Les juges de pédagogie et de commentaires rendent leur verdict en ~3 s au lieu de ~6,5 s (thinking coupé, démarrage minimal), avec un `timeout` de 30 s ; le juge des commentaires ne bloque plus l'écriture ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- `/pipe-review`, `/pipe-test`, `/pipe-spec` et `/audit-conformity` délèguent leur critique aux agents du plugin au lieu d'un prompt inline ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- `/pipe-spec` et `/pipe-plan` ouvrent chaque salve de questions par une vue haut niveau non technique, sans raconter l'exploration ; `/pipe-code` annonce un problème en une phrase non technique avant ses options ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- `/pipe-release` et `/pipe-tag` listent les tickets Jira ou Linear depuis les commits et les corps de PR de la plage, vérifient chaque clé sur le tracker et écartent les introuvables avant de poser le statut ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- `/setup` diagnostique et copie par deux scripts du plugin au lieu de blocs shell dans le skill ; son récap et le commentaire d'itération de `/pipe-pr` passent en annexe ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- La détection d'accents surveille 45 mots de plus, sans homographe anglais ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- La section `## Tests` du pilotage suit un format contractuel — un fichier par ligne en backticks — lu par le verrou des tests ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- `/setup` écrit dans le `CLAUDE.md` du projet une section Git qui nomme le plugin au lieu de recopier ses conventions ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+
+### Removed
+
+- `reference.md` de `pipe-spec`, `pipe-plan`, `pipe-review`, `pipe-changelog`, `git-conventions` et `create-issue` — remplacés par des annexes nommées, des agents, ou intégrés au skill ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+
+### Fixed
+
+- Le hook `Stop` bloque réellement une réponse jugée trop verbeuse ou sans vue haut niveau : le verdict négatif du juge était avalé par une lecture jq `// empty` ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Les descriptions de skills, `CLAUDE.md`, le rappel de début de session et les messages des hooks d'accents sont écrits avec accents — ils contredisaient la règle qu'ils énoncent ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+- Le hook d'accents ne bloque plus un `git add` ou un `gh pr edit` à cause d'un nom de fichier, d'une URL ou d'une option ([#63](https://github.com/alex-robert-fr/claude-workflow/pull/63))
+
 ## [1.7.1] - 2026-09-12
 
 ### Added
@@ -307,7 +342,8 @@ Les détails techniques de chaque changement sont documentés dans les commits e
 - Préfixage des skills par catégorie : `pipe-*` (pipeline), `create-*` (artefacts), `setup-*` (config), `audit-*` (audits) ([#8](https://github.com/ToolsForSaaS/claude-workflow/pull/8))
 - Installation du plugin via la marketplace Claude Code ([`951edeb`](https://github.com/ToolsForSaaS/claude-workflow/commit/951edeb))
 
-[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.3...v1.7.0
 [1.6.3]: https://github.com/alex-robert-fr/claude-workflow/compare/v1.6.2...v1.6.3

@@ -54,7 +54,7 @@ Les maquettes de rendu reellement variables — celles qu'un skill n'affiche que
 | 1.6.3 | — | Deux regimes : constat dense, sollicitation developpee | Une densite uniforme a produit des questions cryptiques : options telegraphiques, jargon non defini, conséquences absentes | Garder la densite prioritaire partout et ne corriger que les abus — le fond serait revenu |
 | 1.6.3 | — | Les options d'une sollicitation se formulent en comportement | Un libelle qui nomme un fichier oblige a connaitre le code pour repondre, ce qui deplace la charge sur l'humain | Nommer la couche ou le module concerne |
 | 1.6.3 | — | La spec ne prescrit aucun moyen de mise en oeuvre | Frontiere spec/plan : un outil ou un script d'apprentissage se choisit au plan et peut changer sans que la règle bouge | Engager des le cadrage un garde-fou outille |
-| 1.8.0 (a venir) | — | Vue haut niveau avant toute question technique | Une clarification qui part directement dans le detail technique force l'humain a déjà connaitre le sujet pour repondre | Poser la question technique directement, quitte a la reformuler si l'humain ne suit pas |
+| 1.7.1 | — | Vue haut niveau avant toute question technique | Une clarification qui part directement dans le detail technique force l'humain a déjà connaitre le sujet pour repondre | Poser la question technique directement, quitte a la reformuler si l'humain ne suit pas |
 
 ## Points d'entrée
 
