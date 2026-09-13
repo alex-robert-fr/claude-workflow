@@ -10,7 +10,7 @@ argument-hint: [cle JIRA, numéro issue, URL, nom de feature, ou rien pour inven
 
 - Aucun argument → mode inventaire : Read `${CLAUDE_SKILL_DIR}/inventaire.md`, puis reprends à l'étape 2 avec la feature choisie (pas de ticket, pas de pilotage)
 - Nom de feature libre (`export CSV`) → usage autonome : étape 1 directement, sans pilotage
-- Ticket → Read `${CLAUDE_SKILL_DIR}/../pipe-plan/reference.md`, section « Detection de l'environnement et recuperation du ticket »
+- Ticket → Read `${CLAUDE_SKILL_DIR}/../pipe-plan/ticket.md` (plateforme, tracker, formes de l'argument) et applique-le
 
 ## Étape 1 — Trier
 
