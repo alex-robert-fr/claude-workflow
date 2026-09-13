@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -41,7 +42,7 @@ Le depot cible est deduit du remote, jamais demande. Les règles de decoupage, l
 
 ## Dependances
 
-- **Externes** : le MCP de la plateforme pour identifier le depot, créer les issues et leurs labels
+- **Externes** : le MCP de la plateforme pour créer les issues et leurs labels, à défaut `gh issue create` ; aucun des deux → le skill s'arrête
 - **Dependants** : [`plan-technique-d-un-ticket.md`](plan-technique-d-un-ticket.md), qui consomme ces issues comme point de depart d'un cycle
 
 ## Decisions
@@ -58,7 +59,6 @@ Le depot cible est deduit du remote, jamais demande. Les règles de decoupage, l
 | Fichier | Rôle |
 |---------|------|
 | `skills/create-issue/SKILL.md` | Detection du depot, analyse de la demande, rédaction, creation |
-| `skills/create-issue/reference.md` | Règles de decoupage, template de corps, table des labels |
 
 ## Pieges et zones sensibles
 

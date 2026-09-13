@@ -11,7 +11,9 @@
 #     chemin qualifie : Read exige un chemin absolu, un nom nu n'est resolvable que
 #     depuis le cwd de ce repo, pas depuis un plugin installe
 #   - un skill invocable sans $ARGUMENTS : l'argument utilisateur est perdu
-#   - un corps trop long sans fichier support : le seuil de delegation n'est pas tenu
+#   - un skill que le modèle peut invoquer seul : tous ont des effets de bord
+#   - un mot sans accent dans ce que le modèle lit à chaque session
+#   - un corps au-delà du budget de 80 lignes : le seuil de délégation n'est pas tenu
 #   - le diagramme du pipeline divergent entre ses trois copies
 
 ROOT="${CLAUDE_PROJECT_DIR:-.}"
@@ -70,13 +72,32 @@ for skill in "$ROOT"/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md; do
     status=1
   fi
 
-  # 4. Corps > 150 lignes sans aucun fichier support a cote
-  fm_end=$(awk 'NR > 1 && /^---$/ { print NR; exit }' "$skill")
-  body=$(( $(wc -l < "$skill") - ${fm_end:-0} ))
-  if [ "$body" -gt 150 ] && [ -z "$(find "$dir" -maxdepth 1 -type f ! -name 'SKILL.md' -print -quit)" ]; then
-    echo "SKILL $name — corps de $body lignes sans fichier support (max 150)"
+  # 3b. Skill invocable que le modèle pourrait déclencher seul. Tous les skills du plugin
+  # écrivent, poussent ou lancent des agents : ils restent slash-only, ce qui retire aussi
+  # leur description du contexte de chaque session. Un futur skill en lecture seule
+  # s'ajoute à AUTO_OK plutôt que de retirer le contrôle.
+  AUTO_OK="create-skill"
+  if ! grep -qE '^disable-model-invocation:[ \t]*true' "$skill" && ! printf ' %s ' "$AUTO_OK" | grep -qF " $name "; then
+    echo "SKILL $name — invocable par le modèle : disable-model-invocation: true attendu (ou nom dans AUTO_OK)"
     status=1
   fi
+
+  # 4. Budget de la doctrine : 80 lignes de corps pour un skill du plugin (le contenu
+  # conditionnel va en annexe). Les skills locaux de .claude/ tolèrent 150 sans annexe.
+  fm_end=$(awk 'NR > 1 && /^---$/ { print NR; exit }' "$skill")
+  body=$(( $(wc -l < "$skill") - ${fm_end:-0} ))
+  case "$skill" in
+    "$ROOT"/skills/*)
+      if [ "$body" -gt 80 ]; then
+        echo "SKILL $name — corps de $body lignes (max 80 : déplacer le conditionnel en annexe)"
+        status=1
+      fi ;;
+    *)
+      if [ "$body" -gt 150 ] && [ -z "$(find "$dir" -maxdepth 1 -type f ! -name 'SKILL.md' -print -quit)" ]; then
+        echo "SKILL $name — corps de $body lignes sans fichier support (max 150)"
+        status=1
+      fi ;;
+  esac
 done
 
 # 5. Le diagramme du pipeline est reproduit a trois endroits : README.md (source),
@@ -88,7 +109,7 @@ done
 # `sed '/pipe-spec/,/pipe-pr/p'` attraperait la première mention en prose du
 # fichier et produirait une fausse divergence.
 #   - README.md et CLAUDE.md : bloc entre <!-- pipeline:debut --> et <!-- pipeline:fin -->
-#   - skills/setup/SKILL.md  : la ligne du recap, prefixee `Cycle : `
+#   - skills/setup/recap.md  : la ligne du recap, prefixee `Cycle : `
 sequence() {
   # Noms de skills pipe-* dans l'ordre, dedoublonnes a la suite. pipe-ship est
   # ecarte : il reprend le cycle, il n'en est pas une phase.
@@ -121,8 +142,50 @@ else
     fi
   }
   compare "CLAUDE.md" ancre_bloc
-  compare "skills/setup/SKILL.md" ancre_recap
+  compare "skills/setup/recap.md" ancre_recap
 fi
 
-[ $status -eq 0 ] && echo "Skills : coherents"
+# 6. Agents du plugin : leur description est payée dans chaque session comme
+# celle des skills — même plafond.
+for agent in "$ROOT"/agents/*.md; do
+  [ -f "$agent" ] || continue
+  desc=$(awk 'NR > 1 && /^---$/ { exit } /^description:/ { sub(/^description:[ \t]*/, ""); print; exit }' "$agent")
+  if [ "${#desc}" -gt 130 ]; then
+    echo "AGENT $(basename "$agent" .md) — description trop longue (${#desc} car, max 130)"
+    status=1
+  fi
+done
+
+# 7. Référence ${CLAUDE_SKILL_DIR}/... vers un fichier qui n'existe pas : un
+# Read qui échoue en silence chez l'utilisateur du plugin.
+for f in "$ROOT"/skills/*/*.md "$ROOT"/shared/*.md "$ROOT"/agents/*.md; do
+  [ -f "$f" ] || continue
+  d=$(dirname "$f")
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue
+    target=$(realpath -m "${ref//\$\{CLAUDE_SKILL_DIR\}/$d}")
+    if [ ! -e "$target" ]; then
+      echo "REF ${f#"$ROOT"/} — cible introuvable : $ref"
+      status=1
+    fi
+  done < <(grep -oE '\$\{CLAUDE_SKILL_DIR\}/[^` )"]+\.(md|sh|json)' "$f" | sort -u)
+done
+
+# 8. Accents dans ce que le modèle lit à chaque session : frontmatters des skills et des
+# agents, CLAUDE.md, rappel de session-prime.sh. Le plugin exige les accents ; un
+# contre-exemple dans ces sources est le premier texte vu par le modèle.
+ACC="$ROOT/hooks/scripts/check-accents.sh"
+if [ -x "$ACC" ]; then
+  for f in "$ROOT"/skills/*/SKILL.md "$ROOT"/agents/*.md; do
+    [ -f "$f" ] || continue
+    hits=$(awk 'NR == 1 { next } /^---$/ { exit } { print }' "$f" | "$ACC" | paste -sd' ' -)
+    [ -z "$hits" ] || { echo "ACCENTS ${f#"$ROOT"/} — frontmatter : $hits"; status=1; }
+  done
+  hits=$("$ACC" < "$ROOT/CLAUDE.md" | paste -sd' ' -)
+  [ -z "$hits" ] || { echo "ACCENTS CLAUDE.md : $hits"; status=1; }
+  hits=$(bash "$ROOT/hooks/scripts/session-prime.sh" | jq -r '.hookSpecificOutput.additionalContext' | "$ACC" | paste -sd' ' -)
+  [ -z "$hits" ] || { echo "ACCENTS session-prime.sh — rappel : $hits"; status=1; }
+fi
+
+[ $status -eq 0 ] && echo "Skills : cohérents"
 exit $status

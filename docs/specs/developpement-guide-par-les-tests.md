@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -26,9 +27,10 @@ Reussi quand la suite verte est une preuve, et non un constat d'accord du code a
 - Aucune logique n'est implementee a l'ecriture des tests, au plus le squelette minimal permettant a la suite de s'executer
 - Les nouveaux tests doivent echouer, et pour la bonne raison ; les tests existants doivent continuer de passer
 - Un ticket technique produit au besoin des tests de caracterisation, qui doivent eux être verts avant le dev
+- Un agent indépendant critique les tests (redondances, tautologies, cas limites manquants) avant leur présentation
 - Les tests sont presentes en langage métier, un comportement par ligne, et ne sont figes qu'apres accord explicite
 - L'implementation se fait dans une session neuve, dont tout le contexte est le pilotage, les tests et la spec
-- Un test suspecte de fausseté arrete l'implementation et remonte a l'humain
+- Un test suspecte de fausseté arrete l'implementation et remonte a l'humain ; un hook du plugin refuse toute modification d'un test validé tant que le code n'est pas validé
 - Les unites logiques terminees sont committees au fil du dev, chacune déjà conforme aux conventions ; le reste attend le decoupage de fin de cycle
 - Un problème non anticipe par le plan arrete l'implementation, avec des options presentees
 
@@ -41,11 +43,7 @@ Reussi quand la suite verte est une preuve, et non un constat d'accord du code a
 
 ## Fonctionnement technique
 
-Deux phases, séparées par une pause humaine et une frontiere de session. La première crée la branche, ecrit les tests, verifie qu'ils sont rouges pour la bonne raison, et les fait valider. La seconde repart d'un contexte vide : elle relit le pilotage et la spec, puis boucle coder, tester, corriger jusqu'a ce que tout passe.
-
-La frontiere de session est ce qui rend le contrat effectif : le contexte qui implemente n'a pas assiste a la negociation des tests, il ne peut donc que les satisfaire.
-
-Les ecarts au plan et le contexte utile a la review sont notes dans le pilotage a la cloture, pas conserves en memoire de session.
+Deux phases, séparées par une pause humaine et une frontiere de session. La première crée la branche, ecrit les tests, verifie qu'ils sont rouges pour la bonne raison, et les fait valider. La seconde repart d'un contexte vide : elle relit le pilotage et la spec, puis boucle coder, tester, corriger jusqu'a ce que tout passe. La frontiere de session est ce qui rend le contrat effectif : le contexte qui implemente n'a pas assiste a la negociation des tests, il ne peut donc que les satisfaire. Les ecarts au plan et le contexte utile a la review sont notes dans le pilotage a la cloture, pas conserves en memoire de session.
 
 ## Dependances
 
@@ -69,6 +67,10 @@ Les ecarts au plan et le contexte utile a la review sont notes dans le pilotage 
 |---------|------|
 | `skills/pipe-test/SKILL.md` | Branche, ecriture des tests, verification rouge, review humaine |
 | `skills/pipe-code/SKILL.md` | Boucle d'implementation, commits au fil de l'eau, cloture |
+| `shared/scripts/find-plan.sh` | Localise le pilotage (identifiant, unique, ou branche courante) |
+| `shared/scripts/new-branch.sh` | Crée la branche depuis la branche de base lue dans workflow-config |
+| `agents/test-critic.md` | Critique indépendante des tests avant la review humaine |
+| `hooks/scripts/protect-tests.sh` | Verrou des tests validés jusqu'à `Code valide` |
 
 ## Pieges et zones sensibles
 

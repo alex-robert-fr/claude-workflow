@@ -2,183 +2,66 @@
 name: setup
 description: Configurer un projet pour le workflow AI-Driven Development : CLAUDE.md, workflow-config, hooks, scripts, plans, specs.
 disable-model-invocation: true
+allowed-tools:
+  - Bash(git remote -v)
+  - Bash(git symbolic-ref *)
+  - Bash(git branch --show-current)
 ---
+
+**Ne traite que ce qui manque, après confirmation de la liste.** Les scripts se copient (`cp`), ils ne se réécrivent jamais ; ce qui varie par projet passe en argument dans `settings.json`.
 
 ## Étape 0 — Diagnostic
 
-Analyse l'etat actuel du projet et identifie ce qui manque :
+`bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/setup-diagnose.sh"` — une ligne `ok` / `KO (motif)` par élément : CLAUDE.md, workflow-config sans placeholder, les quatre hooks de `.claude/settings.json` chacun câblé vers un script exécutable, check-specs.sh, `.claude/plans/`, `docs/specs/` et son index. Vérifie aussi l'absence de placeholder dans tout autre fichier de `.claude/skills/`.
 
-- [ ] `CLAUDE.md` existe a la racine
-- [ ] `.claude/skills/workflow-config/SKILL.md` est rempli (pas de placeholders `<!-- -->`)
-- [ ] `.claude/settings.json` existe avec des hooks configures — verifie chaque type séparément (SessionStart, PreToolUse, PostToolUse, Stop) : un projet configure par une version anterieure a les trois derniers mais pas le premier
-- [ ] Chaque hook de `.claude/settings.json` pointe vers un script qui **existe et est executable** — un hook cable vers un fichier absent ne fait rien, et un PostToolUse casse tue le formatage automatique en silence :
-
-  ```bash
-  jq -r '.hooks | to_entries[] | .value[].hooks[].command' .claude/settings.json 2>/dev/null \
-    | awk '{print $2}' | sort -u \
-    | while read -r f; do [ -x "$f" ] && echo "ok $f" || echo "KO $f"; done
-  ```
-
-- [ ] `.claude/scripts/check-specs.sh` existe (check outille lance par `/pipe-review`)
-- [ ] `.claude/plans/` existe
-- [ ] `docs/specs/` existe avec son index `README.md`
-- [ ] Aucun autre fichier de `.claude/skills/` ne contient de placeholders `<!-- ... -->`
-
-Affiche un recap :
-
-```
-## Diagnostic — [nom du projet]
-
-✅ CLAUDE.md
-❌ workflow-config (manquant)
-❌ hooks (non configures)
-❌ hooks (PostToolUse cable sur .claude/hooks/post-tool-use.sh — script absent)
-...
-```
-
-Un hook dont le script est absent ou non executable compte comme ❌, meme si `settings.json` le declare.
-
-Ne traite que ce qui manque. Confirme la liste des actions avant de commencer.
+Affiche le diagnostic tel quel, puis la liste des actions ; confirme-la avant de commencer.
 
 ## Étape 1 — CLAUDE.md
 
-Si `CLAUDE.md` n'existe pas, génère-le avec le strict minimum :
-
-- Nom du projet
-- Description courte (une phrase)
-- Stack principale (detectee depuis package.json, Cargo.toml, go.mod, etc.)
-- Règles critiques évidentes (monorepo, strict mode, etc.)
-- Section **Git** : utilise Read pour charger `${CLAUDE_SKILL_DIR}/../git-conventions/SKILL.md` et inclure les règles clefs dans le CLAUDE.md (format de commit, format de branche, pas de signature `Co-Authored-By` dans les commits ni `Generated with Claude Code` dans les PR)
-- Section **Specs** : le pointeur qui rend la doc de features decouvrable — sans lui, personne ne va la lire
+Absent → génère le minimum : nom, description en une phrase, stack détectée (package.json, Cargo.toml, go.mod…), règles critiques évidentes, et deux sections :
 
 ```markdown
+## Git
+
+Conventions du plugin claude-workflow : branches `type/identifiant-titre-court`, commits `emoji type(scope): description` en français avec corps en puces, aucune signature automatique — appliquées par `/pipe-commit` et `/pipe-pr`.
+
 ## Specs
 
-Chaque feature a une spec dans `docs/specs/` : intention, comportement attendu, hors-scope,
-decisions et points d'entrée techniques. **Avant de modifier une feature, lire sa spec**
-(index : `docs/specs/README.md`) plutot que de parcourir le code.
-Les specs sont ecrites et maintenues par `/pipe-spec`.
+Chaque feature a une spec dans `docs/specs/` : intention, comportement attendu, hors-scope, décisions et points d'entrée. **Avant de modifier une feature, lire sa spec** (index : `docs/specs/README.md`). Écrites et maintenues par `/pipe-spec`.
 ```
 
-Si `CLAUDE.md` existe déjà, verifie qu'il contient ces deux sections (Git et Specs). Si l'une manque, propose de l'ajouter.
+Présent → vérifie ces deux sections, propose d'ajouter celle qui manque.
 
 ## Étape 2 — workflow-config
 
-Si `.claude/skills/workflow-config/SKILL.md` n'existe pas, utilise Read pour charger `${CLAUDE_SKILL_DIR}/workflow-config-template.md` comme squelette. Si le fichier existe mais contient des placeholders, pose les questions pour le remplir :
+Absent → Read `${CLAUDE_SKILL_DIR}/workflow-config-template.md` comme squelette. Placeholders → pose les questions, valeur détectée proposée :
 
-1. **Plateforme Git** : GitHub, GitLab ou Gitea ? (detecte depuis `git remote -v`)
-2. **Issue tracker** : GitHub Issues, Jira, Linear ? (detecte depuis les MCP configures)
-3. **Statut ticket à la release** — uniquement si la question 2 répond Jira ou Linear : quel statut appliquer aux tickets couverts par une release, une fois déployée (ex: Done, Terminé) ? (MCP déjà repéré à la question 2 — `mcp__atlassian__` pour Jira, `mcp__linear__` pour Linear)
-4. **Branche par defaut** (base des features) : main, develop, master ? (detecte depuis `git symbolic-ref refs/remotes/origin/HEAD`) — et **branche de production** (cible des releases) si le projet en a une distincte (ex: develop → main)
-5. **Commande lint** : biome check, eslint, etc. ? (detecte depuis package.json scripts)
-6. **Commande format** : biome format --write, prettier --write, etc. ?
-7. **Commande test** : vitest, jest, npm test, etc. ?
-8. **Commande build** : tsc --noEmit, npm run build, etc. ?
-9. **Notification** : canal Slack, aucun ?
+1. Plateforme git (`git remote -v`)
+2. Issue tracker (MCP configurés) ; si Jira ou Linear : statut à appliquer aux tickets à la release
+3. Branche par défaut (`git symbolic-ref refs/remotes/origin/HEAD`) et branche de production si distincte
+4. Commandes lint, format, test, build (scripts de package.json ou équivalent)
+5. Notification (canal, aucun)
 
-Les sections Stack technique, Architecture et Nommage du template se remplissent a partir de ce qui est detecte (package.json, structure des dossiers, configs). Propose des valeurs detectees automatiquement, demande confirmation, puis ecris le fichier.
+Stack, architecture et nommage se remplissent depuis ce qui est détecté. Confirme, écris. Un `.claude/skills/tech-stack/SKILL.md` (legacy) → propose de le fusionner puis de le supprimer. Ne touche jamais un champ déjà rempli.
 
-Si le projet a encore un `.claude/skills/tech-stack/SKILL.md` (config legacy), propose de fusionner son contenu dans `workflow-config` et de le supprimer.
+## Étape 3 — Hooks et scripts
 
-Meme mecanique pour tout autre fichier de `.claude/skills/` contenant des placeholders `<!-- ... -->` (detecte a l'étape 0) : proposer une valeur detectee automatiquement, poser une question courte si rien n'est detectable, confirmer, puis remplacer le placeholder. Ne jamais toucher aux champs déjà remplis.
+Read `${CLAUDE_SKILL_DIR}/hooks-reference.md`.
 
-## Étape 3 — Hooks
+`bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/setup-install.sh"` — copie les quatre hooks, check-specs.sh et le template de settings, sans écraser : `différent` → demande, puis relance avec `--force` si confirmé.
 
-Utilise Read pour charger `${CLAUDE_SKILL_DIR}/hooks-reference.md`.
+- `settings.json` existant → merge les hooks du template sans toucher permissions ni MCP
+- Placeholders, depuis workflow-config : `<EXTENSIONS>` (liste `ts|tsx|js`, sans point ni antislash — tableau « Valeurs par stack » de hooks-reference), `<COMMANDE_FORMAT>` (sans chemin de fichier), `<COMMANDE_TEST>`
+- Après écriture : aucun `<...>` ne subsiste, rejoue le contrôle d'existence de l'étape 0. `jq` absent → le signaler, installer quand même
+- Affiche la config générée et demande confirmation avant d'écrire
 
-### Scripts universels — copier, ne jamais reecrire
+## Étape 4 — Répertoires
 
-Aucune variable projet (voir hooks-reference.md ci-dessus) : cree les repertoires puis copie :
+`.claude/plans/` (ajouté à `.gitignore`), `.claude/rules/`, `docs/specs/` (versionné, jamais ignoré) avec un `README.md` vide créé selon `${CLAUDE_SKILL_DIR}/../pipe-spec/index-format.md` (Read) — aucune spec n'est écrite depuis `/setup`. Projet avec des features livrées → `Pour les documenter en partant des plus rentables : /pipe-spec sans argument (inventaire priorisé, une feature par passe).`
 
-```bash
-mkdir -p .claude/hooks .claude/scripts
-cp "${CLAUDE_SKILL_DIR}/scripts/session-start.sh"  .claude/hooks/
-cp "${CLAUDE_SKILL_DIR}/scripts/pre-tool-use.sh"   .claude/hooks/
-cp "${CLAUDE_SKILL_DIR}/scripts/post-tool-use.sh"  .claude/hooks/
-cp "${CLAUDE_SKILL_DIR}/scripts/stop.sh"           .claude/hooks/
-cp "${CLAUDE_SKILL_DIR}/scripts/check-specs.sh"    .claude/scripts/
-chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
-```
+## Étape 5 — Récap
 
-Les 4 hooks de `settings.json` pointent vers ces scripts : aucun ne doit être cable vers un fichier que cette étape ne copie pas.
-
-Si un fichier existe déjà, compare-le a la source : identique → ne rien faire ; different → signale que le projet a une version modifiee et demande avant d'ecraser (elle a pu être adaptee volontairement).
-
-### settings.json — copier le template, remplacer les placeholders
-
-Copie le template, puis remplace ses placeholders.
-
-```bash
-cp "${CLAUDE_SKILL_DIR}/settings-template.json" .claude/settings.json
-```
-
-Les 4 hooks y pointent déjà vers les scripts copies. Ce qui varie par projet, c'est uniquement leurs **arguments** :
-
-| Placeholder | Valeur, depuis `workflow-config` |
-|-------------|-----------------------------------|
-| `<EXTENSIONS>` | extensions a formater, séparées par `\|`, sans point ni antislash (ex `ts\|tsx\|js`) — tableau « Valeurs par stack » de `${CLAUDE_SKILL_DIR}/hooks-reference.md` |
-| `<COMMANDE_FORMAT>` | commande **Format** — sans chemin de fichier, le hook l'ajoute |
-| `<COMMANDE_TEST>` | commande **Test** |
-
-Ce que fait chaque hook :
-
-- **SessionStart** (pas de matcher) — `session-start.sh`, sans argument : injecte l'index des specs
-- **PreToolUse** (matcher `Bash`) — `pre-tool-use.sh`, sans argument : bloque les commandes dangereuses
-- **PostToolUse** (matcher `Write|Edit`) — `post-tool-use.sh '<EXTENSIONS>' '<COMMANDE_FORMAT>'` : formate le fichier ecrit
-- **Stop** (pas de matcher) — `stop.sh <COMMANDE_TEST>` : tests avant de considerer la tache finie
-
-Apres ecriture, verifie qu'aucun `<...>` ne subsiste dans `.claude/settings.json` et rejoue le controle d'existence de l'étape 0.
-
-Le hook SessionStart est inerte tant que `docs/specs/README.md` n'existe pas — installe-le meme sur un projet qui n'a pas encore de spec. Lui et `check-specs.sh` requierent `jq` : si l'outil est absent du système, signale-le et installe quand meme.
-
-Si un `.claude/settings.json` existe déjà, merge les hooks du template sans ecraser les permissions ou MCP existants.
-
-Affiche la config générée et demande confirmation avant d'ecrire.
-
-## Étape 4 — Repertoires
-
-Cree les repertoires manquants :
-
-- `.claude/plans/` — pour les plans generes par `/pipe-plan`
-- `.claude/rules/` — pour les rules contextuelles futures
-- `docs/specs/` — pour les specs de features generees par `/pipe-spec`
-
-`.claude/hooks/` et `.claude/scripts/` ont déjà ete créés a l'étape 3 avec les scripts.
-
-Ajoute `.claude/plans/` a `.gitignore` si ce n'est pas déjà fait (les plans sont des documents de travail ephemeres). `docs/specs/`, au contraire, est **versionne** : ne jamais l'ignorer.
-
-Cree l'index `docs/specs/README.md` s'il manque, en chargeant le format depuis `${CLAUDE_SKILL_DIR}/../pipe-spec/index-format.md`. Laisse-le vide : n'ecris aucune spec depuis `/setup`, chacune exige un cadrage avec l'utilisateur.
-
-Sur un projet qui a **déjà des features**, signale le rattrapage — sans lui, les specs n'arriveront qu'au rythme des futurs tickets :
-
-```
-Ce projet a déjà des features livrees. Pour les documenter en partant des plus
-rentables : `/pipe-spec` sans argument (inventaire priorise, une feature par passe).
-```
-
-## Étape 5 — Recap final
-
-```
-## Setup termine — [nom du projet]
-
-### Configure
-- ✅ CLAUDE.md
-- ✅ workflow-config (lint: [cmd], test: [cmd], ...)
-- ✅ hooks (SessionStart, PreToolUse, PostToolUse, Stop) — scripts copies dans .claude/hooks/
-- ✅ post-tool-use.sh (format: [cmd], extensions: [regex]) + stop.sh (test: [cmd])
-- ✅ check-specs.sh (cohérence des specs, lance par /pipe-review)
-- ✅ .claude/plans/
-- ✅ .claude/rules/
-- ✅ docs/specs/ (+ index)
-
-### Pipeline disponible
-Cycle : /pipe-spec → [validation humaine de la spec] → /pipe-plan → /pipe-test → [review humaine des tests] → /pipe-code (session neuve) → /pipe-review (session neuve) → [review humaine du code] → /pipe-commit → /pipe-pr
-Reprise a tout moment : /pipe-ship [ticket]
-Release : /pipe-release → [merge + deploiement] → /pipe-tag
-
-### Prochaine étape
-Lance `/pipe-spec [ticket]` pour demarrer un cycle par le cadrage de la feature.
-```
+Read `${CLAUDE_SKILL_DIR}/recap.md` et affiche-le avec les valeurs du projet.
 
 ---
 

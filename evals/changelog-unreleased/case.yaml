@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: changelog-unreleased
+description: /pipe-changelog sans argument propose une section [Unreleased] rédigée pour le consommateur et attend la confirmation.
+tags: [changelog, smoke]
+context:
+  scaffold_script: fixture.sh

@@ -2,6 +2,7 @@
 
 > **Statut** : active
 > **Tickets** : —
+> **Sommaire** : [Intention](#intention) · [Philosophie](#philosophie) · [Comportement attendu](#comportement-attendu) · [Hors scope](#hors-scope) · [Fonctionnement technique](#fonctionnement-technique) · [Dependances](#dependances) · [Decisions](#decisions) · [Points d'entrée](#points-dentrée) · [Pieges et zones sensibles](#pieges-et-zones-sensibles)
 
 ## En une phrase
 
@@ -64,6 +65,7 @@ Deux phases exigent un contexte neuf : l'implementation et la review. La frontie
 | Fichier | Rôle |
 |---------|------|
 | `skills/pipe-ship/SKILL.md` | Localisation, detection de phase, table etat → skill, frontieres de session |
+| `shared/scripts/find-plan.sh` | Localise le pilotage : identifiant, unique, ou branche courante |
 | `shared/pilotage-template.md` | Ordre des étapes de la section d'etat |
 
 ## Pieges et zones sensibles

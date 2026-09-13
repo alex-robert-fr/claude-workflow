@@ -1,8 +1,8 @@
 # claude-workflow
 
-Plugin Claude Code pour le workflow AI-Driven Development (`name: claude-workflow` dans `.claude-plugin/plugin.json` — les skills sont namespaces `/claude-workflow:pipe-code`).
+Plugin Claude Code pour le workflow AI-Driven Development (`name: claude-workflow` dans `.claude-plugin/plugin.json` — les skills sont namespacés `/claude-workflow:pipe-code`).
 
-Le detail fonctionnel — raison d'être, pipeline commente, specs, voie rapide, installation, inventaire des skills — vit dans `README.md`. Le lire avant de modifier le comportement d'un skill : il est la source unique, ce fichier n'en est pas une copie.
+Le détail fonctionnel — raison d'être, pipeline commenté, specs, voie rapide, installation, inventaire des skills — vit dans `README.md`. Le lire avant de modifier le comportement d'un skill : il est la source unique, ce fichier n'en est pas une copie.
 
 ## Pipeline
 
@@ -10,29 +10,29 @@ Le detail fonctionnel — raison d'être, pipeline commente, specs, voie rapide,
 ```
 /pipe-spec (cadrage de la feature + validation humaine)
 → /pipe-plan (Q/R + plan) → /pipe-test (tests d'abord + review humaine)
-→ session neuve : /pipe-code (guide par les tests, changesets au fil de l'eau)
-→ session neuve : /pipe-review (format/lint/tests outilles + agent + review humaine + fraicheur de la spec)
-→ /pipe-commit (decoupage en changesets) → /pipe-pr (vers la branche d'integration)
+→ session neuve : /pipe-code (guidé par les tests, changesets au fil de l'eau)
+→ session neuve : /pipe-review (format/lint/tests outillés + agent + review humaine + fraîcheur de la spec)
+→ /pipe-commit (découpage en changesets) → /pipe-pr (vers la branche d'intégration)
 ```
 <!-- pipeline:fin -->
+`/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, détecte la phase et déroule jusqu'à la prochaine pause humaine. Release : `/pipe-release` → [merge + déploiement] → `/pipe-tag`.
 
-`/pipe-ship <ticket>` est la commande de reprise : elle lit le pilotage, detecte la phase et deroule jusqu'a la prochaine pause humaine. Release : `/pipe-release` → [merge + deploiement] → `/pipe-tag`.
-
-Deux documents, deux durees de vie — ne jamais les confondre. La **spec** (`docs/specs/<feature>.md`, versionnee) dit ce que la feature **est** ; le **pilotage** (`.claude/plans/plan-<ticket>.md`, gitignore) dit ce qu'on **fait** sur ce ticket, et meurt a la PR. Règle de tri : si une phrase devient fausse une fois le ticket merge, elle n'a rien a faire dans une spec.
+Deux documents, deux durées de vie — ne jamais les confondre. La **spec** (`docs/specs/<feature>.md`, versionnée) dit ce que la feature **est** ; le **pilotage** (`.claude/plans/plan-<ticket>.md`, gitignoré) dit ce qu'on **fait** sur ce ticket, et meurt à la PR. Règle de tri : si une phrase devient fausse une fois le ticket mergé, elle n'a rien à faire dans une spec.
 
 ## Règles
 
-- Les fichiers de `skills/` sont **partages** — distribues via le plugin. `.claude/` porte l'outillage local du repo (create-skill, scripts de check) et n'est jamais distribue
-- Les templates projet-spécifiques sont dans `skills/setup/`, deployes par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
-- **Un script est un fichier, jamais un bloc de code dans un markdown** : les scripts sans variable projet vivent dans `skills/setup/scripts/*.sh` et sont **copies** par `/setup`. Seuls les templates reellement variables (commandes de lint, format, test) restent dans les markdown — le pourquoi est dans `README.md`
-- La qualité est garantie par les **hooks** et les **sub-agents**, jamais par des instructions au LLM. Les garde-fous outilles : `.claude/scripts/check-skills.sh` (budget et cohérence des skills), `skills/setup/scripts/check-specs.sh` (cohérence des specs, lance par `/pipe-review`)
-- Ne jamais mettre de logique spécifique a un projet dans les skills partages
-- Chaque skill est un repertoire `nom/SKILL.md` avec frontmatter obligatoire
-- References entre skills du plugin : `${CLAUDE_SKILL_DIR}/../autre-skill/`. **Toujours un chemin qualifie**, jamais un nom de fichier nu : `Read` exige un chemin absolu, et un nom nu n'est resolvable que depuis le cwd de ce repo — pas depuis un plugin installe
-- Toute ligne ajoutee ici est payee dans **chaque** session : ce fichier reste un aide-memoire operationnel, pas de la documentation
+- Les fichiers de `skills/` sont **partagés** — distribués via le plugin. `.claude/` porte l'outillage local du repo (create-skill, scripts de check) et n'est jamais distribué
+- Les templates projet-spécifiques sont dans `skills/setup/`, déployés par `/setup`. `workflow-config` est la source unique de config projet (plateforme, commandes, stack)
+- **Un script est un fichier, jamais un bloc de code dans un markdown** : la mécanique appelée par les skills vit dans `shared/scripts/` (exécutée depuis le plugin), les hooks sans variable projet dans `hooks/`, les scripts à variable projet dans `skills/setup/scripts/` (copiés par `/setup`). Seuls les templates réellement variables (commandes de lint, format, test) restent dans les markdown — le pourquoi est dans `README.md`
+- La qualité est garantie par les **hooks** et les **agents** (`agents/`), jamais par des instructions au LLM. Outillage local : `.claude/scripts/check-skills.sh` (cohérence des skills), `measure-skills.sh` (graphe de chargement, avant/après toute refonte), `test-hooks.sh` et `test-scripts.sh` (hooks et scripts partagés), `claude plugin eval . --scaffold --allow-tools Bash` (comportement des skills, `evals/`) ; `skills/setup/scripts/check-specs.sh` (cohérence des specs, lancé par `/pipe-review`)
+- **Doctrine d'un skill** : invariant en tête, puces impératives sans justification, 50–80 lignes ; annexe par chemin seulement pour un contenu conditionnel, un seul niveau ; protocole de sub-agent = agent du plugin ; le pourquoi va dans `README.md`, sauf s'il tranche un conflit réel
+- Ne jamais mettre de logique spécifique à un projet dans les skills partagés
+- Chaque skill est un répertoire `nom/SKILL.md` avec frontmatter obligatoire
+- Références entre skills du plugin : `${CLAUDE_SKILL_DIR}/../autre-skill/`. **Toujours un chemin qualifié**, jamais un nom de fichier nu : `Read` exige un chemin absolu, et un nom nu n'est résolvable que depuis le cwd de ce repo — pas depuis un plugin installé
+- Toute ligne ajoutée ici est payée dans **chaque** session : ce fichier reste un aide-mémoire opérationnel, pas de la documentation
 
 ## Renvois
 
-- Ecrire ou modifier un skill : `.claude/skills/create-skill/` (conventions de nommage, frontmatter, seuils de délégation)
-- Commits, branches, Pull Requests : `skills/git-conventions/SKILL.md` — a respecter systematiquement
-- Publier une version : `/pipe-release` puis `/pipe-tag`. **`/pipe-release` ne bump pas `plugin.json`** (logique specifique a ce repo, exclue du skill partage) : entre son etape 3 (CHANGELOG committe) et son etape 4 (push + PR), lancer `.claude/scripts/bump-version.sh X.Y.Z` et committer avant de pousser — jamais editer `version` a la main. Sans ce bump, aucun utilisateur ne recoit quoi que ce soit et `/plugin update` repond « already at the latest version » : panne totale et silencieuse, qu'aucun test ne rattrape. Meme exigence pour la cible d'installation de `marketplace.json` (`repo`, `homepage`, `repository`) : divergente du remote, elle fait installer un autre depot que celui publie
+- Écrire ou modifier un skill : `.claude/skills/create-skill/` (conventions de nommage, frontmatter, seuils de délégation)
+- Commits, branches, Pull Requests : `skills/git-conventions/SKILL.md` — à respecter systématiquement
+- Publier une version : `/pipe-release` puis `/pipe-tag`. **`/pipe-release` ne bump pas `plugin.json`** (logique spécifique à ce repo, exclue du skill partagé) : entre son étape 3 (CHANGELOG committé) et son étape 4 (push + PR), lancer `.claude/scripts/bump-version.sh X.Y.Z` et committer avant de pousser — jamais éditer `version` à la main. Sans ce bump, aucun utilisateur ne reçoit quoi que ce soit et `/plugin update` répond « already at the latest version » : panne totale et silencieuse, qu'aucun test ne rattrape. Même exigence pour la cible d'installation de `marketplace.json` (`repo`, `homepage`, `repository`) : divergente du remote, elle fait installer un autre dépôt que celui publié

@@ -1,113 +1,56 @@
 ---
 name: audit-conformity
-description: Auditer la conformite du code a un document de reference (spec, règle, skill, CLAUDE.md) et planifier la remediation.
-argument-hint: [document de reference] [perimetre optionnel]
+description: Auditer la conformité du code à un document de référence (spec, règle, skill, CLAUDE.md) et planifier la remédiation.
+disable-model-invocation: true
+argument-hint: [document de référence] [périmètre optionnel]
 ---
 
-Ce skill repond a une seule question : **ce que ce document affirme est-il vrai partout dans le code ?** Le document est la loi, le code est le prevenu — jamais l'inverse. Un ecart se tranche a la fin, pas pendant l'audit.
+**Le document est la loi, le code est le prévenu : ce skill ne modifie aucune ligne.** Il produit un rapport de conformité, un plan de remédiation en lots, et propose leur mise en place dans le pipeline.
 
-Il ne modifie aucune ligne de code. Il produit un rapport de conformite, un plan de remediation en lots, et propose leur mise en place dans le pipeline.
+## Étape 0 — Document et périmètre
 
-## Étape 0 — Verifications
+- Un document de référence lisible ; sans argument ou ambigu → inventorie les candidats (`docs/specs/*.md`, `CLAUDE.md`, `.claude/skills/*/SKILL.md`, `skills/*/SKILL.md`) et demande lequel. Un seul document par audit
+- Second argument = périmètre (`src/auth/`, `**/*.tsx`) ; sinon le projet entier
+- Read `.claude/skills/workflow-config/SKILL.md` s'il existe (stack et conventions cadrent le périmètre)
 
-- [ ] Un document de reference est identifie et lisible
-- [ ] Utilise Read pour charger `.claude/skills/workflow-config/SKILL.md` s'il existe (stack et conventions du projet : ils cadrent le perimetre)
+## Étape 1 — Grille de règles (pause)
 
-Sans argument, ou si le document est ambigu, inventorie les candidats (`docs/specs/*.md`, `CLAUDE.md`, `.claude/skills/*/SKILL.md`, `skills/*/SKILL.md`) et demande lequel auditer. **N'en audite jamais plusieurs a la fois** : les grilles se melangeraient et le rapport deviendrait illisible.
+Read `${CLAUDE_SKILL_DIR}/reference.md`, section « Extraction de la grille ». Lis le document en entier, convertis-le en règles atomiques `R1..Rn` (énoncé impératif, portée, citation source), liste à part les intentions non vérifiables. Affiche la grille et attends validation : l'utilisateur corrige les règles mal lues, retire celles qui ne s'appliquent plus, ajoute l'implicite.
 
-Le second argument, optionnel, restreint le perimetre (`src/auth/`, `**/*.tsx`). Sans lui, le perimetre est le projet entier.
+## Étape 2 — Zones
 
-## Étape 1 — Extraire la grille de règles (pause)
+Fichiers du périmètre (Glob) hors dépendances, artefacts de build, fichiers générés, lockfiles, `.git`. Découpe par répertoire ou module, jamais par règle : < 30 fichiers → 2 zones ; 30–150 → 3 à 4 ; > 150 → 5 à 6, au-delà élargis les zones plutôt que leur nombre. Annonce : `Périmètre — N fichiers · G zones · R règles`.
 
-C'est l'étape qui decide de la valeur de tout le reste : des auditeurs lances sur une interpretation fausse produisent un rapport faux, avec conviction.
+## Étape 3 — Audit (fan-out)
 
-Lis le document en entier, puis convertis-le en **règles atomiques numerotees** `R1..Rn` (critère d'atomicite, format de la grille et tri normatif/non-verifiable : `${CLAUDE_SKILL_DIR}/reference.md`, section « Extraction de la grille »).
+Un agent `claude-workflow:auditor` par zone, tous lancés dans un seul message, chacun avec le document, la grille entière et sa zone seule.
 
-Affiche la grille et **attends validation**. L'utilisateur corrige ici les règles mal lues, retire celles qui ne s'appliquent plus, ajoute l'implicite que le document ne dit pas. Sans cette pause, l'audit est une opinion.
+## Étape 4 — Réfutation
 
-## Étape 2 — Cartographier le perimetre
+Regroupe les constats par règle ; un agent `claude-workflow:refuter` par lot, en parallèle, avec les violations du lot, la grille et le document. Les constats réfutés restent dans le rapport, avec leur motif.
 
-Etablis la liste des fichiers concernes (Glob), exclusions comprises : dependances, artefacts de build, fichiers generes, lockfiles, `.git`.
+## Étape 5 — Angles morts
 
-Decoupe-la en **zones equilibrees** par repertoire ou module — jamais par règle : un auditeur qui ne connait qu'une règle rate les interactions entre elles, et relit le meme fichier n fois.
+Un seul agent `claude-workflow:gap-finder` avec la grille, la carte des zones et les rapports agrégés. Trous remontés → une salve ciblée d'auditeurs, une seule : au-delà, c'est la grille qu'il faut revoir.
 
-| Fichiers dans le perimetre | Zones (auditeurs) |
-|---|---|
-| < 30 | 2 |
-| 30 – 150 | 3 a 4 |
-| > 150 | 5 a 6 |
+## Étape 6 — Rapport
 
-Au-dela de 6 zones, elargis chaque zone plutot que le nombre d'agents : la synthese devient le goulot.
+Écris `.claude/audits/audit-<slug>.md` (répertoire créé, dans `.gitignore`) au format de `${CLAUDE_SKILL_DIR}/reference.md`, section « Format du rapport ». À l'écran : le tableau des règles avec leur verdict et le décompte des violations confirmées par sévérité, rien de plus. Conformité totale → une ligne, rapport écrit, stop.
 
-Annonce en une ligne : `Perimetre — N fichiers · G zones · R règles`.
+## Étape 7 — Arbitrage (pause)
 
-## Étape 3 — Auditer (fan-out)
+Par violation confirmée, sévérité décroissante, une décision explicite : corriger le code (→ plan de remédiation), amender le document (la règle est fausse, obsolète ou trop large), ou accepter l'écart avec sa raison, consignée dans le rapport. Rien n'est corrigé ici, même trivial.
 
-Lance **un sub-agent par zone**, tous dans **un seul message** pour qu'ils tournent en parallele. Outil Agent, type `Explore` (read-only : un auditeur ne corrige rien).
+## Étape 8 — Plan de remédiation
 
-Chaque agent recoit la **grille entiere** et **sa zone seule**. Le protocole de l'auditeur — obligation de preuve `fichier:ligne`, verdict par règle, interdiction de signaler du gout — est dans `${CLAUDE_SKILL_DIR}/reference.md`, section « Protocole de l'auditeur » : il s'adresse aux sub-agents, ne le charge jamais dans le contexte principal.
-
-```
-Utilise Read pour charger `[chemin absolu de ${CLAUDE_SKILL_DIR}/reference.md]` et applique la section "Protocole de l'auditeur".
-
-Document de reference : [chemin]
-Ta zone : [liste des fichiers ou glob]
-Grille a vérifier :
-[grille R1..Rn validee a l'étape 1]
-```
-
-## Étape 4 — Refuter (contre-audit)
-
-Une violation non refutee est une violation supposée. Regroupe les constats par règle, et lance **un refutateur par lot** (Agent, `Explore`, en parallele) — pas un par violation, le cout exploserait sans gain.
-
-Sa consigne : **detruire** le constat, pas le confirmer. Quatre sorties possibles — faux positif, exception legitime, règle mal interpretee, **la règle elle-meme est mauvaise**. En cas de doute, le defaut est `refute`. Protocole complet dans `${CLAUDE_SKILL_DIR}/reference.md`, section « Protocole du refutateur ».
-
-Les constats refutes ne disparaissent pas : ils vont dans une section a part du rapport, avec le motif (raison : `${CLAUDE_SKILL_DIR}/reference.md`, section « Format du rapport »).
-
-## Étape 5 — Chasser les angles morts
-
-Un audit se juge autant sur ce qu'il n'a pas vu. Lance **un seul** sub-agent critique (Agent, `Explore`), avec la grille, la carte des zones et les rapports agreges. Sa question : quelle règle n'a jamais ete reellement evaluee, quelle zone n'a ete que survolee, quel faux negatif est probable ? Protocole dans `${CLAUDE_SKILL_DIR}/reference.md`, section « Protocole du critique ».
-
-S'il remonte des trous, lance **une** salve ciblee d'auditeurs dessus, puis passe a la suite. Une seule relance : au-dela, c'est la grille qu'il faut revoir, pas le nombre d'agents.
-
-## Étape 6 — Rapport de conformite
-
-Ecris `.claude/audits/audit-<slug>.md` (crée le repertoire si besoin, verifie qu'il est dans `.gitignore` — un rapport d'audit est ephemere, il n'a pas a être versionne).
-
-Le format du rapport est dans `${CLAUDE_SKILL_DIR}/reference.md`, section « Format du rapport ». A l'ecran, n'affiche que la synthese dense : le tableau des règles avec leur verdict, et le decompte des violations confirmees par sévérité. Le detail est dans le fichier, l'utilisateur l'ouvre s'il le veut.
-
-Conformite totale est un **resultat valide** : le dire en une ligne, ecrire le rapport, et s'arreter la.
-
-## Étape 7 — Arbitrage humain (pause)
-
-Parcours les violations confirmees, par sévérité. Pour chacune, trois issues — et la troisieme compte autant que les autres :
-
-- **Corriger le code** — l'ecart part au plan de remediation
-- **Amender le document** — c'est la règle qui est fausse, obsolete ou trop large ; la correction va dans le document de reference, pas dans le code
-- **Accepter l'ecart** — avec sa raison, consignee dans le rapport ; sans raison ecrite, il reviendra a chaque audit
-
-Ne corrige rien ici, meme trivial : ce skill audite, il n'edite pas. Attends une decision explicite par violation.
-
-## Étape 8 — Plan de remediation et mise en place
-
-Regroupe les ecarts a corriger en **lots cohérents** — par zone du code ou par règle, selon ce qui produit le moins de conflits entre eux — ordonnes par sévérité puis par dependance. Format dans `${CLAUDE_SKILL_DIR}/reference.md`, section « Plan de remediation ».
-
-Chaque lot recoit une route, selon la règle de tri du projet (comportement a valider → cycle ; rien a tester → voie rapide) :
-
-| Nature du lot | Route |
-|---|---|
-| Mecanique, aucun comportement touche | `/pipe-commit` (voie rapide) |
-| Comportement a valider, feature existante | `/pipe-spec` puis le cycle |
-| Chantier a suivre dans le tracker | `/create-issue` |
-
-Puis propose la mise en place et **attends confirmation** :
+Lots selon `${CLAUDE_SKILL_DIR}/reference.md`, section « Plan de remédiation » : par règle (correction mécanique répétée) ou par zone (compréhension du module), ≤ 15 fichiers, ordonnés par sévérité puis dépendance. Route : mécanique sans comportement → `/pipe-commit` (voie rapide) ; comportement à valider → `/pipe-spec` puis le cycle ; chantier à suivre → `/create-issue`.
 
 ```
 Plan — N lots · [x] voie rapide, [y] cycle, [z] issues.
 Je mets en place le lot 1 ([route]) ?
 ```
 
-Enchaine lot par lot, jamais tous d'un coup : chaque lot est un travail complet qui merite son propre cycle.
+Un lot à la fois, chacun avec son propre cycle.
 
 ---
 

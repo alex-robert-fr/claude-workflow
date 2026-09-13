@@ -1,48 +1,45 @@
 ---
 name: create-issue
-description: Creer des issues GitHub structurees depuis une demande : decoupage, critères d'acceptance, labels.
+description: Créer des issues GitHub structurées depuis une demande : découpage, critères d'acceptance, labels.
+disable-model-invocation: true
 argument-hint: [description de ce qu'il faut faire]
+allowed-tools:
+  - Bash(git remote get-url origin)
 ---
 
-## Étape 0 — Verifications
+**En cas de doute, découper : une issue trop petite coûte moins qu'une issue fourre-tout.** Rien n'est créé sans confirmation.
 
-- [ ] Le repo a un remote `origin` configure
-- [ ] L'utilisateur a fourni une description de ce qu'il veut créer
+## Étape 0 — Vérifications
 
-Si une verification echoue, signale-le clairement et arrete-toi.
+Remote `origin` configuré et description fournie ; sinon une ligne, stop. Le repo actif est celui du remote : toutes les issues y vont. Canal : MCP GitHub, sinon `gh issue create` ; ni l'un ni l'autre → une ligne, stop.
 
-## Étape 1 — Détecter le repo courant
+## Étape 1 — Une ou plusieurs issues
 
-Utilise le MCP GitHub pour identifier le repo actif a partir du remote Git (`origin`). Toutes les issues seront créées dans ce repo.
+Séparer si : domaines fonctionnels distincts (auth + dashboard + API = 3 issues si indépendantes) ; bug et feature mélangés ; couches techniques livrables séparément (backend + frontend non couplés) ; charge > 2 jours sur un sujet ; dépendances claires (A avant B). Une seule si : bug isolé à cause et correction claires ; petite feature qui tient en une PR ; éléments trop couplés pour être livrés séparément.
 
-## Étape 2 — Analyser la demande
+## Étape 2 — Rédaction
 
-Lis attentivement ce que l'utilisateur decrit. Evalue si c'est **une seule issue ou plusieurs**.
+Titre `[Type] Description concise` en français — types `[Bug]`, `[Feature]`, `[Refactor]`, `[Chore]`, `[Docs]`, `[Perf]`. Corps :
 
-Si la demande couvre plusieurs domaines ou natures, utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` (règles de decoupage).
+```markdown
+## Contexte
+Pourquoi cette issue existe, ce qui a déclenché le besoin. `Depend de #X` si dépendance.
 
-Principe : en cas de doute, prefere **decouper** — une issue trop petite est moins grave qu'une issue fourre-tout.
+## Description
+Ce qu'il faut faire, précisément.
 
-## Étape 3 — Rediger les issues
+## Critères d'acceptance
+- [ ] Critère
 
-Pour **chaque issue** identifiee, rédige un titre et un body structures.
+## Notes techniques (si pertinent)
+Contraintes, pièges connus, suggestions d'approche.
+```
 
-**Titre** : court, précis, en français. Format : `[Type] Description concise`
-Types : `[Bug]`, `[Feature]`, `[Refactor]`, `[Chore]`, `[Docs]`, `[Perf]`
+Un mécanisme qui bifurque réellement (plusieurs cas d'erreur parallèles) se décrit en diagramme Mermaid plutôt qu'en paragraphe — critères dans `${CLAUDE_SKILL_DIR}/../pipe-spec/template.md`, section Fonctionnement technique.
 
-**Body** : utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` (template body avec sections Contexte, Description, Critères d'acceptance, Notes techniques).
+## Étape 3 — Confirmer puis créer
 
-## Étape 4 — Recapituler avant de créer
-
-Affiche le recap de toutes les issues puis demande confirmation : **"Je crée ces N issues sur GitHub ?"**
-
-## Étape 5 — Creer les issues via MCP GitHub
-
-Une fois confirmation recue, crée chaque issue via le MCP GitHub dans l'ordre logique (dependances d'abord).
-
-- Assigne le label correspondant au type (utilise Read pour charger `${CLAUDE_SKILL_DIR}/reference.md` si besoin de la table de correspondance). Si le label n'existe pas encore sur le repo, crée-le.
-- Si l'issue depend d'une autre, ajoute `Depend de #X` dans la section Contexte du body
-- Affiche l'URL retournee
+Récap de toutes les issues, puis « Je crée ces N issues sur GitHub ? ». Confirmé → création par le canal disponible dans l'ordre des dépendances, label = type en minuscules (`bug`, `feature`, `refactor`, `chore`, `docs`, `perf`), créé s'il manque sur le repo ; affiche chaque URL.
 
 ---
 
