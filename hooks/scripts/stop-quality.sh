@@ -92,7 +92,8 @@ VERDICT=$(CLAUDE_WORKFLOW_JUDGE_ACTIVE=1 claude --safe-mode -p \
   "$PROMPT" 2>/dev/null)
 [ -n "$VERDICT" ] || exit 0
 
-OK=$(printf '%s' "$VERDICT" | jq -r '.structured_output.ok // empty' 2>/dev/null)
+# `// empty` avalerait un `false` (falsy en jq) : le verdict négatif ne serait jamais lu.
+OK=$(printf '%s' "$VERDICT" | jq -r '.structured_output.ok | if . == false then "false" else empty end' 2>/dev/null)
 [ "$OK" = "false" ] || exit 0
 
 RAISON=$(printf '%s' "$VERDICT" | jq -r '.structured_output.raison // "reponse trop longue ou pedagogie a ameliorer"' 2>/dev/null)
