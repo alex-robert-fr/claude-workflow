@@ -7,16 +7,10 @@
 # Garde anti-boucle (stop_hook_active) : si ce hook a deja relance Claude sans qu'il ait pu
 # se corriger, on le laisse s'arreter — meme garde que stop.sh du /setup projet.
 #
-# Garde anti-recursion, deux niveaux : le juge tourne en `--safe-mode`, qui desactive tous
-# les hooks (donc le sien) — la boucle ne peut normalement jamais s'amorcer. En secours,
-# CLAUDE_WORKFLOW_JUDGE_ACTIVE est pose avant l'appel et herite par le process enfant : si
-# jamais son propre Stop s'executait quand meme, il se neutraliserait des la ligne 21.
-#
-# Cout reel : ce juge invoque un modele a chaque reponse substantielle qui le declenche —
-# quelques secondes et quelques centimes par appel (chargement du contexte projet compris,
-# non desactivable sans perdre l'analyse elle-meme). C'est le seul garde-fou de ce plugin a
-# ne pas etre instantane : aucun autre point de la session ne peut juger la pedagogie ou la
-# verbosite d'une reponse en cours de redaction.
+# L'appel du juge (flags, garde anti-récursion) vit dans judge.sh, partagé avec
+# post-edit-comments.sh. Coût réel : ~2,5 s et quelques centimes par réponse substantielle —
+# le seul garde-fou du plugin à ne pas être instantané, et le seul point de la session qui
+# peut juger la pédagogie ou la verbosité d'une réponse avant qu'elle ne soit rendue.
 
 [ -z "$CLAUDE_WORKFLOW_JUDGE_ACTIVE" ] || exit 0
 command -v jq >/dev/null 2>&1 || exit 0
@@ -26,18 +20,23 @@ INPUT=$(cat)
 ACTIVE=$(printf '%s' "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null)
 [ "$ACTIVE" = "true" ] && exit 0
 
-TRANSCRIPT=$(printf '%s' "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)
-[ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] || exit 0
-
-# Dernier message assistant, texte seul (ignore les blocs tool_use/thinking).
-LAST_MSG=$(jq -rs '
-  [.[] | select(.type == "assistant")] | last
-  | (.message.content // [])
-  | map(select(.type == "text") | .text) | join("\n")
-' "$TRANSCRIPT" 2>/dev/null)
+# Claude Code fournit le texte de la dernière réponse dans l'entrée du hook ; le transcript
+# n'est qu'un repli pour les versions antérieures — il n'est pas garanti à jour au moment
+# du Stop.
+LAST_MSG=$(printf '%s' "$INPUT" | jq -r '.last_assistant_message // empty' 2>/dev/null)
+if [ -z "$LAST_MSG" ]; then
+  TRANSCRIPT=$(printf '%s' "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)
+  [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ] || exit 0
+  LAST_MSG=$(jq -rs '
+    [.[] | select(.type == "assistant")] | last
+    | (.message.content // [])
+    | map(select(.type == "text") | .text) | join("\n")
+  ' "$TRANSCRIPT" 2>/dev/null)
+fi
 [ -n "$LAST_MSG" ] || exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$SCRIPT_DIR/judge.sh"
 
 # 1) Accents — deterministe, toujours actif, jamais desactive par le filtre ci-dessous.
 ACCENT_HITS=$(printf '%s' "$LAST_MSG" | "$SCRIPT_DIR/check-accents.sh")
@@ -83,13 +82,7 @@ ok=false, ou pourquoi c'est correct si ok=true.
 $LAST_MSG
 </extrait>"
 
-VERDICT=$(CLAUDE_WORKFLOW_JUDGE_ACTIVE=1 claude --safe-mode -p \
-  --model claude-haiku-4-5-20251001 \
-  --effort low \
-  --system-prompt "$SYS_PROMPT" \
-  --output-format json \
-  --json-schema "$SCHEMA" \
-  "$PROMPT" 2>/dev/null)
+VERDICT=$(judge "$SYS_PROMPT" "$PROMPT" "$SCHEMA")
 [ -n "$VERDICT" ] || exit 0
 
 # `// empty` avalerait un `false` (falsy en jq) : le verdict négatif ne serait jamais lu.

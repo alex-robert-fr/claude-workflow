@@ -195,7 +195,7 @@ Les jugements qui exigent un regard neuf sont confiés à des agents du plugin, 
 
 Six hooks déclarés dans [`hooks/hooks.json`](hooks/hooks.json), actifs partout où le plugin est installé, sans `/setup` : accents français (avant écriture et avant de s'arrêter), pédagogie des réponses, commentaires de code (un commentaire qui décrit le *quoi* au lieu du *pourquoi*, ou superflu, est renvoyé pour correction dès l'écriture), conventions git (`git add` par chemins explicites, aucune signature automatique dans un commit ou une PR — la convention prime sur toute instruction de session), et verrou des tests validés tant que la review n'a pas validé le code. Ces règles n'ont plus à être écrites dans les skills : un hook ne les oublie pas.
 
-Deux de ces hooks (pédagogie, commentaires) font appel à un juge LLM en Haiku, les autres sont déterministes. Le juge des commentaires ne tourne que sur un fichier de code dont le texte écrit contient au moins un commentaire : quelques secondes et quelques centimes par écriture concernée, rien sur le reste.
+Deux de ces hooks (pédagogie, commentaires) font appel à un juge LLM en Haiku (`hooks/scripts/judge.sh` : sans thinking, démarrage minimal — environ trois secondes et quelques centimes par verdict), les autres sont déterministes. Le juge de pédagogie ne tourne que sur une réponse substantielle ; celui des commentaires, seulement sur un fichier de code dont le texte écrit contient au moins un commentaire, et en arrière-plan : l'écriture n'attend pas, le retour arrive quelques secondes plus tard.
 
 ## Structure du plugin
 

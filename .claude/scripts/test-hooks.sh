@@ -1,7 +1,7 @@
 #!/bin/bash
-# Rejoue les hooks git/tests/commentaires du plugin (hooks/scripts/pre-git-guard.sh,
-# protect-tests.sh et post-edit-comments.sh) sur des entrées JSON simulées, sans Claude
-# Code. Le juge LLM de post-edit-comments.sh est remplacé par un faux binaire `claude`
+# Rejoue les hooks git/tests/commentaires/Stop du plugin (hooks/scripts/pre-git-guard.sh,
+# protect-tests.sh, post-edit-comments.sh, stop-quality.sh) sur des entrées JSON simulées, sans Claude
+# Code. Le juge LLM (judge.sh) est remplacé par un faux binaire `claude`
 # dont le verdict est piloté par FAKE_VERDICT : on teste le filtre et le câblage, pas
 # le jugement lui-même.
 # Outillage LOCAL, jamais distribué — à lancer après toute modification de ces
@@ -94,8 +94,10 @@ echo "== post-edit-comments =="
 FAKE=$(mktemp -d)
 cat > "$FAKE/claude" <<'FAKECLI'
 #!/bin/bash
-# Faux juge : le verdict vient de FAKE_VERDICT (ok | ko | muet), et il note qu'il a été appelé.
+# Faux juge : le verdict vient de FAKE_VERDICT (ok | ko | muet) ; il note qu'il a été
+# appelé, et avec quels flags.
 echo called >> "$FAKE_LOG"
+printf '%s\n' "$@" "MAX_THINKING_TOKENS=${MAX_THINKING_TOKENS-absent}" >> "$FAKE_LOG.args"
 case "$FAKE_VERDICT" in
   ok)   echo '{"structured_output":{"ok":true,"commentaires":[]}}' ;;
   ko)   echo '{"structured_output":{"ok":false,"commentaires":[{"commentaire":"// incrémente i","raison":"paraphrase du code"}]}}' ;;
@@ -124,6 +126,29 @@ t "juge muet → 0"                  0 "$C" "$(write_json src/a.ts "$AVEC")"
 export FAKE_VERDICT=ko
 out=$(printf '%s' "$(write_json src/a.ts "$AVEC")" | CLAUDE_WORKFLOW_JUDGE_ACTIVE=1 bash "$C" 2>&1 >/dev/null); code=$?
 [ "$code" = 0 ] && echo "ok   CLAUDE_WORKFLOW_JUDGE_ACTIVE neutralise" || { echo "FAIL CLAUDE_WORKFLOW_JUDGE_ACTIVE (exit $code)"; status=1; }
+# Les flags d'allègement du démarrage (judge.sh) sont ce qui tient la latence : un retrait
+# silencieux rendrait chaque jugement deux fois plus lent sans qu'aucun test ne le voie.
+for flag in --safe-mode --strict-mcp-config --no-session-persistence --disable-slash-commands MAX_THINKING_TOKENS=0; do
+  grep -q -- "$flag" "$FAKE_LOG.args" || { echo "FAIL juge appelé sans $flag"; status=1; }
+done
+grep -q -- '--strict-mcp-config' "$FAKE_LOG.args" && echo "ok   juge appelé avec les flags d'allègement"
+
+echo "== stop-quality =="
+S="$ROOT/hooks/scripts/stop-quality.sh"
+stop_json() { jq -cn --arg m "$1" '{hook_event_name:"Stop",stop_hook_active:false,last_assistant_message:$m}'; }
+LONG=$(printf 'Voici une explication détaillée et très longue du choix technique retenu. %.0s' $(seq 1 12))
+export FAKE_VERDICT=ko
+: > "$FAKE_LOG"
+t "réponse courte sans question → 0"    0 "$S" "$(stop_json 'Fait.')"
+[ -s "$FAKE_LOG" ] && { echo "FAIL juge appelé sur une réponse courte"; status=1; } || echo "ok   juge non appelé sur une réponse courte"
+t "accent manquant → renvoyé"           2 "$S" "$(stop_json 'Le fichier existe deja.')"
+t "réponse longue, verdict ko → 2"      2 "$S" "$(stop_json "$LONG")"
+t "stop_hook_active → 0"                0 "$S" "$(jq -cn --arg m "$LONG" '{stop_hook_active:true,last_assistant_message:$m}')"
+export FAKE_VERDICT=ok
+t "réponse longue, verdict ok → 0"      0 "$S" "$(stop_json "$LONG")"
+TR="$FAKE/transcript.jsonl"
+jq -cn '{type:"assistant",message:{content:[{type:"text",text:"Le fichier existe deja."}]}}' > "$TR"
+t "repli transcript sans last_assistant_message" 2 "$S" "$(jq -cn --arg p "$TR" '{stop_hook_active:false,transcript_path:$p}')"
 rm -rf "$FAKE"
 
 [ $status -eq 0 ] && echo "Hooks : OK" || echo "Hooks : ÉCHEC"

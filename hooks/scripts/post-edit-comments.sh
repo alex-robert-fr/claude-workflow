@@ -8,20 +8,19 @@
 # YAML et tout fichier sans commentaire ne déclenchent rien : le juge coûte quelques
 # secondes et quelques centimes, il ne tourne que quand il a quelque chose à juger.
 #
-# Juge LLM imbriqué (même mécanique que stop-quality.sh) : `claude --safe-mode -p` en
-# Haiku, sortie structurée, cadrage strict pour que l'extrait soit noté et jamais exécuté.
-# Le juge ne voit que le texte écrit, pas le fichier entier : un commentaire qui justifie
-# un choix hors de l'extrait peut paraître orphelin — d'où la consigne « seulement si net ».
+# Juge LLM imbriqué (judge.sh, partagé avec stop-quality.sh) : Haiku, sortie structurée,
+# cadrage strict pour que l'extrait soit noté et jamais exécuté. Le juge ne voit que le
+# texte écrit, pas le fichier entier : un commentaire qui justifie un choix hors de
+# l'extrait peut paraître orphelin — d'où la consigne « seulement si net ».
 #
-# Garde anti-récursion : CLAUDE_WORKFLOW_JUDGE_ACTIVE est posé avant l'appel et hérité par
-# le juge ; `--safe-mode` désactive de toute façon ses hooks.
-#
-# Sémantique PostToolUse : l'écriture a déjà eu lieu. Exit 2 ne l'annule pas, il transmet
-# STDERR à Claude comme retour à traiter — c'est exactement le canal voulu ici.
+# Déclaré `asyncRewake` dans hooks.json : l'écriture n'attend pas le juge. Exit 0 ne produit
+# rien ; exit 2 réveille Claude avec STDERR comme retour à traiter, qu'il soit encore en
+# train de travailler ou déjà arrêté — l'écriture a eu lieu, le retour est un correctif.
 
 [ -z "$CLAUDE_WORKFLOW_JUDGE_ACTIVE" ] || exit 0
 command -v jq >/dev/null 2>&1 || exit 0
 command -v claude >/dev/null 2>&1 || exit 0
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/judge.sh"
 
 INPUT=$(cat)
 TOOL=$(printf '%s' "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
@@ -78,13 +77,7 @@ chaque commentaire signalé : son texte exact (commentaire) et le défaut en une
 $EXTRAIT
 </extrait>"
 
-VERDICT=$(CLAUDE_WORKFLOW_JUDGE_ACTIVE=1 claude --safe-mode -p \
-  --model claude-haiku-4-5-20251001 \
-  --effort low \
-  --system-prompt "$SYS_PROMPT" \
-  --output-format json \
-  --json-schema "$SCHEMA" \
-  "$PROMPT" 2>/dev/null)
+VERDICT=$(judge "$SYS_PROMPT" "$PROMPT" "$SCHEMA")
 [ -n "$VERDICT" ] || exit 0
 
 # `// empty` avalerait un `false` (falsy en jq) : le verdict négatif ne serait jamais lu.
