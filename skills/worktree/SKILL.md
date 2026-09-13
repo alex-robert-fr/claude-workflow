@@ -1,6 +1,6 @@
 ---
 name: worktree
-description: Creer, lister, supprimer et basculer entre worktrees git pour travailler en parallele sur plusieurs branches.
+description: Créer, lister, supprimer et basculer entre worktrees git pour travailler en parallèle sur plusieurs branches.
 disable-model-invocation: true
 argument-hint: [create|list|remove|switch] [branche]
 allowed-tools:

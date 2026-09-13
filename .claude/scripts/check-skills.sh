@@ -12,6 +12,7 @@
 #     depuis le cwd de ce repo, pas depuis un plugin installe
 #   - un skill invocable sans $ARGUMENTS : l'argument utilisateur est perdu
 #   - un skill que le modèle peut invoquer seul : tous ont des effets de bord
+#   - un mot sans accent dans ce que le modèle lit à chaque session
 #   - un corps trop long sans fichier support : le seuil de delegation n'est pas tenu
 #   - le diagramme du pipeline divergent entre ses trois copies
 
@@ -161,5 +162,21 @@ for f in "$ROOT"/skills/*/*.md "$ROOT"/shared/*.md "$ROOT"/agents/*.md; do
   done < <(grep -oE '\$\{CLAUDE_SKILL_DIR\}/[^` )"]+\.(md|sh|json)' "$f" | sort -u)
 done
 
-[ $status -eq 0 ] && echo "Skills : coherents"
+# 8. Accents dans ce que le modèle lit à chaque session : frontmatters des skills et des
+# agents, CLAUDE.md, rappel de session-prime.sh. Le plugin exige les accents ; un
+# contre-exemple dans ces sources est le premier texte vu par le modèle.
+ACC="$ROOT/hooks/scripts/check-accents.sh"
+if [ -x "$ACC" ]; then
+  for f in "$ROOT"/skills/*/SKILL.md "$ROOT"/agents/*.md; do
+    [ -f "$f" ] || continue
+    hits=$(awk 'NR == 1 { next } /^---$/ { exit } { print }' "$f" | "$ACC" | paste -sd' ' -)
+    [ -z "$hits" ] || { echo "ACCENTS ${f#"$ROOT"/} — frontmatter : $hits"; status=1; }
+  done
+  hits=$("$ACC" < "$ROOT/CLAUDE.md" | paste -sd' ' -)
+  [ -z "$hits" ] || { echo "ACCENTS CLAUDE.md : $hits"; status=1; }
+  hits=$(bash "$ROOT/hooks/scripts/session-prime.sh" | jq -r '.hookSpecificOutput.additionalContext' | "$ACC" | paste -sd' ' -)
+  [ -z "$hits" ] || { echo "ACCENTS session-prime.sh — rappel : $hits"; status=1; }
+fi
+
+[ $status -eq 0 ] && echo "Skills : cohérents"
 exit $status

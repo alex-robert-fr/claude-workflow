@@ -1,8 +1,8 @@
 ---
 name: pipe-review
-description: Reviewer le code en session dediee : checks outilles, agent, review humaine, fraicheur de la spec. Apres /pipe-code.
+description: Reviewer le code en session dédiée : checks outillés, agent, review humaine, fraîcheur de la spec. Après /pipe-code.
 disable-model-invocation: true
-argument-hint: [cle du ticket ou rien si un seul cycle en cours]
+argument-hint: [clé du ticket ou rien si un seul cycle en cours]
 allowed-tools:
   - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
   - Bash(bash .claude/scripts/check-specs.sh)

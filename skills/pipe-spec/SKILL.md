@@ -1,8 +1,8 @@
 ---
 name: pipe-spec
-description: Cadrer une feature dans une spec durable et versionnee (docs/specs/) avant le dev. Sans argument, inventorier l'existant.
+description: Cadrer une feature dans une spec durable et versionnée (docs/specs/) avant le dev. Sans argument, inventorier l'existant.
 disable-model-invocation: true
-argument-hint: [cle JIRA, numéro issue, URL, nom de feature, ou rien pour inventorier l'existant]
+argument-hint: [clé JIRA, numéro issue, URL, nom de feature, ou rien pour inventorier l'existant]
 allowed-tools:
   - Bash(bash .claude/scripts/check-specs.sh)
   - Bash(git remote get-url origin)

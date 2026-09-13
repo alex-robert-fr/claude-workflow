@@ -1,8 +1,8 @@
 ---
 name: pipe-ship
-description: Reprendre le cycle d'un ticket : lit le pilotage, detecte la phase, deroule jusqu'a la prochaine pause humaine.
+description: Reprendre le cycle d'un ticket : lit le pilotage, détecte la phase, déroule jusqu'à la prochaine pause humaine.
 disable-model-invocation: true
-argument-hint: [cle du ticket ou rien pour détecter le cycle en cours]
+argument-hint: [clé du ticket ou rien pour détecter le cycle en cours]
 allowed-tools:
   - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
   - Bash(bash .claude/scripts/check-specs.sh)

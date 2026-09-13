@@ -1,6 +1,6 @@
 ---
 name: create-issue
-description: Creer des issues GitHub structurees depuis une demande : decoupage, critères d'acceptance, labels.
+description: Créer des issues GitHub structurées depuis une demande : découpage, critères d'acceptance, labels.
 disable-model-invocation: true
 argument-hint: [description de ce qu'il faut faire]
 allowed-tools:

@@ -1,6 +1,6 @@
 ---
 name: pipe-tag
-description: Creer et pousser le tag git annote d'une release, apres merge de la PR et deploiement.
+description: Créer et pousser le tag git annoté d'une release, après merge de la PR et déploiement.
 disable-model-invocation: true
 argument-hint: "[v1.2.3]"
 allowed-tools:

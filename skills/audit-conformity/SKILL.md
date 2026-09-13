@@ -1,8 +1,8 @@
 ---
 name: audit-conformity
-description: Auditer la conformite du code a un document de reference (spec, règle, skill, CLAUDE.md) et planifier la remediation.
+description: Auditer la conformité du code à un document de référence (spec, règle, skill, CLAUDE.md) et planifier la remédiation.
 disable-model-invocation: true
-argument-hint: [document de reference] [perimetre optionnel]
+argument-hint: [document de référence] [périmètre optionnel]
 ---
 
 **Le document est la loi, le code est le prévenu : ce skill ne modifie aucune ligne.** Il produit un rapport de conformité, un plan de remédiation en lots, et propose leur mise en place dans le pipeline.

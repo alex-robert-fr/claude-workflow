@@ -1,6 +1,6 @@
 ---
 name: pipe-release
-description: Preparer une release : CHANGELOG métier, puis PR de la branche d'integration vers la production.
+description: Préparer une release : CHANGELOG métier, puis PR de la branche d'intégration vers la production.
 disable-model-invocation: true
 argument-hint: "[version cible ex: 0.5.2, ou rien pour détecter]"
 allowed-tools:

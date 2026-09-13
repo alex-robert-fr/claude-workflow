@@ -1,18 +1,20 @@
 #!/bin/bash
-# Detecteur d'accents francais manquants (substitution ASCII) — deterministe, aucun LLM.
-# Recoit le texte a verifier sur stdin, imprime les mots suspects trouves (un par ligne,
-# "mot" -> "correction"). Exit 0 si rien trouve, exit 1 si au moins un mot signale.
+# Détecteur d'accents français manquants (substitution ASCII) — déterministe, aucun LLM.
+# Reçoit le texte à vérifier sur stdin, imprime les mots suspects trouvés (un par ligne,
+# "mot" -> "correction"). Exit 0 si rien trouvé, exit 1 si au moins un mot signalé.
 #
 # Volontairement conservateur : seuls des mots dont la forme sans accent ne collisionne
-# jamais avec un mot anglais, un identifiant de code ou une autre forme francaise correcte
-# sont surveilles. Deux exclusions notables, trouvees par sondage sur ce depot :
+# jamais avec un mot anglais, un identifiant de code ou une autre forme française correcte
+# sont surveillés. Deux exclusions notables, trouvées par sondage sur ce dépôt :
 #   - "reference" : mot anglais courant (reference.md, "cross-reference"...), la forme
-#     francaise correcte cohabite avec des usages anglais legitimes partout dans ce repo
-#   - "decision"/"utilise" : "utilise" est correct sans accent a l'imperatif ("utilise Read
-#     pour charger" — convention de ce depot) ; "decision" est deja utilise sans accent dans
-#     une grande partie du corpus existant (a corriger a part, pas par ce garde-fou)
-# Cette liste s'etend au besoin : un mot ajoute ici doit d'abord etre sonde sur le corpus
-# existant pour eviter un nouveau faux positif systemique.
+#     française correcte cohabite avec des usages anglais légitimes partout dans ce repo
+#   - "decision"/"utilise" : "utilise" est correct sans accent à l'impératif ("utilise Read
+#     pour charger" — convention de ce dépôt) ; "decision" est encore écrit sans accent dans
+#     une grande partie du corpus existant (à corriger à part, pas par ce garde-fou)
+# Cette liste s'étend au besoin : un mot ajouté ici doit d'abord être sondé sur le corpus
+# existant pour éviter un nouveau faux positif systémique. Seconde salve (1.9.0) : mots
+# sans homographe anglais — écartés pour cette raison : detail, verification, coherent,
+# precis, resume, recap, implementer, verifies, decoupage, execute, schema, element.
 #
 # Usage : printf '%s' "$TEXTE" | check-accents.sh
 
@@ -58,6 +60,52 @@ WORDS=(
   "procedures:procédures"
   "periode:période"
   "periodes:périodes"
+  "creer:créer"
+  "generer:générer"
+  "preparer:préparer"
+  "decouper:découper"
+  "ecrire:écrire"
+  "reponse:réponse"
+  "reponses:réponses"
+  "dediee:dédiée"
+  "guidee:guidée"
+  "apres:après"
+  "detecte:détecte"
+  "deroule:déroule"
+  "versionnee:versionnée"
+  "parallele:parallèle"
+  "conformite:conformité"
+  "regle:règle"
+  "regles:règles"
+  "outilles:outillés"
+  "recapitulatif:récapitulatif"
+  "cle:clé"
+  "critere:critère"
+  "criteres:critères"
+  "redige:rédige"
+  "rediger:rédiger"
+  "reecrit:réécrit"
+  "specifie:spécifie"
+  "genere:génère"
+  "pedagogie:pédagogie"
+  "pedagogique:pédagogique"
+  "implemente:implémente"
+  "defaut:défaut"
+  "demarrage:démarrage"
+  "demarre:démarre"
+  "memoire:mémoire"
+  "dependance:dépendance"
+  "dependances:dépendances"
+  "etape:étape"
+  "etapes:étapes"
+  "deploiement:déploiement"
+  "mecanique:mécanique"
+  "resultat:résultat"
+  "modele:modèle"
+  "verifie:vérifie"
+  "equipe:équipe"
+  "operationnel:opérationnel"
+  "requete:requête"
 )
 
 TEXT=$(cat)

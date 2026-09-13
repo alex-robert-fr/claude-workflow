@@ -1,8 +1,8 @@
 ---
 name: pipe-pr
-description: Creer ou mettre a jour une Pull Request : titre, description, commentaire d'iteration. Apres /pipe-commit.
+description: Créer ou mettre à jour une Pull Request : titre, description, commentaire d'itération. Après /pipe-commit.
 disable-model-invocation: true
-argument-hint: [rien — detecte automatiquement la branche courante]
+argument-hint: [rien — détecte automatiquement la branche courante]
 allowed-tools:
   - Bash(bash "${CLAUDE_SKILL_DIR}/../../shared/scripts/find-plan.sh" *)
   - Bash(git status *)

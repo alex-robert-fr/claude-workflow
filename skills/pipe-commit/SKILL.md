@@ -1,6 +1,6 @@
 ---
 name: pipe-commit
-description: Decouper le travail en commits-changesets qui servent de doc technique, selon les conventions git.
+description: Découper le travail en commits-changesets qui servent de doc technique, selon les conventions git.
 disable-model-invocation: true
 argument-hint: [description optionnelle du changement]
 allowed-tools:

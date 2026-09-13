@@ -1,8 +1,8 @@
 ---
 name: pipe-plan
-description: Co-construire le plan d'un ticket (Jira, GitHub, GitLab, Gitea) par questions/reponses, et tenir le pilotage.
+description: Co-construire le plan d'un ticket (Jira, GitHub, GitLab, Gitea) par questions/réponses, et tenir le pilotage.
 disable-model-invocation: true
-argument-hint: [cle JIRA, numéro issue, URL ou texte]
+argument-hint: [clé JIRA, numéro issue, URL ou texte]
 allowed-tools:
   - Bash(git remote get-url origin)
   - Bash(git log *)
